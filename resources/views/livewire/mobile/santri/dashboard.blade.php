@@ -12,7 +12,7 @@
                 @endif
             </div>
             <div class="">
-                <h class="mb-0 text-dark fw-bold">Halo, {{ explode(' ', auth()->user()->name)[0] }}!</h>
+                <h class="mb-0 text-dark fw-bold">Halo, {{ explode(' ', Auth::guard('santri')->user()->nama)[0] }}!</h>
                 <p class="m-0 mt-1"><span class="badge bg-primary">{{ $profile?->kelas->nama ?? '-' }}</span></p>
             </div>
         </div>

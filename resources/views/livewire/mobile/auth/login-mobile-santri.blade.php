@@ -14,10 +14,6 @@
                 <div class="form-control-icon">
                     <i class="bi bi-person"></i>
                 </div>
-
-                @if ($errors->has('nisn'))
-                    <small class="text-danger">{{ $errors->first('nisn') }}</small>
-                @endif
             </div>
 
             <div x-data="{ show: false }" class="form-group position-relative has-icon-left mb-3">
@@ -29,12 +25,9 @@
                 <div class="form-control-icon" style="left:auto; right:0; cursor: pointer;" @click="show = !show">
                     <i :class="!show ? 'bi-eye-slash' : 'bi-eye'"></i>
                 </div>
-                @if ($errors->has('password'))
-                    <small class="text-danger">{{ $errors->first('password') }}</small>
-                @endif
             </div>
 
-            @error('error')
+            @error('credentials')
                 <div class="alert alert-danger mt-3 text-center">
                     Login gagal, password atau NISN salah.
                 </div>

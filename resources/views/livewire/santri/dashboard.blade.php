@@ -3,7 +3,7 @@
     <div class="mb-md-3 d-flex md-2">
         <img class="bg-secondary" src="" alt="">
         <div class="">
-            <h2 class="fw-bold text-dark">Selamat Datang, {{ explode(' ', auth()->user()->name)[0] }}</h2>
+            <h2 class="fw-bold text-dark">Selamat Datang, {{ explode(' ', Auth::guard('santri')->user()->nama)[0] }}</h2>
         </div>
     </div>
     <!-- Dashboard Grid -->
@@ -20,15 +20,11 @@
                     </div>
                     <div class="mt-4">
                         <h6 class="mb-2 ">Nama Lengkap</h6>
-                        <p class="fw-medium">{{ auth()->user()->name ?? '-' }}</p>
-                    </div>
-                    <div class="mt-3">
-                        <h6 class="mb-2 ">Email</h6>
-                        <p class="fw-medium">{{ auth()->user()->email ?? '-' }}</p>
+                        <p class="fw-medium">{{ Auth::guard('santri')->user()->nama ?? '-' }}</p>
                     </div>
                     <div class="mt-3">
                         <h6 class="mb-2 ">Password</h6>
-                        <p class="fw-medium">{{ auth()->user()->password ?? '-' }}</p>
+                        <p class="fw-medium">{{ Auth::guard('santri')->user()->password ?? '-' }}</p>
                     </div>
                     <div class="mt-3">
                         <h6 class="mb-2 ">Jenjang</h6>

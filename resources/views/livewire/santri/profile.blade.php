@@ -5,22 +5,18 @@
                 <div class="card-body">
                     <div class="d-flex align-items-center justify-content-between">
                         <h3 class="card-title">Data Pribadi</h3>
-                        <button class="btn btn-dark" wire:click='edit("{{  auth()->user()->id }}")' data-bs-target='#santriProfile'
+                        <button class="btn btn-dark" wire:click='edit("{{  Auth::guard('santri')->user()->id }}")' data-bs-target='#santriProfile'
                             data-bs-toggle="modal">
                             Edit Profile
                         </button>
                     </div>
                     <div class="mt-4">
                         <h6 class="mb-2 ">Nama Lengkap</h6>
-                        <p class="fw-medium">{{ auth()->user()->name }}</p>
-                    </div>
-                    <div class="mt-3">
-                        <h6 class="mb-2 ">Email</h6>
-                        <p class="fw-medium">{{ auth()->user()->email }}</p>
+                        <p class="fw-medium">{{ Auth::guard('santri')->user()->nama }}</p>
                     </div>
                     <div class="mt-3">
                         <h6 class="mb-2 ">Password</h6>
-                        <p class="fw-medium">{{ auth()->user()->password }}</p>
+                        <p class="fw-medium">{{ Auth::guard('santri')->user()->password }}</p>
                     </div>
                     <div class="mt-3">
                         <h6 class="mb-2 ">Jenjang</h6>
@@ -83,10 +79,10 @@
                 <form wire:submit.prevent='updateProfileSantri'>
                     <div class="modal-body">
                         <div class="mb-2">
-                            <label for="email" class="form-label text-dark">Email</label>
-                            <input type="text" class="form-control" id="email" wire:model.live="userForm.email"
-                                placeholder="Email" required>
-                            @error('userForm.email')
+                            <label for="nama" class="form-label text-dark">Nama</label>
+                            <input type="text" class="form-control" id="nama" wire:model.live="nama"
+                                placeholder="Nama Lengkap" required>
+                            @error('nama')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
@@ -94,14 +90,14 @@
                             <label for="password" class="form-label text-dark">Password</label>
                             <div class="form-group position-relative">
                                 <input type="{{ $showPassword ? 'text' : 'password' }}" class="form-control"
-                                    id="password" wire:model.live="userForm.password" placeholder="Password">
+                                    id="password" wire:model.live="password" placeholder="Password">
                                 <div wire:click="$toggle('showPassword')"
                                     class="form-control-icon me-2 position-absolute"
                                     style="left:auto; right:0; cursor: pointer;">
                                     <i class="bi {{ $showPassword ? 'bi-eye-slash' : 'bi-eye' }}"></i>
                                 </div>
                             </div>
-                            @error('userForm.password')
+                            @error('password')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>
