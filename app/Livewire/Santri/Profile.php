@@ -35,7 +35,8 @@ class Profile extends Component
 
     public function close()
     {
-        $this->userForm->reset();
+        $this->nama = '';
+        $this->password = '';
     }
 
     public function updateProfileSantri()
