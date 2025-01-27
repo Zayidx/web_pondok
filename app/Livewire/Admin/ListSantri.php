@@ -110,13 +110,6 @@ class ListSantri extends Component
         $waliSantriData['santri_id'] = $santri->id;
         OrangTuaSantri::create($waliSantriData);
 
-        User::create([
-            'roles_id' => 6,
-            'email' => $this->santriForm->nisn,
-            'name' => $this->santriForm->nama,
-            'password' => Hash::make($this->santriForm->nisn),
-        ]);
-
         return to_route('admin.master-santri.santri')->with(['message' => "Success created " . $this->santriForm->nama . " !"]);
     }
 
@@ -130,7 +123,7 @@ class ListSantri extends Component
         // Data Wali dan Data Alamat
         $waliData = OrangTuaSantri::where('santri_id', $santriId)->first();
 
-        $this->user = User::where('email', $santriData->nisn)->first();
+        // $this->user = User::where('email', $santriData->nisn)->first();
 
         $this->foto = $santriData->foto;
         $this->santriForm->nama = $santriData->nama;
@@ -222,12 +215,12 @@ class ListSantri extends Component
         OrangTuaSantri::where('santri_id', $this->santriEditId)
             ->update($this->waliSantriForm->all());
 
-        $this->user->update([
-            'roles_id' => 6,
-            'email' => $this->santriForm->nisn,
-            'name' => $this->santriForm->nama,
-            'password' => Hash::make($this->santriForm->nisn),
-        ]);
+        // $this->user->update([
+        //     'roles_id' => 6,
+        //     'email' => $this->santriForm->nisn,
+        //     'name' => $this->santriForm->nama,
+        //     'password' => Hash::make($this->santriForm->nisn),
+        // ]);
 
         return to_route('admin.master-santri.santri')
             ->with(['message' => "Success updated " . $santri->nama . " !"]);

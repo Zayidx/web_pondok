@@ -5,11 +5,14 @@ namespace App\Models;
 use App\Models\admin\Angkatan;
 use App\Models\admin\Semester;
 use App\Models\Cashless\LaundryOrder;
+use App\Models\ESantri\JadwalPiket;
 use App\Models\Spp\Pembayaran;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\Hash;
 
-class Santri extends Model
+class Santri extends Authenticatable
 {
     use HasFactory;
 
@@ -18,6 +21,7 @@ class Santri extends Model
         'foto',
         'nama',
         'nisn',
+        'password',
         'nism',
         'kewarganegaraan',
         'nik',
@@ -38,6 +42,7 @@ class Santri extends Model
         'status_santri',
         'asal_sekolah',
         'yang_membiayai_sekolah',
+        'password',
 
         'kelas_id',
         'kamar_id',
@@ -45,10 +50,31 @@ class Santri extends Model
         'angkatan_id',
     ];
 
-    public function user()
+    protected static function boot()
     {
-        return $this->belongsTo(User::class, 'nisn', 'email');
+        parent::boot();
+
+        static::creating(function ($santri) {
+            if (empty($santri->password)) {
+                $santri->password = Hash::make($santri->nisn);
+            }
+        });
+
+        static::updating(function ($santri) {
+            if ($santri->isDirty('nisn')) {
+                $santri->password = Hash::make($santri->nisn);
+            }
+        });
     }
+
+    public function getAuthIdentifierName()
+    {
+        return 'nisn';
+    }
+
+    protected $hidden = [
+        'password',
+    ];
 
     public function kelas()
     {
