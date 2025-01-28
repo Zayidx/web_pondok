@@ -18,7 +18,7 @@
         <div x-data="{ show: false }" class="form-group position-relative has-icon-left mb-3">
             <input required :type="show ? 'text' : 'password'" class="form-control form-control-xl"
                 placeholder="Password" wire:model='password'>
-            <div class="form-control-ico n" style="cursor: pointer;">
+            <div class="form-control-icon" style="cursor: pointer;">
                 <i class="bi bi-shield-lock"></i>
             </div>
             <div class="form-control-icon" style="left:auto; right:0; cursor: pointer;" @click="show = !show">

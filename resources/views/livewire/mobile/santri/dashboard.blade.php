@@ -3,8 +3,8 @@
         <div class="d-flex align-items-center gap-3">
             <div class="position-relative" style="width: 60px; height: 60px;">
                 @if ($profile && $profile->foto)
-                    <img class="img-fluid rounded-circle" src="{{ Storage::url($profile->foto) }}"
-                        alt="" style="object-fit: cover; width: 100%; height: 100%;">
+                    <img class="img-fluid rounded-circle" src="{{ Storage::url($profile->foto) }}" alt=""
+                        style="object-fit: cover; width: 100%; height: 100%;">
                 @else
                     <img class="img-fluid rounded-circle"
                         src="https://a.storyblok.com/f/191576/1200x800/a3640fdc4c/profile_picture_maker_before.webp"
@@ -99,37 +99,31 @@
             <div class="d-flex mb-3 align-items-center justify-content-between">
                 <h6 class="card-title text-dark">Jadwal Hari Ini</h6>
                 <div class="form-group">
-                    <select class="form-control form-control-sm" name="" id="">
-                        <option>Senin</option>
-                        <option>Selasa</option>
-                        <option>Rabu</option>
-                        <option>Kamis</option>
-                        <option>Jum'at</option>
+                    <select wire:model.live='jadwalHari' class="form-control form-control-md" name=""
+                        id="">
+                        <option value="Senin">Senin</option>
+                        <option value="Selasa">Selasa</option>
+                        <option value="Rabu">Rabu</option>
+                        <option value="Kamis">Kamis</option>
+                        <option value="Jumat">Jum'at</option>
+                        <option value="Sabtu">Sabtu</option>
+                        <option value="Minggu">Minggu</option>
                     </select>
-                </div>
+                </div> 
             </div>
             <div class="d-flex flex-column gap-md-3 gap-2">
-                <div class="d-flex justify-content-between align-items-center pb-2 rounded">
-                    <div>
-                        <h6 class="fw-medium text-dark mb-2">Tahfidz</h6>
-                        <p class="card-subtitle text-dark mb-0">04:30 - 06:00</p>
+                @forelse ($this->getMataPelajaran() ?? [] as $mapel)
+                    <div class="d-flex justify-content-between align-items-center pb-2 rounded">
+                        <div>
+                            <h6 class="fw-medium text-dark mb-2">{{ $mapel->mata_pelajaran }}</h6>
+                            <p class="card-subtitle text-sm text-dark mb-0">
+                                {{ \Carbon\Carbon::parse($mapel->waktu_mulai)->format('H:i') }} -
+                                {{ \Carbon\Carbon::parse($mapel->waktu_selesai)->format('H:i') }}</p>
+                        </div>
                     </div>
-                    <span class="badge bg-success">Sekarang</span>
-                </div>
-                <div class="d-flex justify-content-between align-items-center pb-2 rounded">
-                    <div>
-                        <h6 class="fw-medium text-dark mb-2">Tahfidz</h6>
-                        <p class="card-subtitle text-dark mb-0">04:30 - 06:00</p>
-                    </div>
-                    <span class="badge bg-success">Sekarang</span>
-                </div>
-                <div class="d-flex justify-content-between align-items-center rounded">
-                    <div>
-                        <h6 class="fw-medium text-dark mb-2">Tahfidz</h6>
-                        <p class="card-subtitle text-dark mb-0">04:30 - 06:00</p>
-                    </div>
-                    <span class="badge bg-success">Sekarang</span>
-                </div>
+                @empty
+                    <p>Belum ada mata pelajaran.</p>
+                @endforelse
             </div>
         </div>
     </div>
@@ -181,8 +175,9 @@
                         Semua</a>
                 </div>
                 @forelse ($this->listPengumuman() as $item)
-                    <div style="background-color: #f5f5f5;" data-bs-toggle="modal" wire:click='detailPengumuman("{{ $item->id }}")'
-                        data-bs-target="#detailPengumuman" class="p-3">
+                    <div style="background-color: #f5f5f5;" data-bs-toggle="modal"
+                        wire:click='detailPengumuman("{{ $item->id }}")' data-bs-target="#detailPengumuman"
+                        class="p-3">
                         <div class="border-start border-info ps-3">
                             <h6 class="fw-bold text-dark mb-2">{{ $item->judul }}</h6>
                             <p class="fw-medium text-dark mb-0">
