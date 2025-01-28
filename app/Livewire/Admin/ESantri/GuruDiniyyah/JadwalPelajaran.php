@@ -44,7 +44,11 @@ class JadwalPelajaran extends Component
     #[Computed()]
     public function kelasList()
     {
-        return Kelas::with('jenjang')->when($this->jadwalPelajaranForm->jenjang_id)->where('jenjang_id', 'LIKE', "%{$this->jadwalPelajaranForm->jenjang_id}%")->get();
+        if($this->jadwalPelajaranForm->jenjang_id){
+            return Kelas::with('jenjang')->where('jenjang_id', 'LIKE', "%{$this->jadwalPelajaranForm->jenjang_id}%")->get();
+        } else {
+            return [];
+        }
     }
 
     #[Computed()]
@@ -87,7 +91,7 @@ class JadwalPelajaran extends Component
         $jadwalEdit = ModelsJadwalPelajaran::findOrFail($id);
         $this->jadwalPelajaranForm->fill($jadwalEdit);
 
-        // dd($jadwalEdit);
+        // dd($this->jadwalPelajaranForm, $jadwalEdit);
     }
 
     public function updateJadwalPelajaran()
@@ -101,7 +105,8 @@ class JadwalPelajaran extends Component
                 ->update($this->jadwalPelajaranForm->all());
 
             session()->flash('success', 'Jadwal Pelajaran berhasil diupdate!');
-            $this->dispatch('close-modal');
+            return to_route('e-santri-guru-diniyyah.jadwal-pelajaran');
+            // $this->dispatch('close-modal');
         } catch (\Exception $e) {
             session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }

@@ -128,9 +128,10 @@
                             <label class="form-label">Jenjang</label>
                             <select class="form-control" required wire:model.live="jadwalPelajaranForm.jenjang_id">
                                 <option value="">Pilih Jenjang</option>
-                                @foreach ($this->jenjangList() as $jenjangItem)
+                                @forelse ($this->jenjangList() as $jenjangItem)
                                     <option value="{{ $jenjangItem->id }}">{{ $jenjangItem->nama }}</option>
-                                @endforeach
+                                @empty
+                                @endforelse
                             </select>
                             @error('jadwalPelajaranForm.jenjang_id')
                                 <span class="text-danger">{{ $message }}</span>
@@ -141,8 +142,9 @@
                             <select class="form-control" required wire:model.live="jadwalPelajaranForm.kelas_id">
                                 <option value="">Pilih Kelas</option>
                                 @forelse ($this->kelasList() as $kelasItem)
-                                    <option value="{{ $kelasItem->id }}">{{ $kelasItem->nama }}</option>
-                                    @empty
+                                    <option
+                                        value="{{ $kelasItem->id }}">{{ $kelasItem->nama }}</option>
+                                @empty
                                 @endforelse
                             </select>
                             @error('jadwalPelajaranForm.kelas_id')
