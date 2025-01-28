@@ -19,7 +19,7 @@ class Dashboard extends Component
     #[Title('Dashboard Santri')]
     public $detailKegiatanModal, $detailPengumumanModal;
 
-    public $profile, $credentials, $timeline_spp, $pembayaran;
+    public $profile, $credentials, $timeline_spp, $pembayaran, $jadwalPelajaran, $jadwalHari;
     public $setStatusSpp, $isMobile;
 
     public function mount()
@@ -28,10 +28,22 @@ class Dashboard extends Component
         $this->timeline_spp = PembayaranTimeline::all();
         $this->setStatusSpp = Carbon::now()->format('F');
 
+        Carbon::setLocale('id');
+
+        $this->jadwalHari = strtolower(Carbon::now()->translatedFormat('l'));
+
         $mobile = new MobileDetect();
         $this->isMobile = $mobile->isMobile();
 
         $this->updatedSetStatusSpp($this->setStatusSpp);
+    }
+
+    #[Computed]
+    public function getMataPelajaran()
+    {
+        return $this->jadwalPelajaran = $this->profile->kelas->jenjang->jadwalPelajaran()
+            ->when($this->jadwalHari)->where('hari', 'LIKE', "%{$this->jadwalHari}%")
+            ->get();
     }
 
     public function updatedSetStatusSpp($value)

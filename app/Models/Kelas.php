@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\ESantri\JadwalPelajaran;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -26,5 +27,10 @@ class Kelas extends Model
     public function santri()
     {
         return $this->hasMany(Santri::class);
+    }
+
+    public function jadwalPelajaran()
+    {
+        return $this->hasMany(JadwalPelajaran::class);
     }
 }

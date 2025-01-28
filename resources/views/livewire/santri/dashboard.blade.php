@@ -120,28 +120,26 @@
                     <div class="d-flex align-items-center justify-content-between">
                         <h3 class="card-title">Jadwal Hari Ini</h3>
                         <div class="form-group">
-                            <select class="form-control form-control-md" name="" id="">
-                                <option>Senin</option>
-                                <option>Selasa</option>
-                                <option>Rabu</option>
-                                <option>Kamis</option>
-                                <option>Jum'at</option>
+                            <select wire:model.live='jadwalHari' class="form-control form-control-md" name="" id="">
+                                <option value="Senin">Senin</option>
+                                <option value="Selasa">Selasa</option>
+                                <option value="Rabu">Rabu</option>
+                                <option value="Kamis">Kamis</option>
+                                <option value="Jumat">Jum'at</option>
+                                <option value="Sabtu">Sabtu</option>
+                                <option value="Minggu">Minggu</option>
                             </select>
                         </div>
                     </div>
                     <div class="mt-3 d-flex flex-column gap-md-3 gap-2">
-                        <div class="py-2 px-3 rounded" style="background-color: #f5f5f5">
-                            <h6 class="fw-medium mb-2">Tahfidz</h6>
-                            <p class="card-subtitle mb-0">04:30 - 06:00</p>
-                        </div>
-                        <div class="py-2 px-3 rounded" style="background-color: #f5f5f5">
-                            <h6 class="fw-medium mb-2">Tahfidz</h6>
-                            <p class="card-subtitle mb-0">04:30 - 06:00</p>
-                        </div>
-                        <div class="py-2 px-3 rounded" style="background-color: #f5f5f5">
-                            <h6 class="fw-medium mb-2">Tahfidz</h6>
-                            <p class="card-subtitle mb-0">04:30 - 06:00</p>
-                        </div>
+                        @forelse ($this->getMataPelajaran() ?? [] as $mapel)
+                            <div class="py-2 px-3 rounded" style="background-color: #f5f5f5">
+                                <h6 class="fw-medium mb-2">{{ $mapel->mata_pelajaran }}</h6>
+                                <p class="card-subtitle mb-0">{{ \Carbon\Carbon::parse($mapel->waktu_mulai)->format('H:i') }} - {{ \Carbon\Carbon::parse($mapel->waktu_selesai)->format('H:i') }}</p>
+                            </div>
+                        @empty
+                            <p>Belum ada mata pelajaran.</p>
+                        @endforelse
                     </div>
                 </div>
             </div>
