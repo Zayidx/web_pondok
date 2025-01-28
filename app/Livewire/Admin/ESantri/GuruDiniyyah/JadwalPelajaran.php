@@ -90,8 +90,6 @@ class JadwalPelajaran extends Component
         $this->jadwalPelajaranId = $id;
         $jadwalEdit = ModelsJadwalPelajaran::findOrFail($id);
         $this->jadwalPelajaranForm->fill($jadwalEdit);
-
-        // dd($this->jadwalPelajaranForm, $jadwalEdit);
     }
 
     public function updateJadwalPelajaran()

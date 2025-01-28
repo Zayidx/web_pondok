@@ -139,13 +139,12 @@
                         </div>
                         <div class="mb-3">
                             <label class="form-label">Kelas</label>
-                            <select class="form-control" required wire:model.live="jadwalPelajaranForm.kelas_id">
+                            <select class="form-control" required wire:model="jadwalPelajaranForm.kelas_id"
+                                wire:key="kelas-{{ $jadwalPelajaranForm->jenjang_id }}">
                                 <option value="">Pilih Kelas</option>
-                                @forelse ($this->kelasList() as $kelasItem)
-                                    <option
-                                        value="{{ $kelasItem->id }}">{{ $kelasItem->nama }}</option>
-                                @empty
-                                @endforelse
+                                @foreach ($this->kelasList as $kelasItem)
+                                    <option value="{{ $kelasItem->id }}">{{ $kelasItem->nama }}</option>
+                                @endforeach
                             </select>
                             @error('jadwalPelajaranForm.kelas_id')
                                 <span class="text-danger">{{ $message }}</span>
