@@ -24,13 +24,14 @@ class Dashboard extends Component
 
     public function mount()
     {
-        $this->profile = Santri::with('kamar', 'kelas', 'semester', 'angkatan')->where('nama', Auth::guard('santri')->user()->nama)->first();
-        $this->timeline_spp = PembayaranTimeline::all();
-        $this->setStatusSpp = Carbon::now()->format('F');
-
         Carbon::setLocale('id');
 
-        $this->jadwalHari = strtolower(Carbon::now()->translatedFormat('l'));
+        $this->profile = Santri::with('kamar', 'kelas', 'semester', 'angkatan')->where('nama', Auth::guard('santri')->user()->nama)->first();
+        $this->timeline_spp = PembayaranTimeline::all();
+
+        $this->setStatusSpp = Carbon::now()->translatedFormat('F');
+
+        $this->jadwalHari = Carbon::now()->translatedFormat('l');
 
         $mobile = new MobileDetect();
         $this->isMobile = $mobile->isMobile();

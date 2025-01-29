@@ -78,8 +78,8 @@ class JadwalPelajaran extends Component
 
             ModelsJadwalPelajaran::create($this->jadwalPelajaranForm->all());
 
-            session()->flash('success', 'Jadwal Pelajaran baru berhasil dibuat!');
-            $this->dispatch('close-modal');
+            return to_route('e-santri-guru-diniyyah.jadwal-pelajaran')->with('success', 'Jadwal Pelajaran berhasil dibuat!');
+            // $this->dispatch('close-modal');
         } catch (\Exception $e) {
             session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
@@ -102,8 +102,7 @@ class JadwalPelajaran extends Component
             ModelsJadwalPelajaran::findOrFail($this->jadwalPelajaranId)
                 ->update($this->jadwalPelajaranForm->all());
 
-            session()->flash('success', 'Jadwal Pelajaran berhasil diupdate!');
-            return to_route('e-santri-guru-diniyyah.jadwal-pelajaran');
+            return to_route('e-santri-guru-diniyyah.jadwal-pelajaran')->with('success', 'Jadwal Pelajaran berhasil diupdate!');
             // $this->dispatch('close-modal');
         } catch (\Exception $e) {
             session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
@@ -113,8 +112,8 @@ class JadwalPelajaran extends Component
     public function deleteJadwalPelajaran($id)
     {
         $jadwal = ModelsJadwalPelajaran::findOrFail($id);
-        session()->flash('success', 'Berhasil hapus jadwal pelajaran');
         $jadwal->delete();
+        return to_route('e-santri-guru-diniyyah.jadwal-pelajaran')->with('success', 'Berhasil hapus jadwal pelajaran');
     }
 
     public function detailJadwalPelajaran($id)

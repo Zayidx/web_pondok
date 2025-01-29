@@ -77,7 +77,8 @@
                     </div>
                 </div>
             </div>
-            <div class="card shadow-sm">
+            {{-- Akademik --}}
+            {{-- <div class="card shadow-sm">
                 <div class="card-body">
                     <h3 class="card-title">Perkembangan Akademik</h3>
                     <div class="mt-4">
@@ -111,7 +112,7 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> --}}
         </div>
         <!-- Schedule Card -->
         <div class="col-12 col-md-6 col-lg-4">
@@ -177,7 +178,7 @@
             </div>
         </div>
         <!-- Duty Roster Card -->
-        <div class="col-12 col-md-6 col-lg-4">
+        {{-- <div class="col-12 col-md-6 col-lg-4">
             <div class="card shadow-sm">
                 <div class="card-body">
                     <h3 class="card-title">Jadwal Piket</h3>
@@ -213,7 +214,7 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
         <!-- Activities Card -->
         <div class="col-12 col-md-6 col-lg-4">
             <div class="card shadow-sm">

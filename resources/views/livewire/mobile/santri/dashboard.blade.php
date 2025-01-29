@@ -20,8 +20,9 @@
             <i class="bi text-dark fs-4 bi-eye"></i>
         </a>
     </div>
+
     <div class="">
-        <div class="scroll-container">
+        {{-- <div class="scroll-container">
             <div class="card bg-primary mt-4 shadow">
                 <div class="card-body">
                     <h6 class="card-title text-white">Perkembangan Akademik</h6>
@@ -56,12 +57,12 @@
                     </div>
                 </div>
             </div>
-        </div>
+        </div> --}}
 
         <div class="card mt-3">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h6 class="card-title text-dark m-0 d-inline-flex align-items-center gap-2">Status SPP <div
+                    <h6 class="card-title text-dark m-0 d-inline-flex align-items-center gap-2">Status SPP: <div
                             class="status-spp">
                             @php
                                 $statusClass = 'bg-secondary';
@@ -109,7 +110,7 @@
                         <option value="Sabtu">Sabtu</option>
                         <option value="Minggu">Minggu</option>
                     </select>
-                </div> 
+                </div>
             </div>
             <div class="d-flex flex-column gap-md-3 gap-2">
                 @forelse ($this->getMataPelajaran() ?? [] as $mapel)
@@ -128,7 +129,7 @@
         </div>
     </div>
 
-    <div class="mt-4">
+    {{-- <div class="mt-4">
         <div class="card">
             <div class="card-body">
                 <h6 class="card-title text-dark">Jadwal Piket</h6>
@@ -164,7 +165,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </div> --}}
 
     <div class="mt-4">
         <div class="card">
