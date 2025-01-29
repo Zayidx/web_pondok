@@ -7,78 +7,8 @@
         </div>
     </div>
     <!-- Dashboard Grid -->
-    <div class="row">
-        <!-- Profile Card -->
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex align-items-center justify-content-between">
-                        <h3 class="card-title">Informasi Pribadi</h3>
-                        <div class="btn btn-dark">
-                            <a class="text-white" href="{{ route('santri.profile') }}">Profile</a>
-                        </div>
-                    </div>
-                    <div class="mt-4">
-                        <h6 class="mb-2 ">Nama Lengkap</h6>
-                        <p class="fw-medium">{{ Auth::guard('santri')->user()->nama ?? '-' }}</p>
-                    </div>
-                    <div class="mt-3">
-                        <h6 class="mb-2 ">Password</h6>
-                        <p class="fw-medium">{{ Auth::guard('santri')->user()->password ?? '-' }}</p>
-                    </div>
-                    <div class="mt-3">
-                        <h6 class="mb-2 ">Jenjang</h6>
-                        <p class="fw-medium">{{ $profile?->kelas->jenjang->nama ?? '-' }}</p>
-                    </div>
-                    <div class="mt-3">
-                        <h6 class="mb-2 ">Kelas</h6>
-                        <p class="fw-medium">{{ $profile?->kelas->nama ?? '-' }}</p>
-                    </div>
-                    <div class="mt-3">
-                        <h6 class="mb-2 ">Kamar</h6>
-                        <p class="fw-medium">{{ $profile?->kamar->nama ?? '-' }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <!-- SPP Status Card -->
-        <div class="col-12 col-md-6 col-lg-4">
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h3 class="card-title">Status SPP</h3>
-                        <div class="form-group">
-                            <select wire:model.live='setStatusSpp' class="form-control form-control-md" name=""
-                                id="">
-                                @forelse ($timeline_spp as $timeline)
-                                    <option value="{{ $timeline->nama_bulan }}">{{ $timeline->nama_bulan }}</option>
-                                @empty
-                                    <option value="">Tidak ada bulan!</option>
-                                @endforelse
-                            </select>
-                        </div>
-                    </div>
-                    <div class="status-spp">
-                        @php
-                            $statusClass = 'bg-secondary';
-                            if (isset($pembayaran)) {
-                                switch ($pembayaran->status) {
-                                    case 'lunas':
-                                        $statusClass = 'bg-success';
-                                        break;
-                                    case 'cicilan':
-                                        $statusClass = 'bg-warning';
-                                        break;
-                                }
-                            }
-                        @endphp
-                        Status Pembayaran: <span
-                            class="badge ms-1 {{ $statusClass }}">{{ $pembayaran->status ?? 'belum bayar' }}</span>
-                    </div>
-                </div>
-            </div>
-            {{-- Akademik --}}
-            {{-- <div class="card shadow-sm">
+    {{-- Akademik --}}
+    {{-- <div class="card shadow-sm">
                 <div class="card-body">
                     <h3 class="card-title">Perkembangan Akademik</h3>
                     <div class="mt-4">
@@ -113,38 +43,118 @@
                     </div>
                 </div>
             </div> --}}
-        </div>
-        <!-- Schedule Card -->
-        <div class="col-12 col-md-6 col-lg-4">
+    <div class="row">
+        <!-- Profile Card -->
+        <div class="col-12 col-md-4">
             <div class="card shadow-sm">
                 <div class="card-body">
                     <div class="d-flex align-items-center justify-content-between">
-                        <h3 class="card-title">Jadwal Hari Ini</h3>
-                        <div class="form-group">
-                            <select wire:model.live='jadwalHari' class="form-control form-control-md" name="" id="">
-                                <option value="Senin">Senin</option>
-                                <option value="Selasa">Selasa</option>
-                                <option value="Rabu">Rabu</option>
-                                <option value="Kamis">Kamis</option>
-                                <option value="Jumat">Jum'at</option>
-                                <option value="Sabtu">Sabtu</option>
-                                <option value="Minggu">Minggu</option>
-                            </select>
+                        <h3 class="card-title">Informasi Pribadi</h3>
+                        <div class="btn btn-dark">
+                            <a class="text-white" href="{{ route('santri.profile') }}">Profile</a>
                         </div>
                     </div>
-                    <div class="mt-3 d-flex flex-column gap-md-3 gap-2">
-                        @forelse ($this->getMataPelajaran() ?? [] as $mapel)
-                            <div class="py-2 px-3 rounded" style="background-color: #f5f5f5">
-                                <h6 class="fw-medium mb-2">{{ $mapel->mata_pelajaran }}</h6>
-                                <p class="card-subtitle mb-0">{{ \Carbon\Carbon::parse($mapel->waktu_mulai)->format('H:i') }} - {{ \Carbon\Carbon::parse($mapel->waktu_selesai)->format('H:i') }}</p>
-                            </div>
-                        @empty
-                            <p>Belum ada mata pelajaran.</p>
-                        @endforelse
+                    <div class="mt-4">
+                        <h6 class="mb-2 ">Nama Lengkap</h6>
+                        <p class="fw-medium">{{ Auth::guard('santri')->user()->nama ?? '-' }}</p>
+                    </div>
+                    <div class="mt-3">
+                        <h6 class="mb-2 ">Password</h6>
+                        <p class="fw-medium">{{ Auth::guard('santri')->user()->password ?? '-' }}</p>
+                    </div>
+                    <div class="mt-3">
+                        <h6 class="mb-2 ">Jenjang</h6>
+                        <p class="fw-medium">{{ $profile?->kelas->jenjang->nama ?? '-' }}</p>
+                    </div>
+                    <div class="mt-3">
+                        <h6 class="mb-2 ">Kelas</h6>
+                        <p class="fw-medium">{{ $profile?->kelas->nama ?? '-' }}</p>
+                    </div>
+                    <div class="mt-3">
+                        <h6 class="mb-2 ">Kamar</h6>
+                        <p class="fw-medium">{{ $profile?->kamar->nama ?? '-' }}</p>
                     </div>
                 </div>
             </div>
         </div>
+
+        <div class="col-12 col-md-8">
+            <div class="row d-flex">
+                <!-- SPP Status Card -->
+                <div class="col-12 mb-4 col-md-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h3 class="card-title">Status SPP</h3>
+                                <div class="form-group">
+                                    <select wire:model.live='setStatusSpp' class="form-control form-control-md"
+                                        name="" id="">
+                                        @forelse ($timeline_spp as $timeline)
+                                            <option value="{{ $timeline->nama_bulan }}">{{ $timeline->nama_bulan }}
+                                            </option>
+                                        @empty
+                                            <option value="">Tidak ada bulan!</option>
+                                        @endforelse
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="status-spp">
+                                @php
+                                    $statusClass = 'bg-secondary';
+                                    if (isset($pembayaran)) {
+                                        switch ($pembayaran->status) {
+                                            case 'lunas':
+                                                $statusClass = 'bg-success';
+                                                break;
+                                            case 'cicilan':
+                                                $statusClass = 'bg-warning';
+                                                break;
+                                        }
+                                    }
+                                @endphp
+                                Status Pembayaran: <span
+                                    class="badge ms-1 {{ $statusClass }}">{{ $pembayaran->status ?? 'belum bayar' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Schedule Card -->
+                <div class="col-12 mb-4 col-md-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center justify-content-between">
+                                <h3 class="card-title">Jadwal Hari Ini</h3>
+                                <div class="form-group">
+                                    <select wire:model.live='jadwalHari' class="form-control form-control-md"
+                                        name="" id="">
+                                        <option value="Senin">Senin</option>
+                                        <option value="Selasa">Selasa</option>
+                                        <option value="Rabu">Rabu</option>
+                                        <option value="Kamis">Kamis</option>
+                                        <option value="Jumat">Jum'at</option>
+                                        <option value="Sabtu">Sabtu</option>
+                                        <option value="Minggu">Minggu</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="mt-3 d-flex flex-column gap-md-3 gap-2">
+                                @forelse ($this->getMataPelajaran() ?? [] as $mapel)
+                                    <div class="py-2 px-3 rounded" style="background-color: #f5f5f5">
+                                        <h6 class="fw-medium mb-2">{{ $mapel->mata_pelajaran }}</h6>
+                                        <p class="card-subtitle mb-0">
+                                            {{ \Carbon\Carbon::parse($mapel->waktu_mulai)->format('H:i') }} -
+                                            {{ \Carbon\Carbon::parse($mapel->waktu_selesai)->format('H:i') }}</p>
+                                    </div>
+                                @empty
+                                    <p>Belum ada mata pelajaran.</p>
+                                @endforelse
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Announcements Card -->
         <div class="col-12 col-md-6 col-lg-4">
             <div class="card shadow-sm">
@@ -171,8 +181,7 @@
                     @empty
                         <p class="text-muted mt-1">Belum ada pengumuman</p>
                     @endforelse
-                    <a href="{{ route('santri.pengumuman') }}"
-                        class="d-md-none mt-md-4 mt-3 w-100 btn btn-dark">Lihat
+                    <a href="{{ route('santri.pengumuman') }}" class="d-md-none mt-md-4 mt-3 w-100 btn btn-dark">Lihat
                         Semua Pengumuman</a>
                 </div>
             </div>
