@@ -43,6 +43,7 @@ class LoginSantri extends Component
 
             return back()->withErrors(['credentials' => 'NISN atau password salah']);
         } catch (\Throwable $th) {
+            dd( $th->getMessage());
             return back()->withErrors(['credentials' => $th->getMessage()]);
         }
     }

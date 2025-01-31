@@ -128,6 +128,7 @@ class ListSantri extends Component
         $this->foto = $santriData->foto;
         $this->santriForm->nama = $santriData->nama;
         $this->santriForm->nisn = $santriData->nisn;
+        $this->santriForm->password = $santriData->password;
         $this->santriForm->nism = $santriData->nism;
         $this->santriForm->kewarganegaraan = $santriData->kewarganegaraan;
         $this->santriForm->nik = $santriData->nik;
@@ -212,6 +213,7 @@ class ListSantri extends Component
         }
 
         $santri->update($santriData);
+
         OrangTuaSantri::where('santri_id', $this->santriEditId)
             ->update($this->waliSantriForm->all());
 
