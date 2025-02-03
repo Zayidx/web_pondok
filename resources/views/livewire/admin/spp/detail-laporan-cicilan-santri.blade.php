@@ -152,7 +152,7 @@
                             <tr>
                                 <td colspan="10" class="text-center">
                                     @if ($filter['bulan'])
-                                        Tidak ada data cicilan pada bulan {{ $filter['bulan'] }}
+                                        Tidak ada data cicilan pada bulan {{ $filter['bulan'] }} tahun {{ $filter['tahun'] }}
                                         @else
                                         Tidak ada data cicilan di bulan manapun
                                     @endif
