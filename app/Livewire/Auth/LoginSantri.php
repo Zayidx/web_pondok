@@ -31,23 +31,29 @@ class LoginSantri extends Component
 
     public function login()
     {
-        $user = User::where('email', $this->nisn)->first();
+        try {
+            $this->validate();
 
-        if (!$user) {
-            $this->addError('nisn', 'NISN tidak ditemukan.');
-            return;
+            $data = [
+                'nisn' => $this->nisn,
+                'password' => $this->password,
+            ];
+
+            if (Auth::guard('santri')->attempt($data)) {
+                return to_route('santri.dashboard');
+            }
+
+            return back()->withErrors(['credentials' => 'NISN atau password salah']);
+        } catch (\Throwable $th) {
+            return back()->withErrors(['credentials' => $th->getMessage()]);
         }
-
-        if (!Hash::check($this->password, $user->password)) {
-            $this->addError('password', 'Password salah, pastikan password sama dengen NISN');
-            return;
-        }
-
-        Auth::login($user);
-
-        return to_route('santri.dashboard');
     }
 
+    public function logout()
+    {
+        Auth::guard('santri')->logout();
+        return redirect('/auth/login-santri');
+    }
 
     public function render()
     {

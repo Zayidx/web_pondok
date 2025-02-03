@@ -6,6 +6,7 @@ use App\Livewire\Forms\ProfileSantriForm;
 use App\Models\Santri;
 use App\Models\User;
 use Detection\MobileDetect;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\Hash;
 use Livewire\Attributes\Title;
@@ -16,11 +17,11 @@ class Profile extends Component
     #[Title('Profile Santri')]
     public $profile;
     public $showPassword, $userId, $isMobile;
-    public ProfileSantriForm $userForm;
+    public $nama, $password;
 
     public function mount()
     {
-        $this->profile = Santri::with('kamar', 'kelas', 'semester', 'angkatan')->where('nama', auth()->user()->name)->first();
+        $this->profile = Santri::with('kamar', 'kelas', 'semester', 'angkatan')->where('nama', Auth::guard('santri')->user()->nama)->first();
         $mobile = new MobileDetect();
         $this->isMobile = $mobile->isMobile();
     }
@@ -28,31 +29,32 @@ class Profile extends Component
     public function edit($id)
     {
         $this->userId = $id;
-        $userEdit = User::findOrFail($id);
-        $this->userForm->fill($userEdit);
+        $userEdit = Santri::findOrFail($id);
+        $this->nama = $userEdit->nama;
     }
 
     public function close()
     {
-        $this->userForm->reset();
+        $this->nama = '';
+        $this->password = '';
     }
 
     public function updateProfileSantri()
     {
-        $this->userForm->validate([
-            'email' => 'required|email',
+        $this->validate([
+            'nama' => 'required|string',
             'password' => 'nullable|min:8'
         ]);
 
         try {
-            if ($this->userForm->password) {
-                User::findOrFail($this->userId)->update([
-                    'password' => Hash::make($this->userForm->password),
+            if ($this->password) {
+                Santri::findOrFail($this->userId)->update([
+                    'password' => Hash::make($this->password),
                 ]);
             }
 
-            User::findOrFail($this->userId)->update([
-                'email' => $this->userForm->email,
+            Santri::findOrFail($this->userId)->update([
+                'nama' => $this->nama,
             ]);
 
             return to_route('santri.profile');

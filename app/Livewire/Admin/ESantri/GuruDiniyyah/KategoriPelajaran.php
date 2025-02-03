@@ -42,8 +42,8 @@ class KategoriPelajaran extends Component
 
             ModelsKategoriPelajaran::create($this->kategoriPelajaranForm->all());
 
-            session()->flash('success', 'Kategori Pelajaran baru berhasil dibuat!');
-            $this->dispatch('closeModalCreateOrUpdate');
+            return to_route('e-santri-guru-diniyyah.kategori-pelajaran')->with('success', 'Kategori Pelajaran baru berhasil dibuat!');
+            // $this->dispatch('closeModalCreateOrUpdate');
         } catch (\Exception $e) {
             session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
@@ -65,8 +65,8 @@ class KategoriPelajaran extends Component
             ModelsKategoriPelajaran::findOrFail($this->kategoriPelajaranId)
                 ->update($this->kategoriPelajaranForm->all());
 
-            session()->flash('success', 'Kategori Pelajaran berhasil diupdate!');
-            $this->dispatch('closeModalCreateOrUpdate');
+            return to_route('e-santri-guru-diniyyah.kategori-pelajaran')->with('success', 'Kategori Pelajaran baru berhasil diupdate!');
+            // $this->dispatch('closeModalCreateOrUpdate');
         } catch (\Exception $e) {
             session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
@@ -84,8 +84,7 @@ class KategoriPelajaran extends Component
             // }
             $kategori->delete();
 
-
-            session()->flash('success', "Berhasil hapus kategori pelajaran: $kategori->nama");
+            return to_route('e-santri-guru-diniyyah.kategori-pelajaran')->with('success', 'Berhasil hapus kategori pelajaran: ' . $kategori->nama);
         } catch (\Exception $e) {
             session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }

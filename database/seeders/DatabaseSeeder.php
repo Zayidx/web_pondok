@@ -35,6 +35,7 @@ class DatabaseSeeder extends Seeder
             ProductListSeeder::class,
             PengumumanSeeder::class,
             KegiatanSeeder::class,
+            PasswordSantriSeeder::class,
         ]);
     }
 }

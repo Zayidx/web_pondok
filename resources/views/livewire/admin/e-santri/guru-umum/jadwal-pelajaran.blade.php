@@ -28,6 +28,7 @@
                 <thead>
                     <tr>
                         <th>No</th>
+                        <th>Jenjang</th>
                         <th>Kelas</th>
                         <th>Kategori Pelajaran</th>
                         <th>Mata Pelajaran</th>
@@ -41,6 +42,7 @@
                     @forelse ($listJadwalPelajaran as $jadwal)
                         <tr>
                             <td>{{ $loop->iteration }}</td>
+                            <td>{{ $jadwal->kelas->jenjang->nama }}</td>
                             <td>{{ $jadwal->kelas->nama }}</td>
                             <td>{{ $jadwal->kategoriPelajaran->nama }}</td>
                             <td>{{ $jadwal->mata_pelajaran }}</td>
@@ -107,8 +109,7 @@
     </div>
 
     {{-- Modal Create/Update --}}
-    <div class="modal fade" wire:ignore.self id="createOrUpdateJadwalPelajaran" tabindex="-1"
-        x-on:close-modal.window="bootstrap.Modal.getInstance($el).hide()">
+    <div class="modal fade" wire:ignore.self id="createOrUpdateJadwalPelajaran" tabindex="-1">
         <div class="modal-dialog modal-md">
             <div class="modal-content">
                 <form
@@ -123,12 +124,27 @@
                     </div>
                     <div class="modal-body">
                         <div class="mb-3">
+                            <label class="form-label">Jenjang</label>
+                            <select class="form-control" required wire:model.live="jadwalPelajaranForm.jenjang_id">
+                                <option value="">Pilih Jenjang</option>
+                                @forelse ($this->jenjangList() as $jenjangItem)
+                                    <option value="{{ $jenjangItem->id }}">{{ $jenjangItem->nama }}</option>
+                                @empty
+                                @endforelse
+                            </select>
+                            @error('jadwalPelajaranForm.jenjang_id')
+                                <span class="text-danger">{{ $message }}</span>
+                            @enderror
+                        </div>
+                        <div class="mb-3">
                             <label class="form-label">Kelas</label>
-                            <select class="form-control" required wire:model.live="jadwalPelajaranForm.kelas_id">
+                            <select class="form-control" required wire:model.live="jadwalPelajaranForm.kelas_id"
+                                wire:key="kelas-{{ $jadwalPelajaranForm->jenjang_id }}">>
                                 <option value="">Pilih Kelas</option>
-                                @foreach ($kelasList as $kelasItem)
+                                @forelse ($this->kelasList() as $kelasItem)
                                     <option value="{{ $kelasItem->id }}">{{ $kelasItem->nama }}</option>
-                                @endforeach
+                                @empty
+                                @endforelse
                             </select>
                             @error('jadwalPelajaranForm.kelas_id')
                                 <span class="text-danger">{{ $message }}</span>
