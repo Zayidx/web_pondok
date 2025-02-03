@@ -32,6 +32,8 @@ class LoginSantri extends Component
     public function login()
     {
         try {
+            $this->validate();
+
             $data = [
                 'nisn' => $this->nisn,
                 'password' => $this->password,
@@ -43,7 +45,6 @@ class LoginSantri extends Component
 
             return back()->withErrors(['credentials' => 'NISN atau password salah']);
         } catch (\Throwable $th) {
-            dd( $th->getMessage());
             return back()->withErrors(['credentials' => $th->getMessage()]);
         }
     }
