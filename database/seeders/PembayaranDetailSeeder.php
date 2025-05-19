@@ -2,7 +2,8 @@
 
 namespace Database\Seeders;
 
-use App\Models\Admin\Spp\PembayaranDetail;
+use App\Models\admin\Spp\PembayaranDetail;
+
 use App\Models\TahunAjaran;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
