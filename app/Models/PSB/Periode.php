@@ -1,11 +1,15 @@
 <?php
 
-namespace App\Models\PSB;
+namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Periode extends Model
 {
-    use HasFactory;
+    protected $table = 'psb_periodes';
+
+    public function pendaftaranSantri()
+    {
+        return $this->hasMany(PendaftaranSantri::class, 'periode_id');
+    }
 }
