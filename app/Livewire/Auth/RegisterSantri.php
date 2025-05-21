@@ -408,6 +408,6 @@ class RegisterSantri extends Component
 
     public function render()
     {
-        return view('livewire.auth.register-santri');
+        return view('livewire.auth.register-santri')->layout('components.layouts.register-santri');
     }
 }
