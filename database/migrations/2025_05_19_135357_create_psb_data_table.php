@@ -8,70 +8,102 @@ class CreatePsbDataTable extends Migration
 {
     public function up()
     {
-        // Tabel psb_periodes
         Schema::create('psb_periodes', function (Blueprint $table) {
             $table->id();
             $table->string('nama_jenjang');
-            $table->string('periode_mulai');
-            $table->string('periode_selesai');
+            $table->date('periode_mulai');
+            $table->date('periode_selesai');
             $table->string('status_periode')->default('active');
             $table->timestamps();
         });
 
-        // Tabel psb_pendaftaran_santri
         Schema::create('psb_pendaftaran_santri', function (Blueprint $table) {
             $table->id();
             $table->string('nama_jenjang');
-            $table->string('nik');
-            $table->enum('jenis_kelamin', ['L', 'P']);
-            $table->date('tanggal_lahir');
-            $table->text('alamat_jenjang');
-            $table->string('asal_sekolah');
-            $table->string('tahun_jurus');
-            $table->string('no_whatsapp');
-            $table->string('email');
-            $table->enum('status_pendaftaran', ['pending', 'approved', 'rejected'])->default('pending');
+            $table->string('nama_lengkap');
+            $table->string('nik')->nullable();
+            $table->string('nisn')->nullable();
+            $table->string('nism')->nullable();
+            $table->string('npsn')->nullable();
+            $table->string('kip')->nullable();
+            $table->string('no_kk')->nullable();
+            $table->integer('jumlah_saudara_kandung')->nullable();
+            $table->integer('anak_keberapa')->nullable();
+            $table->enum('jenis_kelamin', ['putera', 'puteri']);
+            $table->date('tanggal_lahir')->nullable();
+            $table->string('tempat_lahir')->nullable();
+            $table->string('asal_sekolah')->nullable();
+            $table->string('no_whatsapp')->nullable();
+            $table->string('email')->nullable();
+            $table->enum('status_santri', ['reguler', 'dhuafa', 'yatim_piatu'])->nullable();
+            $table->enum('kewarganegaraan', ['wni', 'wna'])->nullable();
+            $table->string('kelas')->nullable();
+            $table->enum('pembiayaan', ['Orang Tua (Ayah/Ibu)', 'Beasiswa', 'Wali(Kakak/Paman/Bibi)'])->nullable();
+            $table->string('riwayat_penyakit')->nullable();
+            $table->string('hobi')->nullable();
+            $table->enum('aktivitas_pendidikan', ['aktif', 'nonaktif'])->nullable();
+            $table->enum('status_kesantrian', ['aktif', 'nonaktif'])->default('aktif');
             $table->unsignedBigInteger('periode_id');
             $table->timestamps();
 
             $table->foreign('periode_id')->references('id')->on('psb_periodes')->onDelete('cascade');
         });
 
-        // Tabel psb_wali_santri
         Schema::create('psb_wali_santri', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('pendaftaran_santri_id');
-            $table->string('nama_ayah');
-            $table->string('pekerjaan_ayah');
-            $table->string('no_hp_ayah');
-            $table->string('nama_ibu');
-            $table->string('pekerjaan_ibu');
-            $table->string('no_hp_ibu');
-            $table->string('alamat_orang_tua');
+            $table->string('nama_kepala_keluarga')->nullable();
+            $table->string('no_hp_kepala_keluarga')->nullable();
+            $table->string('nama_ayah')->nullable();
+            $table->enum('status_ayah', ['hidup', 'meninggal'])->nullable();
+            $table->enum('kewarganegaraan_ayah', ['wni', 'wna'])->nullable();
+            $table->string('nik_ayah')->nullable();
+            $table->string('tempat_lahir_ayah')->nullable();
+            $table->date('tanggal_lahir_ayah')->nullable();
+            $table->enum('pendidikan_terakhir_ayah', ['tidak sekolah', 'sd', 'smp', 'sma', 'slta', 'diploma', 'sarjana'])->nullable();
+            $table->string('pekerjaan_ayah')->nullable();
+            $table->decimal('penghasilan_ayah', 15, 2)->nullable();
+            $table->string('no_telp_ayah')->nullable();
+            $table->string('nama_ibu')->nullable();
+            $table->enum('status_ibu', ['hidup', 'meninggal'])->nullable();
+            $table->enum('kewarganegaraan_ibu', ['wni', 'wna'])->nullable();
+            $table->string('nik_ibu')->nullable();
+            $table->string('tempat_lahir_ibu')->nullable();
+            $table->date('tanggal_lahir_ibu')->nullable();
+            $table->enum('pendidikan_terakhir_ibu', ['tidak sekolah', 'sd', 'smp', 'sma', 'slta', 'diploma', 'sarjana'])->nullable();
+            $table->string('pekerjaan_ibu')->nullable();
+            $table->decimal('penghasilan_ibu', 15, 2)->nullable();
+            $table->string('no_telp_ibu')->nullable();
+            $table->string('provinsi')->nullable();
+            $table->string('kabupaten')->nullable();
+            $table->string('kecamatan')->nullable();
+            $table->string('kelurahan')->nullable();
+            $table->string('rt')->nullable();
+            $table->string('rw')->nullable();
+            $table->string('kode_pos')->nullable();
+            $table->string('status_kepemilikan_rumah')->nullable();
+            $table->text('alamat')->nullable();
+            $table->enum('status_orang_tua', ['kawin', 'cerai hidup', 'cerai mati'])->nullable();
             $table->timestamps();
 
             $table->foreign('pendaftaran_santri_id')->references('id')->on('psb_pendaftaran_santri')->onDelete('cascade');
         });
 
-        // Tabel psb_jadwal_wawancara
-        Schema::create('psb_jadwal_wawancara', function (Blueprint $table) {
+        Schema::create('psb_dokumen', function (Blueprint $table) {
             $table->id();
-            $table->date('tanggal_wawancara');
-            $table->timestamp('waktu');
-            $table->string('tempat');
-            $table->enum('status_wawancara', ['scheduled', 'completed', 'cancelled'])->default('scheduled');
             $table->unsignedBigInteger('santri_id');
+            $table->string('jenis_berkas');
+            $table->string('file_path');
+            $table->date('tanggal')->nullable();
             $table->timestamps();
 
             $table->foreign('santri_id')->references('id')->on('psb_pendaftaran_santri')->onDelete('cascade');
- livestream: https://www.youtube.com/watch?v=2c3tLKBZqDs&list=PLhQjrBD2T382VRUw5ZpSxQSWEzfMgpMdF
         });
 
-        // Tabel psb_pembayaran
         Schema::create('psb_pembayaran', function (Blueprint $table) {
             $table->id();
-            $table->string('jumlah');
-            $table->timestamp('tanggal_bayar');
+            $table->decimal('jumlah', 15, 2)->nullable();
+            $table->date('tanggal_bayar');
             $table->string('bukti_transfer');
             $table->enum('status_pembayaran', ['pending', 'paid', 'failed'])->default('pending');
             $table->unsignedBigInteger('santri_id');
@@ -79,112 +111,12 @@ class CreatePsbDataTable extends Migration
 
             $table->foreign('santri_id')->references('id')->on('psb_pendaftaran_santri')->onDelete('cascade');
         });
-
-        // Tabel psb_dokumen
-        Schema::create('psb_dokumen', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('berkas_pendaftaran_id');
-            $table->string('jenis_berkas');
-            $table->string('tanggal');
-            $table->unsignedBigInteger('santri_id');
-            $table->timestamps();
-
-            $table->foreign('berkas_pendaftaran_id')->references('id')->on('psb_pendaftaran_santri')->onDelete('cascade');
-            $table->foreign('santri_id')->references('id')->on('psb_pendaftaran_santri')->onDelete('cascade');
-        });
-
-        // Tabel psb_ujians
-        Schema::create('psb_ujians', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama_ujian');
-            $table->text('deskripsi');
-            $table->enum('jenis', ['pilhan_ganda', 'essay', 'campuran']);
-            $table->integer('durasi_menit');
-            $table->datetime('waktu_akif_dari');
-            $table->datetime('waktu_akif_sampai');
-            $table->timestamp('created_at')->useCurrent();
-            $table->timestamp('updated_at')->useCurrent()->useCurrentOnUpdate();
-        });
-
-        // Tabel psb_soals
-        Schema::create('psb_soals', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('ujian_id');
-            $table->integer('pertanyaan');
-            $table->text('jenis');
-            $table->timestamps();
-
-            $table->foreign('ujian_id')->references('id')->on('psb_ujians')->onDelete('cascade');
-        });
-
-        // Tabel psb_pilihan_jawaban_soals
-        Schema::create('psb_pilihan_jawaban_soals', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('soal_id');
-            $table->string('opsi');
-            $table->text('teks_jawaban');
-            $table->boolean('jawaban_benar');
-            $table->timestamps();
-
-            $table->foreign('soal_id')->references('id')->on('psb_soals')->onDelete('cascade');
-        });
-
-        // Tabel psb_ujian_santris
-        Schema::create('psb_ujian_santris', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('santri_id');
-            $table->unsignedBigInteger('ujian_id');
-            $table->enum('status', ['belum', 'mulai', 'sedang', 'ujian', 'selesai']);
-            $table->timestamp('waktu_mulai')->nullable();
-            $table->timestamp('waktu_selesai')->nullable();
-            $table->float('skor_akhir')->nullable();
-            $table->text('catatan_penilaian')->nullable();
-            $table->timestamps();
-
-            $table->foreign('santri_id')->references('id')->on('psb_pendaftaran_santri')->onDelete('cascade');
-            $table->foreign('ujian_id')->references('id')->on('psb_ujians')->onDelete('cascade');
-        });
-
-        // Tabel psb_jawaban_santris
-        Schema::create('psb_jawaban_santris', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('santri_id');
-            $table->unsignedBigInteger('ujian_id');
-            $table->unsignedBigInteger('soal_id');
-            $table->unsignedBigInteger('jawaban_pg_id')->nullable();
-            $table->text('jawaban_essay')->nullable();
-            $table->float('skor_diberikan')->nullable();
-            $table->timestamps();
-
-            $table->foreign('santri_id')->references('id')->on('psb_pendaftaran_santri')->onDelete('cascade');
-            $table->foreign('ujian_id')->references('id')->on('psb_ujians')->onDelete('cascade');
-            $table->foreign('soal_id')->references('id')->on('psb_soals')->onDelete('cascade');
-            $table->foreign('jawaban_pg_id')->references('id')->on('psb_pilihan_jawaban_soals')->onDelete('cascade');
-        });
-
-        // Tabel psb_penilaian_essays
-        Schema::create('psb_penilaian_essays', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('jawaban_santri_id');
-            $table->float('skor_diberikan');
-            $table->text('catatan_penilaian');
-            $table->timestamps();
-
-            $table->foreign('jawaban_santri_id')->references('id')->on('psb_jawaban_santris')->onDelete('cascade');
-        });
     }
 
     public function down()
     {
-        Schema::dropIfExists('psb_penilaian_essays');
-        Schema::dropIfExists('psb_jawaban_santris');
-        Schema::dropIfExists('psb_ujian_santris');
-        Schema::dropIfExists('psb_pilihan_jawaban_soals');
-        Schema::dropIfExists('psb_soals');
-        Schema::dropIfExists('psb_ujians');
-        Schema::dropIfExists('psb_dokumen');
         Schema::dropIfExists('psb_pembayaran');
-        Schema::dropIfExists('psb_jadwal_wawancara');
+        Schema::dropIfExists('psb_dokumen');
         Schema::dropIfExists('psb_wali_santri');
         Schema::dropIfExists('psb_pendaftaran_santri');
         Schema::dropIfExists('psb_periodes');

@@ -1,13 +1,16 @@
 <?php
 
 use App\Livewire\Auth;
+use App\Livewire\Auth\RegisterSantri;
+use App\Livewire\PSB\ShowRegistrations;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return redirect('/auth/login');
 });
-
+Route::get('/register-santri', RegisterSantri::class)->name('register-santri');
+Route::get('/show-registrations', ShowRegistrations::class)->name('show-registrations');
 Route::prefix('auth')->group(function () {
     Route::get('/login', Auth\Login::class)->name('login');
     Route::get('/register', Auth\Register::class)->name('register');

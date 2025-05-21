@@ -1,20 +1,27 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\PSB;
 
+use App\Models\PendaftaranSantri;
+use App\Models\PSB\PendaftaranSantri as PSBPendaftaranSantri;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Dokumen extends Model
 {
+    use HasFactory;
+
     protected $table = 'psb_dokumen';
 
-    public function pendaftaranSantri()
-    {
-        return $this->belongsTo(PendaftaranSantri::class, 'santri_id');
-    }
+    protected $fillable = [
+        'santri_id',
+        'jenis_berkas',
+        'file_path',
+        'tanggal',
+    ];
 
-    public function berkasPendaftaran()
+    public function santri()
     {
-        return $this->belongsTo(PendaftaranSantri::class, 'berkas_pendaftaran_id');
+        return $this->belongsTo(PSBPendaftaranSantri::class, 'santri_id');
     }
 }
