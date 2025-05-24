@@ -1,9 +1,19 @@
 <div>
     @if (session('success'))
-        <div class="alert alert-success">{{ session('success') }}</div>
+        <div class="alert alert-success" style="z-index: 1050; position: relative;">{{ session('success') }}</div>
     @endif
     @if (session('error'))
-        <div class="alert alert-danger">{{ session('error') }}</div>
+        <div class="alert alert-danger" style="z-index: 1050; position: relative;">{{ session('error') }}</div>
+    @endif
+
+    @if ($errors->any() && !$interviewModal)
+        <div class="alert alert-danger">
+            <ul>
+                @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
     @endif
 
     <div class="card">
@@ -83,70 +93,63 @@
     </div>
 
     <!-- Interview Modal -->
-    <div id="interviewModal" class="modal fade" tabindex="-1" role="dialog" wire:ignore.self>
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Jadwal Wawancara</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" wire:click="$set('interviewModal', false)"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="form-group mb-3">
-                        <label>Tanggal Wawancara</label>
-                        <input type="date" class="form-control" wire:model="interviewForm.tanggal_wawancara">
-                        @error('interviewForm.tanggal_wawancara') <span class="text-danger">{{ $message }}</span> @enderror
+    @if ($interviewModal)
+        <div class="modal fade show" id="interviewModal" tabindex="-1" role="dialog" style="display: block; z-index: 1040;">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Jadwal Wawancara</h5>
+                        <button type="button" class="btn-close" wire:click="closeModal"></button>
                     </div>
-                    <div class="form-group mb-3">
-                        <label>Jam Wawancara</label>
-                        <input type="time" class="form-control" wire:model="interviewForm.jam_wawancara">
-                        @error('interviewForm.jam_wawancara') <span class="text-danger">{{ $message }}</span> @enderror
-                    </div>
-                    <div class="form-group mb-3">
-                        <label>Mode Wawancara</label>
-                        <select class="form-select" wire:model.live="interviewForm.mode">
-                            <option value="offline">Offline</option>
-                            <option value="online">Online</option>
-                        </select>
-                        @error('interviewForm.mode') <span class="text-danger">{{ $message }}</span> @enderror
-                    </div>
-                    @if ($interviewForm['mode'] === 'online')
+                    <div class="modal-body" style="max-height: 60vh; overflow-y: auto;">
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
                         <div class="form-group mb-3">
-                            <label>Link Online</label>
-                            <input type="url" class="form-control" wire:model="interviewForm.link_online" placeholder="https://zoom.us/...">
-                            @error('interviewForm.link_online') <span class="text-danger">{{ $message }}</span> @enderror
+                            <label>Tanggal Wawancara</label>
+                            <input type="date" class="form-control" wire:model="interviewForm.tanggal_wawancara">
+                            @error('interviewForm.tanggal_wawancara') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
-                    @else
                         <div class="form-group mb-3">
-                            <label>Lokasi Offline</label>
-                            <input type="text" class="form-control" wire:model="interviewForm.lokasi_offline" placeholder="Gedung Serbaguna Pesantren">
-                            @error('interviewForm.lokasi_offline') <span class="text-danger">{{ $message }}</span> @enderror
+                            <label>Jam Wawancara</label>
+                            <input type="time" class="form-control" wire:model="interviewForm.jam_wawancara">
+                            @error('interviewForm.jam_wawancara') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
-                    @endif
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="$set('interviewModal', false)">Batal</button>
-                    <button type="button" class="btn btn-primary" wire:click="saveInterview">Simpan</button>
+                        <div class="form-group mb-3">
+                            <label>Mode Wawancara</label>
+                            <select class="form-select" wire:model.live="interviewForm.mode">
+                                <option value="offline">Offline</option>
+                                <option value="online">Online</option>
+                            </select>
+                            @error('interviewForm.mode') <span class="text-danger">{{ $message }}</span> @enderror
+                        </div>
+                        @if ($interviewForm['mode'] === 'online')
+                            <div class="form-group mb-3">
+                                <label>Link Online</label>
+                                <input type="url" class="form-control" wire:model="interviewForm.link_online" placeholder="https://zoom.us/...">
+                                @error('interviewForm.link_online') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+                        @else
+                            <div class="form-group mb-3">
+                                <label>Lokasi Offline</label>
+                                <input type="text" class="form-control" wire:model="interviewForm.lokasi_offline" placeholder="Gedung Serbaguna Pesantren">
+                                @error('interviewForm.lokasi_offline') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
+                        @endif
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" wire:click="closeModal">Batal</button>
+                        <button type="button" class="btn btn-primary" wire:click="saveInterview">Simpan</button>
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-
-    <!-- JavaScript untuk Mengontrol Modal -->
-    <script>
-        document.addEventListener('livewire:initialized', () => {
-            Livewire.on('showInterviewModal', () => {
-                let modal = document.getElementById('interviewModal');
-                let bsModal = new bootstrap.Modal(modal);
-                bsModal.show();
-            });
-
-            Livewire.on('hideInterviewModal', () => {
-                let modal = document.getElementById('interviewModal');
-                let bsModal = bootstrap.Modal.getInstance(modal);
-                if (bsModal) {
-                    bsModal.hide();
-                }
-            });
-        });
-    </script>
+        <div class="modal-backdrop fade show" style="z-index: 1030;"></div>
+    @endif
 </div>

@@ -7,6 +7,8 @@ use Livewire\WithPagination;
 use App\Models\PSB\PendaftaranSantri;
 use App\Models\PSB\WaliSantri;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Carbon\Carbon;
 
 class ShowRegistrations extends Component
 {
@@ -44,6 +46,7 @@ class ShowRegistrations extends Component
 
     public function updatingKewarganegaraan()
     {
+        Log::info('Kewarganegaraan updated to: ' . $this->kewarganegaraan);
         $this->resetPage();
     }
 
@@ -54,11 +57,13 @@ class ShowRegistrations extends Component
 
     public function updatingStatusSantri()
     {
+        Log::info('Status santri updated to: ' . $this->status_santri);
         $this->resetPage();
     }
 
     public function updatingPerPage()
     {
+        Log::info('PerPage updated to: ' . $this->perPage);
         $this->resetPage();
     }
 
@@ -74,7 +79,7 @@ class ShowRegistrations extends Component
 
     public function openInterviewModal($santriId)
     {
-        \Log::info('openInterviewModal called with santriId: ' . $santriId);
+        Log::info('openInterviewModal called with santriId: ' . $santriId);
         $this->selectedSantriId = $santriId;
         $this->interviewForm = [
             'tanggal_wawancara' => '',
@@ -84,11 +89,18 @@ class ShowRegistrations extends Component
             'lokasi_offline' => '',
         ];
         $this->interviewModal = true;
-        $this->dispatch('showInterviewModal');
+        $this->resetValidation();
+    }
+
+    public function closeModal()
+    {
+        $this->interviewModal = false;
     }
 
     public function saveInterview()
     {
+        Log::info('saveInterview called with data: ', $this->interviewForm);
+
         $this->validate([
             'interviewForm.tanggal_wawancara' => 'required|date|after:today',
             'interviewForm.jam_wawancara' => 'required',
@@ -100,7 +112,7 @@ class ShowRegistrations extends Component
         DB::beginTransaction();
         try {
             $santri = PendaftaranSantri::findOrFail($this->selectedSantriId);
-            $santri->update(['status_santri' => 'diterima']);
+            $santri->update(['status_santri' => 'diterima']); // updated_at akan diatur otomatis oleh Laravel
 
             \App\Models\PSB\JadwalWawancara::create([
                 'santri_id' => $santri->id,
@@ -115,10 +127,12 @@ class ShowRegistrations extends Component
 
             DB::commit();
             $this->interviewModal = false;
-            $this->dispatch('hideInterviewModal');
+            $this->resetValidation();
             session()->flash('success', 'Santri diterima dan jadwal wawancara disimpan.');
         } catch (\Exception $e) {
             DB::rollBack();
+            Log::error('Error in saveInterview: ' . $e->getMessage());
+            $this->interviewModal = false; // Tutup modal saat error
             session()->flash('error', 'Gagal menyimpan: ' . $e->getMessage());
         }
     }
@@ -133,6 +147,11 @@ class ShowRegistrations extends Component
     protected function moveToSantri($santri)
     {
         $wali = WaliSantri::where('pendaftaran_santri_id', $santri->id)->first();
+        if (!$wali) {
+            Log::error('Wali not found for santri ID: ' . $santri->id);
+            throw new \Exception('Data wali tidak ditemukan.');
+        }
+
         $newSantri = \App\Models\Santri::create([
             'nama' => $santri->nama_lengkap,
             'nisn' => $santri->nisn,
