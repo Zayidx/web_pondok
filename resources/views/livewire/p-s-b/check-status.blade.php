@@ -1,7 +1,7 @@
 <div class="container mt-5">
     <div class="card">
-        <div class="card-header bg-primary text-white">
-            <h4>Cek Status Pendaftaran Santri</h4>
+        <div class="card-header bg-primary ">
+            <h4 class="text-white">Cek Status Pendaftaran Santri</h4>
         </div>
         <div class="card-body">
             <form wire:submit.prevent="checkStatus">

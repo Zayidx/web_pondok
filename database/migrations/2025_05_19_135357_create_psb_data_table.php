@@ -35,11 +35,11 @@ class CreatePsbDataTable extends Migration
             $table->string('asal_sekolah')->nullable();
             $table->string('no_whatsapp')->nullable();
             $table->string('email')->nullable();
-            $table->enum('status_santri', ['reguler', 'dhuafa', 'yatim_piatu'])->nullable();
+            $table->enum('status_santri', ['reguler', 'dhuafa', 'yatim_piatu', 'diterima', 'ditolak'])->nullable();
             $table->enum('kewarganegaraan', ['wni', 'wna'])->nullable();
             $table->string('kelas')->nullable();
             $table->enum('pembiayaan', ['Orang Tua (Ayah/Ibu)', 'Beasiswa', 'Wali(Kakak/Paman/Bibi)'])->nullable();
-            $table->string('riwayat_penyakit')->nullable();
+            $table->text('riwayat_penyakit')->nullable();
             $table->string('hobi')->nullable();
             $table->enum('aktivitas_pendidikan', ['aktif', 'nonaktif'])->nullable();
             $table->enum('status_kesantrian', ['aktif', 'nonaktif'])->default('aktif');
@@ -111,6 +111,7 @@ class CreatePsbDataTable extends Migration
 
             $table->foreign('santri_id')->references('id')->on('psb_pendaftaran_santri')->onDelete('cascade');
         });
+
         Schema::create('psb_jadwal_wawancara', function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger('santri_id');

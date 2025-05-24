@@ -103,7 +103,7 @@ class ShowRegistrations extends Component
 
         $this->validate([
             'interviewForm.tanggal_wawancara' => 'required|date|after:today',
-            'interviewForm.jam_wawancara' => 'required',
+            'interviewForm.jam_wawancara' => 'required|date_format:H:i', // Validasi format waktu (HH:MM)
             'interviewForm.mode' => 'required|in:online,offline',
             'interviewForm.link_online' => 'required_if:interviewForm.mode,online|url|nullable',
             'interviewForm.lokasi_offline' => 'required_if:interviewForm.mode,offline|nullable',
@@ -112,7 +112,8 @@ class ShowRegistrations extends Component
         DB::beginTransaction();
         try {
             $santri = PendaftaranSantri::findOrFail($this->selectedSantriId);
-            $santri->update(['status_santri' => 'diterima']); // updated_at akan diatur otomatis oleh Laravel
+            Log::info('Updating status_santri to diterima for santri ID: ' . $santri->id);
+            $santri->update(['status_santri' => 'diterima']);
 
             \App\Models\PSB\JadwalWawancara::create([
                 'santri_id' => $santri->id,
@@ -132,7 +133,7 @@ class ShowRegistrations extends Component
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Error in saveInterview: ' . $e->getMessage());
-            $this->interviewModal = false; // Tutup modal saat error
+            $this->interviewModal = false;
             session()->flash('error', 'Gagal menyimpan: ' . $e->getMessage());
         }
     }
@@ -152,6 +153,10 @@ class ShowRegistrations extends Component
             throw new \Exception('Data wali tidak ditemukan.');
         }
 
+        // Map status_santri agar sesuai dengan definisi tabel santris
+        $validStatuses = ['reguler', 'dhuafa', 'yatim_piatu', 'diterima', 'ditolak'];
+        $statusSantri = in_array($santri->status_santri, $validStatuses) ? $santri->status_santri : 'reguler';
+
         $newSantri = \App\Models\Santri::create([
             'nama' => $santri->nama_lengkap,
             'nisn' => $santri->nisn,
@@ -167,7 +172,7 @@ class ShowRegistrations extends Component
             'asal_sekolah' => $santri->asal_sekolah,
             'no_whatsapp' => $santri->no_whatsapp,
             'email' => $santri->email,
-            'status_santri' => $santri->status_santri,
+            'status_santri' => $statusSantri,
             'kewarganegaraan' => $santri->kewarganegaraan,
             'kelas_id' => \App\Models\Kelas::where('nama', $santri->kelas)->first()->id ?? null,
             'kamar_id' => \App\Models\Kamar::first()->id ?? null,
