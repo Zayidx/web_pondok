@@ -1,37 +1,152 @@
-<div class="container-fluid">
-       <div class="row">
-           <div class="col-12">
-               <div class="card">
-                   <div class="card-header">
-                       <h4>Daftar Pendaftaran Santri</h4>
-                   </div>
-                   <div class="card-body">
-                       <table class="table table-striped">
-                           <thead>
-                               <tr>
-                                   <th>ID</th>
-                                   <th>Nama Lengkap</th>
-                                   <th>Jenis Kelamin</th>
-                                   <th>Status Kesantrian</th>
-                                   <th>Alamat</th>
-                                   <th>Created At</th>
-                               </tr>
-                           </thead>
-                           <tbody>
-                               @foreach ($registrations as $registration)
-                                   <tr>
-                                       <td>{{ $registration->id }}</td>
-                                       <td>{{ $registration->nama_lengkap }}</td>
-                                       <td>{{ $registration->jenis_kelamin }}</td>
-                                       <td>{{ $registration->status_kesantrian }}</td>
-                                       <td>{{ $registration->alamat }}</td>
-                                       <td>{{ $registration->created_at }}</td>
-                                   </tr>
-                               @endforeach
-                           </tbody>
-                       </table>
-                   </div>
-               </div>
-           </div>
-       </div>
-   </div>
+<div>
+    @if (session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+    @if (session('error'))
+        <div class="alert alert-danger">{{ session('error') }}</div>
+    @endif
+
+    <div class="card">
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-4">
+                    <input type="text" class="form-control" wire:model.live="search" placeholder="Cari NISN atau Nama Santri...">
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" wire:model.live="kewarganegaraan">
+                        <option value="">Semua Kewarganegaraan</option>
+                        @foreach ($kewarganegaraanOptions as $value => $label)
+                            <option value="{{ $value }}">{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="text" class="form-control" wire:model.live="kota" placeholder="Kota...">
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" wire:model.live="status_santri">
+                        <option value="">Semua Status</option>
+                        @foreach ($statusSantriOptions as $value => $label)
+                            <option value="{{ $value }}">{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select class="form-select" wire:model.live="perPage">
+                        <option value="5">5</option>
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <thead>
+                        <tr>
+                            <th wire:click="sortBy('nama_lengkap')">Nama Santri @if($sortField == 'nama_lengkap') <i class="bi {{ $sortDirection == 'asc' ? 'bi-arrow-up' : 'bi-arrow-down' }}"></i> @endif</th>
+                            <th wire:click="sortBy('nisn')">NISN @if($sortField == 'nisn') <i class="bi {{ $sortDirection == 'asc' ? 'bi-arrow-up' : 'bi-arrow-down' }}"></i> @endif</th>
+                            <th wire:click="sortBy('kewarganegaraan')">Kewarganegaraan @if($sortField == 'kewarganegaraan') <i class="bi {{ $sortDirection == 'asc' ? 'bi-arrow-up' : 'bi-arrow-down' }}"></i> @endif</th>
+                            <th>Kota</th>
+                            <th wire:click="sortBy('status_santri')">Status Santri @if($sortField == 'status_santri') <i class="bi {{ $sortDirection == 'asc' ? 'bi-arrow-up' : 'bi-arrow-down' }}"></i> @endif</th>
+                            <th>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse ($registrations as $registration)
+                            <tr>
+                                <td>{{ $registration->nama_lengkap }}</td>
+                                <td>{{ $registration->nisn }}</td>
+                                <td>{{ $registration->kewarganegaraan }}</td>
+                                <td>{{ $registration->wali->kabupaten ?? '-' }}</td>
+                                <td>{{ $statusSantriOptions[$registration->status_santri] ?? $registration->status_santri }}</td>
+                                <td>
+                                    <a href="{{ route('admin.show-registration.detail', $registration->id) }}" class="btn btn-sm btn-info">Detail</a>
+                                    @if ($registration->status_santri !== 'diterima' && $registration->status_santri !== 'ditolak')
+                                        <button wire:click="openInterviewModal({{ $registration->id }})" class="btn btn-sm btn-success">Diterima</button>
+                                        <button wire:click="reject({{ $registration->id }})" class="btn btn-sm btn-danger">Ditolak</button>
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="6" class="text-center">Tidak ada data pendaftaran.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            {{ $registrations->links() }}
+        </div>
+    </div>
+
+    <!-- Interview Modal -->
+    <div id="interviewModal" class="modal fade" tabindex="-1" role="dialog" wire:ignore.self>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Jadwal Wawancara</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" wire:click="$set('interviewModal', false)"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group mb-3">
+                        <label>Tanggal Wawancara</label>
+                        <input type="date" class="form-control" wire:model="interviewForm.tanggal_wawancara">
+                        @error('interviewForm.tanggal_wawancara') <span class="text-danger">{{ $message }}</span> @enderror
+                    </div>
+                    <div class="form-group mb-3">
+                        <label>Jam Wawancara</label>
+                        <input type="time" class="form-control" wire:model="interviewForm.jam_wawancara">
+                        @error('interviewForm.jam_wawancara') <span class="text-danger">{{ $message }}</span> @enderror
+                    </div>
+                    <div class="form-group mb-3">
+                        <label>Mode Wawancara</label>
+                        <select class="form-select" wire:model.live="interviewForm.mode">
+                            <option value="offline">Offline</option>
+                            <option value="online">Online</option>
+                        </select>
+                        @error('interviewForm.mode') <span class="text-danger">{{ $message }}</span> @enderror
+                    </div>
+                    @if ($interviewForm['mode'] === 'online')
+                        <div class="form-group mb-3">
+                            <label>Link Online</label>
+                            <input type="url" class="form-control" wire:model="interviewForm.link_online" placeholder="https://zoom.us/...">
+                            @error('interviewForm.link_online') <span class="text-danger">{{ $message }}</span> @enderror
+                        </div>
+                    @else
+                        <div class="form-group mb-3">
+                            <label>Lokasi Offline</label>
+                            <input type="text" class="form-control" wire:model="interviewForm.lokasi_offline" placeholder="Gedung Serbaguna Pesantren">
+                            @error('interviewForm.lokasi_offline') <span class="text-danger">{{ $message }}</span> @enderror
+                        </div>
+                    @endif
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" wire:click="$set('interviewModal', false)">Batal</button>
+                    <button type="button" class="btn btn-primary" wire:click="saveInterview">Simpan</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript untuk Mengontrol Modal -->
+    <script>
+        document.addEventListener('livewire:initialized', () => {
+            Livewire.on('showInterviewModal', () => {
+                let modal = document.getElementById('interviewModal');
+                let bsModal = new bootstrap.Modal(modal);
+                bsModal.show();
+            });
+
+            Livewire.on('hideInterviewModal', () => {
+                let modal = document.getElementById('interviewModal');
+                let bsModal = bootstrap.Modal.getInstance(modal);
+                if (bsModal) {
+                    bsModal.hide();
+                }
+            });
+        });
+    </script>
+</div>

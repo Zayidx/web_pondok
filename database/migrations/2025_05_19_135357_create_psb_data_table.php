@@ -111,6 +111,18 @@ class CreatePsbDataTable extends Migration
 
             $table->foreign('santri_id')->references('id')->on('psb_pendaftaran_santri')->onDelete('cascade');
         });
+        Schema::create('psb_jadwal_wawancara', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('santri_id');
+            $table->date('tanggal_wawancara');
+            $table->time('jam_wawancara');
+            $table->enum('mode', ['online', 'offline']);
+            $table->string('link_online')->nullable();
+            $table->string('lokasi_offline')->nullable();
+            $table->timestamps();
+
+            $table->foreign('santri_id')->references('id')->on('psb_pendaftaran_santri')->onDelete('cascade');
+        });
     }
 
     public function down()
@@ -120,5 +132,6 @@ class CreatePsbDataTable extends Migration
         Schema::dropIfExists('psb_wali_santri');
         Schema::dropIfExists('psb_pendaftaran_santri');
         Schema::dropIfExists('psb_periodes');
+        Schema::dropIfExists('psb_jadwal_wawancara');
     }
 }
