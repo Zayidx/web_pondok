@@ -123,7 +123,7 @@
     </li>
 
     {{-- Master Pendaftaran Santri Baru --}}
-    <li class="sidebar-item has-sub {{ Request::routeIs('admin.show-registrations*') ? 'active' : '' }}">
+    <li class="sidebar-item has-sub {{ Request::routeIs('admin.master-psb*') ? 'active' : '' }}">
         <a href="" class='sidebar-link'>
             <i class="bi bi-journal-text"></i>
             <span>Master PSB</span>
@@ -131,10 +131,10 @@
 
         <ul class="submenu ">
             <li class="submenu-item  ">
-                <a href="{{ route('admin.show-registrations') }}" wire:navigate  class="submenu-link {{ Request::routeIs('admin.show-registrations') ? 'text-primary fs-6' : '' }}">List Santri Baru</a>
+                <a href="{{ route('admin.master-psb.show-registrations') }}" wire:navigate  class="submenu-link {{ Request::routeIs('admin.show-registrations') ? 'text-primary fs-6' : '' }}">List Santri Baru</a>
             </li>
             <li class="submenu-item  ">
-                <a href="{{ route('admin.interview-list') }}" wire:navigate  class="submenu-link {{ Request::routeIs('admin.interview-list') ? 'text-primary fs-6' : '' }}">Wawancara Santri Baru</a>
+                <a href="{{ route('admin.master-psb.interview-list') }}" wire:navigate  class="submenu-link {{ Request::routeIs('admin.interview-list') ? 'text-primary fs-6' : '' }}">Wawancara Santri Baru</a>
             </li>
         </ul>
  

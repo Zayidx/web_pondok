@@ -61,7 +61,159 @@ class InterviewList extends Component
         'lokasiWawancara' => ['except' => ''],
     ];
 
-    // ... (metode lain seperti sortBy, cancelAcceptance, dll. dapat ditambahkan di sini)
+    /**
+     * Mereset halaman saat pencarian diperbarui
+     * - Memastikan paginasi kembali ke halaman pertama
+     */
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    /**
+     * Mereset halaman saat filter tanggal wawancara diperbarui
+     * - Memastikan paginasi kembali ke halaman pertama
+     */
+    public function updatingTanggalWawancara()
+    {
+        $this->resetPage();
+    }
+
+    /**
+     * Mereset halaman saat filter jam wawancara diperbarui
+     * - Memastikan paginasi kembali ke halaman pertama
+     */
+    public function updatingJamWawancara()
+    {
+        $this->resetPage();
+    }
+
+    /**
+     * Mereset halaman saat filter lokasi wawancara diperbarui
+     * - Memastikan paginasi kembali ke halaman pertama
+     */
+    public function updatingLokasiWawancara()
+    {
+        $this->resetPage();
+    }
+
+    /**
+     * Mereset halaman saat jumlah item per halaman diperbarui
+     * - Memastikan paginasi kembali ke halaman pertama
+     */
+    public function updatingPerPage()
+    {
+        $this->resetPage();
+    }
+
+    /**
+     * Mengatur pengurutan data
+     * - Jika kolom yang sama diklik, ubah arah pengurutan (asc/desc)
+     * - Jika kolom baru diklik, set arah pengurutan ke asc
+     */
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
+        }
+    }
+
+    /**
+     * Membatalkan penerimaan santri
+     * - Mengupdate status santri menjadi null
+     * - Menghapus jadwal wawancara, data santri, dan data orang tua terkait
+     * - Menampilkan pesan sukses atau error
+     */
+    public function cancelAcceptance($santriId)
+    {
+        DB::beginTransaction();  // Memulai transaksi database
+        try {
+            $santri = PendaftaranSantri::findOrFail($santriId);
+            $santri->update(['status_santri' => null, 'reason_rejected' => null]);  // Mengosongkan status dan alasan penolakan
+
+            // Menghapus jadwal wawancara terkait
+            JadwalWawancara::where('santri_id', $santriId)->delete();
+
+            // Menghapus data santri dan orang tua dari tabel terkait
+            \App\Models\Santri::where('nisn', $santri->nisn)->delete();
+            \App\Models\OrangTuaSantri::where('santri_id', $santri->id)->delete();
+
+            DB::commit();  // Menyelesaikan transaksi jika sukses
+            session()->flash('success', 'Status santri dibatalkan.');
+        } catch (\Exception $e) {
+            DB::rollBack();  // Membatalkan transaksi jika gagal
+            Log::error('Error in cancelAcceptance: ' . $e->getMessage());  // Mencatat error
+            session()->flash('error', 'Gagal membatalkan: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Membuka modal untuk mengedit jadwal wawancara
+     * - Mengambil data wawancara berdasarkan ID
+     * - Mengisi formulir edit dengan data yang ada
+     * - Membuka modal dan mereset validasi
+     */
+    public function openEditInterviewModal($interviewId)
+    {
+        $interview = JadwalWawancara::findOrFail($interviewId);
+        $this->selectedInterviewId = $interviewId;
+        $this->editInterviewForm = [
+            'tanggal_wawancara' => $interview->tanggal_wawancara,
+            'jam_wawancara' => $interview->jam_wawancara,
+            'mode' => $interview->mode,
+            'link_online' => $interview->link_online,
+            'lokasi_offline' => $interview->lokasi_offline,
+        ];
+        $this->editInterviewModal = true;
+        $this->resetValidation();
+    }
+
+    /**
+     * Menutup semua modal
+     * - Menutup modal edit wawancara dan penolakan
+     */
+    public function closeModal()
+    {
+        $this->editInterviewModal = false;
+        $this->rejectModal = false;
+    }
+
+    /**
+     * Memperbarui jadwal wawancara
+     * - Memvalidasi input (tanggal harus setelah hari ini, mode wajib, dll.)
+     * - Mengupdate data wawancara di database
+     * - Menutup modal dan menampilkan pesan sukses atau error
+     */
+    public function updateInterview()
+    {
+        $this->validate([
+            'editInterviewForm.tanggal_wawancara' => 'required|date|after:today',  // Tanggal wajib dan harus setelah hari ini
+            'editInterviewForm.jam_wawancara' => 'required',                       // Jam wajib diisi
+            'editInterviewForm.mode' => 'required|in:online,offline',              // Mode wajib, hanya online/offline
+            'editInterviewForm.link_online' => 'required_if:editInterviewForm.mode,online|url|nullable',  // Link wajib jika mode online
+            'editInterviewForm.lokasi_offline' => 'required_if:editInterviewForm.mode,offline|nullable',  // Lokasi wajib jika mode offline
+        ]);
+
+        try {
+            $interview = JadwalWawancara::findOrFail($this->selectedInterviewId);
+            $interview->update([
+                'tanggal_wawancara' => $this->editInterviewForm['tanggal_wawancara'],
+                'jam_wawancara' => $this->editInterviewForm['jam_wawancara'],
+                'mode' => $this->editInterviewForm['mode'],
+                'link_online' => $this->editInterviewForm['link_online'],
+                'lokasi_offline' => $this->editInterviewForm['lokasi_offline'],
+            ]);
+
+            $this->editInterviewModal = false;
+            session()->flash('success', 'Jadwal wawancara berhasil diperbarui.');
+        } catch (\Exception $e) {
+            Log::error('Error in updateInterview: ' . $e->getMessage());  // Mencatat error
+            session()->flash('error', 'Gagal memperbarui: ' . $e->getMessage());
+        }
+    }
 
     /**
      * Membuka modal untuk menolak santri
@@ -87,7 +239,7 @@ class InterviewList extends Component
     public function reject()
     {
         $this->validate([
-            'rejectForm.reason' => 'required|string|max:500',
+            'rejectForm.reason' => 'required|string|max:500',  // Alasan wajib, maksimal 500 karakter
         ]);
 
         DB::beginTransaction();  // Memulai transaksi database
@@ -95,7 +247,7 @@ class InterviewList extends Component
             $santri = PendaftaranSantri::findOrFail($this->selectedSantriId);
             $santri->update([
                 'status_santri' => 'ditolak',
-                'reason_rejected' => $this->rejectForm['reason'], // Menyimpan alasan penolakan
+                'reason_rejected' => $this->rejectForm['reason'],  // Menyimpan alasan penolakan
             ]);
 
             // Menghapus jadwal wawancara terkait
@@ -125,7 +277,7 @@ class InterviewList extends Component
     {
         $interviews = PendaftaranSantri::query()
             ->where('status_santri', 'diterima')  // Hanya menampilkan santri yang diterima
-            ->with('jadwalWawancara')            // Mengambil relasi jadwal wawancara
+            ->with('jadwalWawancara')             // Mengambil relasi jadwal wawancara
             ->when($this->search, function ($query) {
                 $query->where('nama_lengkap', 'like', '%' . $this->search . '%')
                     ->orWhere('nisn', 'like', '%' . $this->search . '%');  // Pencarian berdasarkan nama atau NISN

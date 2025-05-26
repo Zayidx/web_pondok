@@ -48,9 +48,9 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     
     //PSB 
     Route::prefix('master-psb')->group(function () {
-        Route::get('/show-registrations', \App\Livewire\Admin\PSB\ShowRegistrations::class)->name('admin.show-registrations');
+        Route::get('/show-registrations', \App\Livewire\Admin\PSB\ShowRegistrations::class)->name('admin.master-psb.show-registrations');
         Route::get('/show-registrations/{santriId}', \App\Livewire\Admin\PSB\DetailRegistration::class)->name('admin.show-registration.detail');
-        Route::get('/wawancara-santri', \App\Livewire\Admin\PSB\InterviewList::class)->name('admin.interview-list');
+        Route::get('/wawancara-santri', \App\Livewire\Admin\PSB\InterviewList::class)->name('admin.master-psb.interview-list');
     });
    
    

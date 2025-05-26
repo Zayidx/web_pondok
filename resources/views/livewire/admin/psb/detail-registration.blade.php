@@ -1,6 +1,6 @@
 <div>
     <div class="d-flex mb-2">
-        <a href="{{ route('admin.show-registrations') }}" class="btn btn-primary">
+        <a href="{{ route('admin.master-psb.show-registrations') }}" class="btn btn-primary">
             <i class="bi bi-arrow-left-circle-fill"></i>
             Kembali ke Daftar Pendaftaran
         </a>
