@@ -11,7 +11,7 @@ class CheckStatus extends Component
     public $nisn = '';
     public $santri = null;
     public $interview = null;
-    public $errorMessage = '';
+    public $errorMessage = ''; // Pastikan didefinisikan sebagai properti publik
 
     public function checkStatus()
     {
@@ -35,6 +35,6 @@ class CheckStatus extends Component
 
     public function render()
     {
-        return view('livewire.guest.check-status')->layout('components.layouts.register-santri');
+        return view('livewire.guest.check-status')->layout('components.layouts.register-santri', ['title' => 'Cek Status Pendaftaran']);
     }
 }
