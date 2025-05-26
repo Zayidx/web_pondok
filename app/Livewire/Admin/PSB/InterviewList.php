@@ -151,6 +151,6 @@ class InterviewList extends Component
 
         return view('livewire.admin.psb.interview-list', [
             'interviews' => $interviews,  // Mengirim data ke view
-        ])->layout('components.layouts.register-santri', ['title' => 'Daftar Jadwal Wawancara']);  // Mengatur layout dan judul
+        ]);
     }
 }
