@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\PSB;
+namespace App\Livewire\Guest;
 
 use Livewire\Component;
 use App\Models\PSB\PendaftaranSantri;
@@ -35,6 +35,6 @@ class CheckStatus extends Component
 
     public function render()
     {
-        return view('livewire.p-s-b.check-status')->layout('components.layouts.register-santri');
+        return view('livewire.guest.check-status')->layout('components.layouts.register-santri');
     }
 }

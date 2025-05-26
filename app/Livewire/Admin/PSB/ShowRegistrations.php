@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\PSB;
+namespace App\Livewire\Admin\PSB;
 
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -22,6 +22,7 @@ class ShowRegistrations extends Component
     public $sortField = 'created_at';
     public $sortDirection = 'desc';
     public $interviewModal = false;
+    public $rejectModal = false;
     public $selectedSantriId;
     public $interviewForm = [
         'tanggal_wawancara' => '',
@@ -29,6 +30,9 @@ class ShowRegistrations extends Component
         'mode' => 'offline',
         'link_online' => '',
         'lokasi_offline' => '',
+    ];
+    public $rejectForm = [
+        'reason' => '',
     ];
 
     protected $queryString = [
@@ -95,6 +99,7 @@ class ShowRegistrations extends Component
     public function closeModal()
     {
         $this->interviewModal = false;
+        $this->rejectModal = false;
     }
 
     public function saveInterview()
@@ -103,7 +108,7 @@ class ShowRegistrations extends Component
 
         $this->validate([
             'interviewForm.tanggal_wawancara' => 'required|date|after:today',
-            'interviewForm.jam_wawancara' => 'required|date_format:H:i', // Validasi format waktu (HH:MM)
+            'interviewForm.jam_wawancara' => 'required',
             'interviewForm.mode' => 'required|in:online,offline',
             'interviewForm.link_online' => 'required_if:interviewForm.mode,online|url|nullable',
             'interviewForm.lokasi_offline' => 'required_if:interviewForm.mode,offline|nullable',
@@ -138,11 +143,64 @@ class ShowRegistrations extends Component
         }
     }
 
-    public function reject($santriId)
+    public function openRejectModal($santriId)
     {
-        $santri = PendaftaranSantri::findOrFail($santriId);
-        $santri->update(['status_santri' => 'ditolak']);
-        session()->flash('success', 'Santri ditolak.');
+        $this->selectedSantriId = $santriId;
+        $this->rejectForm = ['reason' => ''];
+        $this->rejectModal = true;
+        $this->resetValidation();
+    }
+
+    public function reject()
+    {
+        $this->validate([
+            'rejectForm.reason' => 'required|string|max:500',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $santri = PendaftaranSantri::findOrFail($this->selectedSantriId);
+            $santri->update([
+                'status_santri' => 'ditolak',
+                'reason_rejected' => $this->rejectForm['reason'],
+            ]);
+
+            // Hapus jadwal wawancara jika ada
+            \App\Models\PSB\JadwalWawancara::where('santri_id', $santri->id)->delete();
+            // Hapus data dari tabel santri dan orang tua santri jika ada
+            \App\Models\Santri::where('nisn', $santri->nisn)->delete();
+            \App\Models\OrangTuaSantri::where('santri_id', $santri->id)->delete();
+
+            DB::commit();
+            $this->rejectModal = false;
+            session()->flash('success', 'Santri ditolak dengan alasan yang diberikan.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error in reject: ' . $e->getMessage());
+            session()->flash('error', 'Gagal menolak santri: ' . $e->getMessage());
+        }
+    }
+
+    public function cancelStatus($santriId)
+    {
+        DB::beginTransaction();
+        try {
+            $santri = PendaftaranSantri::findOrFail($santriId);
+            $santri->update(['status_santri' => null, 'reason_rejected' => null]);
+
+            // Hapus jadwal wawancara jika ada
+            \App\Models\PSB\JadwalWawancara::where('santri_id', $santri->id)->delete();
+            // Hapus data dari tabel santri dan orang tua santri jika ada
+            \App\Models\Santri::where('nisn', $santri->nisn)->delete();
+            \App\Models\OrangTuaSantri::where('santri_id', $santri->id)->delete();
+
+            DB::commit();
+            session()->flash('success', 'Status santri dibatalkan.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error in cancelStatus: ' . $e->getMessage());
+            session()->flash('error', 'Gagal membatalkan status: ' . $e->getMessage());
+        }
     }
 
     protected function moveToSantri($santri)
@@ -152,10 +210,6 @@ class ShowRegistrations extends Component
             Log::error('Wali not found for santri ID: ' . $santri->id);
             throw new \Exception('Data wali tidak ditemukan.');
         }
-
-        // Map status_santri agar sesuai dengan definisi tabel santris
-        $validStatuses = ['reguler', 'dhuafa', 'yatim_piatu', 'diterima', 'ditolak'];
-        $statusSantri = in_array($santri->status_santri, $validStatuses) ? $santri->status_santri : 'reguler';
 
         $newSantri = \App\Models\Santri::create([
             'nama' => $santri->nama_lengkap,
@@ -172,7 +226,7 @@ class ShowRegistrations extends Component
             'asal_sekolah' => $santri->asal_sekolah,
             'no_whatsapp' => $santri->no_whatsapp,
             'email' => $santri->email,
-            'status_santri' => $statusSantri,
+            'status_santri' => $santri->status_santri,
             'kewarganegaraan' => $santri->kewarganegaraan,
             'kelas_id' => \App\Models\Kelas::where('nama', $santri->kelas)->first()->id ?? null,
             'kamar_id' => \App\Models\Kamar::first()->id ?? null,
@@ -243,7 +297,7 @@ class ShowRegistrations extends Component
             ->orderBy($this->sortField, $this->sortDirection)
             ->paginate($this->perPage);
 
-        return view('livewire.p-s-b.show-registrations', [
+        return view('livewire.admin.psb.show-registrations', [
             'registrations' => $registrations,
             'kewarganegaraanOptions' => ['wni' => 'WNI', 'wna' => 'WNA'],
             'statusSantriOptions' => [

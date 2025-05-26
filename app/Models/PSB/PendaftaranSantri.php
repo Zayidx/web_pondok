@@ -58,4 +58,9 @@ class PendaftaranSantri extends Model
     {
         return $this->hasMany(Pembayaran::class, 'santri_id');
     }
+
+    public function jadwalWawancara()
+    {
+        return $this->hasOne(JadwalWawancara::class, 'santri_id');
+    }
 }

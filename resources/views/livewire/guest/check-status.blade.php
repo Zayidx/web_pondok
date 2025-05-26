@@ -1,6 +1,6 @@
 <div class="container mt-5">
     <div class="card">
-        <div class="card-header bg-primary ">
+        <div class="card-header bg-primary">
             <h4 class="text-white">Cek Status Pendaftaran Santri</h4>
         </div>
         <div class="card-body">
@@ -39,7 +39,11 @@
                     @elseif ($santri->status_santri === 'ditolak')
                         <div class="alert alert-danger">
                             <h5>Mohon maaf, Anda ditolak.</h5>
-                            <p>Silakan hubungi administrasi untuk informasi lebih lanjut.</p>
+                            @if ($santri->reason_rejected)
+                                <p><strong>Alasan Penolakan:</strong> {{ $santri->reason_rejected }}</p>
+                            @else
+                                <p>Silakan hubungi administrasi untuk informasi lebih lanjut.</p>
+                            @endif
                         </div>
                     @else
                         <div class="alert alert-warning">

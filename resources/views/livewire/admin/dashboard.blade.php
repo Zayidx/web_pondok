@@ -20,6 +20,7 @@
                 iconClass="bi bi-usb-mini-fill" textColor="purple" />
         </div>
     </div>
+
     <div style="gap: 5rem;" class="d-flex flex-column">
         <div wire:ignore class="row">
             <div class="col-lg-8">
@@ -72,11 +73,12 @@
                                             @endif
                                         </td>
                                         <td>{{ $santri->nama }}</td>
-                                        <td>{{ $santri->kelas->nama }}</td>
-                                        <td>{{ $santri->kelas->jenjang->nama }}</td>
-                                        <td>{{ $santri->angkatan->nama ?? 'Null' }}</td>
-                                        <td>{{ $santri->kamar->nama }}</td>
-                                        <td><a href="{{ route('admin.master-santri.detail-santri', ['id' => $santri->nism]) }}"
+                                        <td>{{ optional($santri->kelas)->nama ?? 'N/A' }}</td>
+                                        <td>{{ optional(optional($santri->kelas)->jenjang)->nama ?? 'N/A' }}</td>
+                                        <td>{{ optional($santri->angkatan)->nama ?? 'Null' }}</td>
+                                        <td>{{ optional($santri->kamar)->nama ?? 'N/A' }}</td>
+                                        <td>
+                                            <a href="{{ route('admin.master-santri.detail-santri', ['id' => $santri->nism]) }}"
                                                 wire:navigate>
                                                 <button class="btn btn-sm btn-primary text-white">
                                                     <i class="bi bi-eye-fill"></i> Detail
@@ -94,7 +96,6 @@
     </div>
 </section>
 
-{{-- <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.45.1/dist/apexcharts.min.js"></script> --}}
 <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
 <script>
     // Bar Chart (Santri Chart)

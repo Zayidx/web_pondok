@@ -6,7 +6,7 @@
         <div class="alert alert-danger" style="z-index: 1050; position: relative;">{{ session('error') }}</div>
     @endif
 
-    @if ($errors->any() && !$interviewModal)
+    @if ($errors->any() && !$interviewModal && !$rejectModal)
         <div class="alert alert-danger">
             <ul>
                 @foreach ($errors->all() as $error)
@@ -25,19 +25,18 @@
                 <div class="col-md-2">
                     <select class="form-select" wire:model.live="kewarganegaraan">
                         <option value="">Semua Kewarganegaraan</option>
-                        @foreach ($kewarganegaraanOptions as $value => $label)
-                            <option value="{{ $value }}">{{ $label }}</option>
-                        @endforeach
+                        <option value="wni">WNI</option>
+                        <option value="wna">WNA</option>
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <input type="text" class="form-control" wire:model.live="kota" placeholder="Kota...">
+                    <input type="text" class="form-control" wire:model.live="kota" placeholder="Kota">
                 </div>
                 <div class="col-md-2">
                     <select class="form-select" wire:model.live="status_santri">
                         <option value="">Semua Status</option>
-                        @foreach ($statusSantriOptions as $value => $label)
-                            <option value="{{ $value }}">{{ $label }}</option>
+                        @foreach ($statusSantriOptions as $key => $value)
+                            <option value="{{ $key }}">{{ $value }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -57,9 +56,9 @@
                         <tr>
                             <th wire:click="sortBy('nama_lengkap')">Nama Santri @if($sortField == 'nama_lengkap') <i class="bi {{ $sortDirection == 'asc' ? 'bi-arrow-up' : 'bi-arrow-down' }}"></i> @endif</th>
                             <th wire:click="sortBy('nisn')">NISN @if($sortField == 'nisn') <i class="bi {{ $sortDirection == 'asc' ? 'bi-arrow-up' : 'bi-arrow-down' }}"></i> @endif</th>
-                            <th wire:click="sortBy('kewarganegaraan')">Kewarganegaraan @if($sortField == 'kewarganegaraan') <i class="bi {{ $sortDirection == 'asc' ? 'bi-arrow-up' : 'bi-arrow-down' }}"></i> @endif</th>
+                            <th>Kewarganegaraan</th>
                             <th>Kota</th>
-                            <th wire:click="sortBy('status_santri')">Status Santri @if($sortField == 'status_santri') <i class="bi {{ $sortDirection == 'asc' ? 'bi-arrow-up' : 'bi-arrow-down' }}"></i> @endif</th>
+                            <th>Status Santri</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -70,18 +69,19 @@
                                 <td>{{ $registration->nisn }}</td>
                                 <td>{{ $registration->kewarganegaraan }}</td>
                                 <td>{{ $registration->wali->kabupaten ?? '-' }}</td>
-                                <td>{{ $statusSantriOptions[$registration->status_santri] ?? $registration->status_santri }}</td>
+                                <td>{{ $registration->status_santri }}</td>
                                 <td>
-                                    <a href="{{ route('admin.show-registration.detail', $registration->id) }}" class="btn btn-sm btn-info">Detail</a>
-                                    @if ($registration->status_santri !== 'diterima' && $registration->status_santri !== 'ditolak')
+                                    @if ($registration->status_santri === 'diterima' || $registration->status_santri === 'ditolak')
+                                        <button wire:click="cancelStatus({{ $registration->id }})" class="btn btn-sm btn-secondary">Batalkan Status</button>
+                                    @elseif ($registration->status_santri === null)
                                         <button wire:click="openInterviewModal({{ $registration->id }})" class="btn btn-sm btn-success">Diterima</button>
-                                        <button wire:click="reject({{ $registration->id }})" class="btn btn-sm btn-danger">Ditolak</button>
+                                        <button wire:click="openRejectModal({{ $registration->id }})" class="btn btn-sm btn-danger">Tolak</button>
                                     @endif
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center">Tidak ada data pendaftaran.</td>
+                                <td colspan="6" class="text-center">Tidak ada data pendaftaran santri.</td>
                             </tr>
                         @endforelse
                     </tbody>
@@ -146,6 +146,41 @@
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" wire:click="closeModal">Batal</button>
                         <button type="button" class="btn btn-primary" wire:click="saveInterview">Simpan</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-backdrop fade show" style="z-index: 1030;"></div>
+    @endif
+
+    <!-- Reject Modal -->
+    @if ($rejectModal)
+        <div class="modal fade show" id="rejectModal" tabindex="-1" role="dialog" style="display: block; z-index: 1040;">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Tolak Santri</h5>
+                        <button type="button" class="btn-close" wire:click="closeModal"></button>
+                    </div>
+                    <div class="modal-body" style="max-height: 60vh; overflow-y: auto;">
+                        @if ($errors->any())
+                            <div class="alert alert-danger">
+                                <ul>
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+                        <div class="form-group mb-3">
+                            <label>Alasan Penolakan</label>
+                            <textarea class="form-control" wire:model="rejectForm.reason" rows="4" placeholder="Masukkan alasan penolakan..."></textarea>
+                            @error('rejectForm.reason') <span class="text-danger">{{ $message }}</span> @enderror
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" wire:click="closeModal">Batal</button>
+                        <button type="button" class="btn btn-danger" wire:click="reject">Tolak</button>
                     </div>
                 </div>
             </div>

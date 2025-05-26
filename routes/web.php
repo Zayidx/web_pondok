@@ -13,9 +13,8 @@ Route::get('/', function () {
 });
 
 Route::get('/register-santri', RegisterSantri::class)->name('register-santri');
-Route::get('/show-registrations', ShowRegistrations::class)->name('admin.show-registrations');
-Route::get('/show-registrations/{santriId}', DetailRegistration::class)->name('admin.show-registration.detail');
-Route::get('/check-status', CheckStatus::class)->name('check-status');
+
+Route::get('/check-status', \App\Livewire\Guest\CheckStatus::class)->name('check-status');
 
 Route::prefix('auth')->group(function () {
     Route::get('/login', Auth\Login::class)->name('login');

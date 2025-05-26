@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\PSB;
+namespace App\Livewire\Admin\PSB;
 
 use Livewire\Component;
 use App\Models\PSB\PendaftaranSantri;
@@ -41,6 +41,6 @@ class DetailRegistration extends Component
 
     public function render()
     {
-        return view('livewire.p-s-b.detail-registration');
+        return view('livewire.admin.psb.detail-registration');
     }
 }
