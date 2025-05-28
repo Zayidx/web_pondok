@@ -2,20 +2,27 @@
 
 namespace Database\Seeders;
 
+use App\Models\PSB\Periode;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
+/**
+ * Seeder for populating the psb_periodes table.
+ */
 class PsbPeriodesSeeder extends Seeder
 {
+    /**
+     * Run the database seeds.
+     *
+     * @return void
+     */
     public function run()
     {
-        DB::table('psb_periodes')->insert([
-            'nama_jenjang' => 'SMP',
-            'periode_mulai' => '2025-05-01',
-            'periode_selesai' => '2025-06-30',
+        Periode::create([
+            'nama_periode' => 'Pendaftaran 2025',
+            'periode_mulai' => '2025-01-01',
+            'periode_selesai' => '2025-03-31',
             'status_periode' => 'active',
-            'created_at' => now(),
-            'updated_at' => now(),
+            'tahun_ajaran' => '2025/2026',
         ]);
     }
 }

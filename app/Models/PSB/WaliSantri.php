@@ -2,55 +2,71 @@
 
 namespace App\Models\PSB;
 
-use App\Models\PendaftaranSantri;
-use App\Models\PSB\PendaftaranSantri as PSBPendaftaranSantri;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
+/**
+ * Model for the psb_wali_santri table.
+ *
+ * @property int $id
+ * @property int $pendaftaran_santri_id
+ * @property string $nama_ayah
+ * @property string $pekerjaan_ayah
+ * @property string $pendidikan_ayah
+ * @property string $penghasilan_ayah
+ * @property string $nama_ibu
+ * @property string $pekerjaan_ibu
+ * @property string $pendidikan_ibu
+ * @property string $no_telp_ibu
+ * @property string $alamat
+ * @property \Illuminate\Support\Carbon $created_at
+ * @property \Illuminate\Support\Carbon $updated_at
+ */
 class WaliSantri extends Model
 {
-    use HasFactory;
-
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
     protected $table = 'psb_wali_santri';
 
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array
+     */
     protected $fillable = [
         'pendaftaran_santri_id',
-        'nama_kepala_keluarga',
-        'no_hp_kepala_keluarga',
         'nama_ayah',
-        'status_ayah',
-        'kewarganegaraan_ayah',
-        'nik_ayah',
-        'tempat_lahir_ayah',
-        'tanggal_lahir_ayah',
-        'pendidikan_terakhir_ayah',
         'pekerjaan_ayah',
+        'pendidikan_ayah',
         'penghasilan_ayah',
-        'no_telp_ayah',
         'nama_ibu',
-        'status_ibu',
-        'kewarganegaraan_ibu',
-        'nik_ibu',
-        'tempat_lahir_ibu',
-        'tanggal_lahir_ibu',
-        'pendidikan_terakhir_ibu',
         'pekerjaan_ibu',
-        'penghasilan_ibu',
+        'pendidikan_ibu',
         'no_telp_ibu',
-        'provinsi',
-        'kabupaten',
-        'kecamatan',
-        'kelurahan',
-        'rt',
-        'rw',
-        'kode_pos',
-        'status_kepemilikan_rumah',
         'alamat',
-        'status_orang_tua',
     ];
 
-    public function santri()
+    /**
+     * The attributes that should be cast.
+     *
+     * @var array
+     */
+    protected $casts = [
+        'pendidikan_ayah' => 'string',
+        'penghasilan_ayah' => 'string',
+        'pendidikan_ibu' => 'string',
+    ];
+
+    /**
+     * Get the pendaftaran santri that owns this wali santri.
+     *
+     * @return BelongsTo
+     */
+    public function pendaftaranSantri(): BelongsTo
     {
-        return $this->belongsTo(PSBPendaftaranSantri::class, 'pendaftaran_santri_id');
+        return $this->belongsTo(PendaftaranSantri::class, 'pendaftaran_santri_id');
     }
 }

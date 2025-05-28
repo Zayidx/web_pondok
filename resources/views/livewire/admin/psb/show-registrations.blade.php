@@ -23,14 +23,6 @@
                     <input type="text" class="form-control" wire:model.live="search" placeholder="Cari NISN atau Nama Santri...">
                 </div>
                 <div class="col-md-2">
-                    <select class="form-select" wire:model.live="kewarganegaraan">
-                        <option value="">Semua Kewarganegaraan</option>
-                        @foreach ($kewarganegaraanOptions as $value => $label)
-                            <option value="{{ $value }}">{{ $label }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-2">
                     <input type="text" class="form-control" wire:model.live="kota" placeholder="Kota...">
                 </div>
                 <div class="col-md-2">
@@ -57,7 +49,6 @@
                         <tr>
                             <th wire:click="sortBy('nama_lengkap')">Nama Santri @if($sortField == 'nama_lengkap') <i class="bi {{ $sortDirection == 'asc' ? 'bi-arrow-up' : 'bi-arrow-down' }}"></i> @endif</th>
                             <th wire:click="sortBy('nisn')">NISN @if($sortField == 'nisn') <i class="bi {{ $sortDirection == 'asc' ? 'bi-arrow-up' : 'bi-arrow-down' }}"></i> @endif</th>
-                            <th wire:click="sortBy('kewarganegaraan')">Kewarganegaraan @if($sortField == 'kewarganegaraan') <i class="bi {{ $sortDirection == 'asc' ? 'bi-arrow-up' : 'bi-arrow-down' }}"></i> @endif</th>
                             <th>Kota</th>
                             <th wire:click="sortBy('status_santri')">Status Santri @if($sortField == 'status_santri') <i class="bi {{ $sortDirection == 'asc' ? 'bi-arrow-up' : 'bi-arrow-down' }}"></i> @endif</th>
                             <th>Aksi</th>
@@ -68,23 +59,22 @@
                             <tr>
                                 <td>{{ $registration->nama_lengkap }}</td>
                                 <td>{{ $registration->nisn }}</td>
-                                <td>{{ $registration->kewarganegaraan }}</td>
-                                <td>{{ $registration->wali->kabupaten ?? '-' }}</td>
+                                <td>{{ $registration->wali->alamat ?? '-' }}</td>
                                 <td>{{ $statusSantriOptions[$registration->status_santri] ?? $registration->status_santri }}</td>
                                 <td>
                                     <a href="{{ route('admin.show-registration.detail', $registration->id) }}" class="btn btn-sm btn-info">Detail</a>
-                                    @if ($registration->status_santri !== 'diterima' && $registration->status_santri !== 'ditolak')
+                                    @if (!in_array($registration->status_santri, ['diterima', 'ditolak']))
                                         <button wire:click="openInterviewModal({{ $registration->id }})" class="btn btn-sm btn-success">Diterima</button>
                                         <button wire:click="openRejectModal({{ $registration->id }})" class="btn btn-sm btn-danger">Ditolak</button>
                                     @endif
-                                    @if ($registration->status_santri === 'diterima' || $registration->status_santri === 'ditolak')
+                                    @if (in_array($registration->status_santri, ['diterima', 'ditolak']))
                                         <button wire:click="cancelStatus({{ $registration->id }})" class="btn btn-sm btn-warning">Batalkan Status</button>
                                     @endif
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center">Tidak ada data pendaftaran.</td>
+                                <td colspan="5" class="text-center">Tidak ada data pendaftaran.</td>
                             </tr>
                         @endforelse
                     </tbody>

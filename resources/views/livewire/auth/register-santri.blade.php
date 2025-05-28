@@ -1,428 +1,406 @@
-<section id="multiple-column-form">
-    <div class="row match-height">
-        <div class="col-12">
-            <div class="card shadow">
-                <div class="card-header bg-success">
-                    <h4 class="card-title text-white">
-                        Formulir Pendaftaran Santri Baru - 
-                        @if ($formPage == 1)
-                            Data Santri
-                        @elseif ($formPage == 2)
-                            Data Wali
-                        @else
-                            Data Alamat
-                        @endif
-                    </h4>
+
+    <div>
+        <!-- Navigation -->
+        <nav class="bg-white shadow-lg">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex justify-between items-center h-16">
+                    <div class="flex items-center">
+                        <a href="/" class="flex items-center">
+                            <img class="h-10 w-10" src="https://via.placeholder.com/40x40/1e40af/ffffff?text=SMA" alt="Logo SMA" />
+                            <div class="ml-3">
+                                <h1 class="text-xl font-bold text-primary">SMA Bina Prestasi</h1>
+                            </div>
+                        </a>
+                    </div>
+                    <div class="flex items-center space-x-4">
+                        <a href="/" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition duration-300">
+                            <i class="fas fa-home mr-2"></i>Beranda
+                        </a>
+                        <a href="/login" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition duration-300">
+                            Login
+                        </a>
+                    </div>
                 </div>
-                <div class="card-content">
-                    <div class="card-body">
-                        @if ($successMessage)
-                            <div x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 2500)" class="alert alert-success">
-                                {{ $successMessage }}
+            </div>
+        </nav>
+
+        <!-- Header Section -->
+        <section class="bg-gradient-to-r from-primary to-blue-700 text-white py-12">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h1 class="text-3xl md:text-4xl font-bold mb-4">Pendaftaran Siswa Baru</h1>
+                <p class="text-xl mb-6">Tahun Ajaran 2025/2026</p>
+                <div class="bg-white bg-opacity-20 rounded-lg p-4 inline-block">
+                    <p class="text-lg font-semibold">📅 Pendaftaran Dibuka: 1 Januari - 31 Maret 2025</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Progress Steps -->
+        <section class="bg-white py-8 border-b">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-center space-x-4 md:space-x-8">
+                    <div class="flex items-center">
+                        <div class="{{ $formPage == 1 ? 'bg-primary text-white' : 'bg-gray-300 text-gray-600' }} rounded-full w-10 h-10 flex items-center justify-center font-bold">1</div>
+                        <span class="ml-2 {{ $formPage == 1 ? 'text-primary font-semibold' : 'text-gray-600' }}">Data Pribadi</span>
+                    </div>
+                    <div class="w-8 h-1 bg-gray-300"></div>
+                    <div class="flex items-center">
+                        <div class="{{ $formPage == 2 ? 'bg-primary text-white' : 'bg-gray-300 text-gray-600' }} rounded-full w-10 h-10 flex items-center justify-center font-bold">2</div>
+                        <span class="ml-2 {{ $formPage == 2 ? 'text-primary font-semibold' : 'text-gray-600' }}">Data Orang Tua</span>
+                    </div>
+                    <div class="w-8 h-1 bg-gray-300"></div>
+                    <div class="flex items-center">
+                        <div class="{{ $formPage == 3 ? 'bg-primary text-white' : 'bg-gray-300 text-gray-600' }} rounded-full w-10 h-10 flex items-center justify-center font-bold">3</div>
+                        <span class="ml-2 {{ $formPage == 3 ? 'text-primary font-semibold' : 'text-gray-600' }}">Upload Dokumen</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Registration Form -->
+        <section class="py-12">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                @if($successMessage)
+                    <div id="successMessage" class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6 rounded" x-data="{ show: true }" x-show="show" x-init="setTimeout(() => show = false, 2500)">
+                        <p>{{ $successMessage }}</p>
+                    </div>
+                @endif
+
+                @if($errors->has('submit'))
+                    <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded">
+                        <p>{{ $errors->first('submit') }}</p>
+                    </div>
+                @endif
+
+                <form wire:submit.prevent="submit" id="registrationForm" class="space-y-8">
+                    <!-- Step 1: Data Pribadi Siswa -->
+                    <div id="step1" class="{{ $formPage == 1 ? 'block' : 'hidden' }} bg-white rounded-lg shadow-lg p-8">
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-2">Data Pribadi Siswa</h2>
+                            <p class="text-gray-600">Lengkapi data pribadi calon siswa dengan benar</p>
+                        </div>
+
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap *</label>
+                                <input type="text" wire:model="santriForm.nama_lengkap" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-300" placeholder="Masukkan nama lengkap" />
+                                @error('santriForm.nama_lengkap') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
                             </div>
-                        @endif
-                        @if ($errors->any())
-                            <div class="alert alert-danger">
-                                <ul>
-                                    @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">NISN *</label>
+                                <input type="text" wire:model="santriForm.nisn" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-300" placeholder="Nomor Induk Siswa Nasional" />
+                                @error('santriForm.nisn') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
                             </div>
-                        @endif
-                        <form class="form" wire:submit.prevent="submit">
-                            @if ($formPage == 1)
-                                <div class="steppers santri row">
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="foto" class="fw-semibold text-black">Foto (PNG/JPG/JPEG, Max 2MB)</label>
-                                        <input type="file" class="form-control" wire:model="foto" id="foto" accept="image/png,image/jpeg,image/jpg">
-                                        @error('foto') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="santriForm.nama_lengkap" class="fw-semibold text-black">Nama Lengkap</label>
-                                        <input type="text" class="form-control" wire:model="santriForm.nama_lengkap" id="santriForm.nama_lengkap" placeholder="Masukan Nama Lengkap">
-                                        @error('santriForm.nama_lengkap') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="santriForm.nisn" class="fw-semibold text-black">NISN</label>
-                                        <input type="text" class="form-control" wire:model="santriForm.nisn" id="santriForm.nisn" placeholder="Masukan NISN">
-                                        @error('santriForm.nisn') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="santriForm.nism" class="fw-semibold text-black">NISM</label>
-                                        <input type="text" class="form-control" wire:model="santriForm.nism" id="santriForm.nism" placeholder="Masukan NISM">
-                                        @error('santriForm.nism') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="santriForm.npsn" class="fw-semibold text-black">NPSN</label>
-                                        <input type="text" class="form-control" wire:model="santriForm.npsn" id="santriForm.npsn" placeholder="Masukan NPSN">
-                                        @error('santriForm.npsn') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="santriForm.kewarganegaraan" class="fw-semibold text-black">Kewarganegaraan</label>
-                                        <select class="form-select" wire:model="santriForm.kewarganegaraan">
-                                            <option value="">Pilih Kewarganegaraan</option>
-                                            <option value="wni">WNI</option>
-                                            <option value="wna">WNA</option>
-                                        </select>
-                                        @error('santriForm.kewarganegaraan') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="santriForm.nik" class="fw-semibold text-black">NIK</label>
-                                        <input type="text" class="form-control" wire:model="santriForm.nik" id="santriForm.nik" placeholder="Masukan NIK">
-                                        @error('santriForm.nik') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="santriForm.riwayat_penyakit" class="fw-semibold text-black">Riwayat Penyakit</label>
-                                        <input type="text" class="form-control" wire:model="santriForm.riwayat_penyakit" id="santriForm.riwayat_penyakit" placeholder="Masukan Riwayat Penyakit">
-                                        @error('santriForm.riwayat_penyakit') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="santriForm.tempat_lahir" class="fw-semibold text-black">Tempat Lahir</label>
-                                        <input type="text" class="form-control" wire:model="santriForm.tempat_lahir" id="santriForm.tempat_lahir" placeholder="Masukan Tempat Lahir">
-                                        @error('santriForm.tempat_lahir') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="santriForm.tanggal_lahir" class="fw-semibold text-black">Tanggal Lahir</label>
-                                        <input type="date" class="form-control" wire:model="santriForm.tanggal_lahir" id="santriForm.tanggal_lahir">
-                                        @error('santriForm.tanggal_lahir') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="santriForm.jenis_kelamin" class="fw-semibold text-black">Jenis Kelamin</label>
-                                        <select class="form-select" wire:model="santriForm.jenis_kelamin">
-                                            <option value="">Pilih Jenis Kelamin</option>
-                                            <option value="putera">Laki-laki</option>
-                                            <option value="puteri">Perempuan</option>
-                                        </select>
-                                        @error('santriForm.jenis_kelamin') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="santriForm.jumlah_saudara_kandung" class="fw-semibold text-black">Jumlah Saudara Kandung</label>
-                                        <input type="number" class="form-control" wire:model="santriForm.jumlah_saudara_kandung" id="santriForm.jumlah_saudara_kandung" placeholder="Masukan Jumlah">
-                                        @error('santriForm.jumlah_saudara_kandung') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="santriForm.anak_keberapa" class="fw-semibold text-black">Anak Keberapa</label>
-                                        <input type="number" class="form-control" wire:model="santriForm.anak_keberapa" id="santriForm.anak_keberapa" placeholder="Masukan Anak Ke">
-                                        @error('santriForm.anak_keberapa') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="santriForm.hobi" class="fw-semibold text-black">Hobi</label>
-                                        <input type="text" class="form-control" wire:model="santriForm.hobi" id="santriForm.hobi" placeholder="Masukan Hobi">
-                                        @error('santriForm.hobi') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="santriForm.aktivitas_pendidikan" class="fw-semibold text-black">Aktivitas Pendidikan</label>
-                                        <select class="form-select" wire:model="santriForm.aktivitas_pendidikan">
-                                            <option value="">Pilih Aktivitas</option>
-                                            <option value="aktif">Aktif</option>
-                                            <option value="nonaktif">Nonaktif</option>
-                                        </select>
-                                        @error('santriForm.aktivitas_pendidikan') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="santriForm.no_kip" class="fw-semibold text-black">No KIP</label>
-                                        <input type="text" class="form-control" wire:model="santriForm.no_kip" id="santriForm.no_kip" placeholder="Masukan KIP">
-                                        @error('santriForm.no_kip') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="santriForm.no_kk" class="fw-semibold text-black">No KK</label>
-                                        <input type="text" class="form-control" wire:model="santriForm.no_kk" id="santriForm.no_kk" placeholder="Masukan No KK">
-                                        @error('santriForm.no_kk') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="santriForm.status_santri" class="fw-semibold text-black">Status Santri</label>
-                                        <select class="form-select" wire:model="santriForm.status_santri">
-                                            <option value="">Pilih Status</option>
-                                            <option value="reguler">Reguler</option>
-                                            <option value="dhuafa">Dhuafa</option>
-                                            <option value="yatim_piatu">Yatim Piatu</option>
-                                        </select>
-                                        @error('santriForm.status_santri') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="santriForm.kelas" class="fw-semibold text-black">Kelas</label>
-                                        <select class="form-select" wire:model="santriForm.kelas">
-                                            <option value="">Pilih Kelas</option>
-                                            <option value="SMP">SMP</option>
-                                            <option value="SMA">SMA</option>
-                                        </select>
-                                        @error('santriForm.kelas') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="santriForm.nama_kepala_keluarga" class="fw-semibold text-black">Nama Kepala Keluarga</label>
-                                        <input type="text" class="form-control" wire:model="santriForm.nama_kepala_keluarga" id="santriForm.nama_kepala_keluarga" placeholder="Masukan Nama">
-                                        @error('santriForm.nama_kepala_keluarga') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="santriForm.no_hp_kepala_keluarga" class="fw-semibold text-black">No Telepon Kepala Keluarga</label>
-                                        <input type="text" class="form-control" wire:model="santriForm.no_hp_kepala_keluarga" id="santriForm.no_hp_kepala_keluarga" placeholder="081xxxx">
-                                        @error('santriForm.no_hp_kepala_keluarga') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="santriForm.asal_sekolah" class="fw-semibold text-black">Asal Sekolah</label>
-                                        <input type="text" class="form-control" wire:model="santriForm.asal_sekolah" id="santriForm.asal_sekolah" placeholder="Masukan Asal Sekolah">
-                                        @error('santriForm.asal_sekolah') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="santriForm.pembiayaan" class="fw-semibold text-black">Yang Membiayai Sekolah</label>
-                                        <select class="form-select" wire:model="santriForm.pembiayaan">
-                                            <option value="">Pilih Pembiayaan</option>
-                                            <option value="Orang Tua (Ayah/Ibu)">Orang Tua (Ayah/Ibu)</option>
-                                            <option value="Beasiswa">Beasiswa</option>
-                                            <option value="Wali(Kakak/Paman/Bibi)">Wali(Kakak/Paman/Bibi)</option>
-                                        </select>
-                                        @error('santriForm.pembiayaan') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="santriForm.no_whatsapp" class="fw-semibold text-black">No WhatsApp</label>
-                                        <input type="text" class="form-control" wire:model="santriForm.no_whatsapp" id="santriForm.no_whatsapp" placeholder="081xxxx">
-                                        @error('santriForm.no_whatsapp') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="santriForm.email" class="fw-semibold text-black">Email</label>
-                                        <input type="email" class="form-control" wire:model="santriForm.email" id="santriForm.email" placeholder="Masukan Email">
-                                        @error('santriForm.email') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="santriForm.status_kesantrian" class="fw-semibold text-black">Status Kesantrian</label>
-                                        <select class="form-select" wire:model="santriForm.status_kesantrian">
-                                            <option value="aktif">Aktif</option>
-                                            <option value="nonaktif">Nonaktif</option>
-                                        </select>
-                                        @error('santriForm.status_kesantrian') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="ijazah" class="fw-semibold text-black">Ijazah (PDF, Max 2MB)</label>
-                                        <input type="file" class="form-control" wire:model="ijazah" id="ijazah" accept="application/pdf">
-                                        @error('ijazah') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="kartu_keluarga" class="fw-semibold text-black">Kartu Keluarga (PDF, Max 2MB)</label>
-                                        <input type="file" class="form-control" wire:model="kartu_keluarga" id="kartu_keluarga" accept="application/pdf">
-                                        @error('kartu_keluarga') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="bukti_pembayaran" class="fw-semibold text-black">Bukti Pembayaran (PDF, Max 2MB)</label>
-                                        <input type="file" class="form-control" wire:model="bukti_pembayaran" id="bukti_pembayaran" accept="application/pdf">
-                                        @error('bukti_pembayaran') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                </div>
-                            @elseif ($formPage == 2)
-                                <div class="steppers wali row">
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="waliForm.nama_ayah" class="fw-semibold text-black">Nama Ayah</label>
-                                        <input type="text" class="form-control" wire:model="waliForm.nama_ayah" id="waliForm.nama_ayah" placeholder="Masukan Nama Ayah">
-                                        @error('waliForm.nama_ayah') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="waliForm.status_ayah" class="fw-semibold text-black">Status Ayah</label>
-                                        <select class="form-select" wire:model="waliForm.status_ayah">
-                                            <option value="">Pilih Status</option>
-                                            <option value="hidup">Hidup</option>
-                                            <option value="meninggal">Meninggal</option>
-                                        </select>
-                                        @error('waliForm.status_ayah') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="waliForm.kewarganegaraan_ayah" class="fw-semibold text-black">Kewarganegaraan Ayah</label>
-                                        <select class="form-select" wire:model="waliForm.kewarganegaraan_ayah">
-                                            <option value="">Pilih Kewarganegaraan</option>
-                                            <option value="wni">WNI</option>
-                                            <option value="wna">WNA</option>
-                                        </select>
-                                        @error('waliForm.kewarganegaraan_ayah') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="waliForm.nik_ayah" class="fw-semibold text-black">NIK Ayah</label>
-                                        <input type="text" class="form-control" wire:model="waliForm.nik_ayah" id="waliForm.nik_ayah" placeholder="Masukan NIK Ayah">
-                                        @error('waliForm.nik_ayah') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="waliForm.tempat_lahir_ayah" class="fw-semibold text-black">Tempat Lahir Ayah</label>
-                                        <input type="text" class="form-control" wire:model="waliForm.tempat_lahir_ayah" id="waliForm.tempat_lahir_ayah" placeholder="Masukan Tempat Lahir">
-                                        @error('waliForm.tempat_lahir_ayah') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="waliForm.tanggal_lahir_ayah" class="fw-semibold text-black">Tanggal Lahir Ayah</label>
-                                        <input type="date" class="form-control" wire:model="waliForm.tanggal_lahir_ayah" id="waliForm.tanggal_lahir_ayah">
-                                        @error('waliForm.tanggal_lahir_ayah') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="waliForm.pendidikan_terakhir_ayah" class="fw-semibold text-black">Pendidikan Terakhir Ayah</label>
-                                        <select class="form-select" wire:model="waliForm.pendidikan_terakhir_ayah">
-                                            <option value="">Pilih Pendidikan</option>
-                                            <option value="tidak sekolah">Tidak Sekolah</option>
-                                            <option value="sd">SD</option>
-                                            <option value="smp">SMP</option>
-                                            <option value="sma">SMA</option>
-                                            <option value="slta">SLTA</option>
-                                            <option value="diploma">Diploma</option>
-                                            <option value="sarjana">Sarjana</option>
-                                        </select>
-                                        @error('waliForm.pendidikan_terakhir_ayah') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="waliForm.pekerjaan_ayah" class="fw-semibold text-black">Pekerjaan Ayah</label>
-                                        <input type="text" class="form-control" wire:model="waliForm.pekerjaan_ayah" id="waliForm.pekerjaan_ayah" placeholder="Masukan Pekerjaan">
-                                        @error('waliForm.pekerjaan_ayah') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="waliForm.penghasilan_ayah" class="fw-semibold text-black">Penghasilan Ayah</label>
-                                        <input type="number" class="form-control" wire:model="waliForm.penghasilan_ayah" id="waliForm.penghasilan_ayah" placeholder="Masukan Penghasilan">
-                                        @error('waliForm.penghasilan_ayah') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="waliForm.no_telp_ayah" class="fw-semibold text-black">No Telepon Ayah</label>
-                                        <input type="text" class="form-control" wire:model="waliForm.no_telp_ayah" id="waliForm.no_telp_ayah" placeholder="081xxxx">
-                                        @error('waliForm.no_telp_ayah') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="waliForm.nama_ibu" class="fw-semibold text-black">Nama Ibu</label>
-                                        <input type="text" class="form-control" wire:model="waliForm.nama_ibu" id="waliForm.nama_ibu" placeholder="Masukan Nama Ibu">
-                                        @error('waliForm.nama_ibu') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="waliForm.status_ibu" class="fw-semibold text-black">Status Ibu</label>
-                                        <select class="form-select" wire:model="waliForm.status_ibu">
-                                            <option value="">Pilih Status</option>
-                                            <option value="hidup">Hidup</option>
-                                            <option value="meninggal">Meninggal</option>
-                                        </select>
-                                        @error('waliForm.status_ibu') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="waliForm.kewarganegaraan_ibu" class="fw-semibold text-black">Kewarganegaraan Ibu</label>
-                                        <select class="form-select" wire:model="waliForm.kewarganegaraan_ibu">
-                                            <option value="">Pilih Kewarganegaraan</option>
-                                            <option value="wni">WNI</option>
-                                            <option value="wna">WNA</option>
-                                        </select>
-                                        @error('waliForm.kewarganegaraan_ibu') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="waliForm.nik_ibu" class="fw-semibold text-black">NIK Ibu</label>
-                                        <input type="text" class="form-control" wire:model="waliForm.nik_ibu" id="waliForm.nik_ibu" placeholder="Masukan NIK Ibu">
-                                        @error('waliForm.nik_ibu') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="waliForm.tempat_lahir_ibu" class="fw-semibold text-black">Tempat Lahir Ibu</label>
-                                        <input type="text" class="form-control" wire:model="waliForm.tempat_lahir_ibu" id="waliForm.tempat_lahir_ibu" placeholder="Masukan Tempat Lahir">
-                                        @error('waliForm.tempat_lahir_ibu') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="waliForm.tanggal_lahir_ibu" class="fw-semibold text-black">Tanggal Lahir Ibu</label>
-                                        <input type="date" class="form-control" wire:model="waliForm.tanggal_lahir_ibu" id="waliForm.tanggal_lahir_ibu">
-                                        @error('waliForm.tanggal_lahir_ibu') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="waliForm.pendidikan_terakhir_ibu" class="fw-semibold text-black">Pendidikan Terakhir Ibu</label>
-                                        <select class="form-select" wire:model="waliForm.pendidikan_terakhir_ibu">
-                                            <option value="">Pilih Pendidikan</option>
-                                            <option value="tidak sekolah">Tidak Sekolah</option>
-                                            <option value="sd">SD</option>
-                                            <option value="smp">SMP</option>
-                                            <option value="sma">SMA</option>
-                                            <option value="slta">SLTA</option>
-                                            <option value="diploma">Diploma</option>
-                                            <option value="sarjana">Sarjana</option>
-                                        </select>
-                                        @error('waliForm.pendidikan_terakhir_ibu') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="waliForm.pekerjaan_ibu" class="fw-semibold text-black">Pekerjaan Ibu</label>
-                                        <input type="text" class="form-control" wire:model="waliForm.pekerjaan_ibu" id="waliForm.pekerjaan_ibu" placeholder="Masukan Pekerjaan">
-                                        @error('waliForm.pekerjaan_ibu') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="waliForm.penghasilan_ibu" class="fw-semibold text-black">Penghasilan Ibu</label>
-                                        <input type="number" class="form-control" wire:model="waliForm.penghasilan_ibu" id="waliForm.penghasilan_ibu" placeholder="Masukan Penghasilan">
-                                        @error('waliForm.penghasilan_ibu') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="waliForm.no_telp_ibu" class="fw-semibold text-black">No Telepon Ibu</label>
-                                        <input type="text" class="form-control" wire:model="waliForm.no_telp_ibu" id="waliForm.no_telp_ibu" placeholder="081xxxx">
-                                        @error('waliForm.no_telp_ibu') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="waliForm.status_orang_tua" class="fw-semibold text-black">Status Orang Tua</label>
-                                        <select class="form-select" wire:model="waliForm.status_orang_tua">
-                                            <option value="">Pilih Status</option>
-                                            <option value="kawin">Kawin</option>
-                                            <option value="cerai hidup">Cerai Hidup</option>
-                                            <option value="cerai mati">Cerai Mati</option>
-                                        </select>
-                                        @error('waliForm.status_orang_tua') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                </div>
-                            @else
-                                <div class="steppers alamat row">
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="alamatForm.status_kepemilikan_rumah" class="fw-semibold text-black">Status Kepemilikan Rumah</label>
-                                        <input type="text" class="form-control" wire:model="alamatForm.status_kepemilikan_rumah" id="alamatForm.status_kepemilikan_rumah" placeholder="Masukan Status">
-                                        @error('alamatForm.status_kepemilikan_rumah') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="alamatForm.provinsi" class="fw-semibold text-black">Provinsi</label>
-                                        <input type="text" class="form-control" wire:model="alamatForm.provinsi" id="alamatForm.provinsi" placeholder="Masukan Provinsi">
-                                        @error('alamatForm.provinsi') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="alamatForm.kabupaten" class="fw-semibold text-black">Kabupaten</label>
-                                        <input type="text" class="form-control" wire:model="alamatForm.kabupaten" id="alamatForm.kabupaten" placeholder="Masukan Kabupaten">
-                                        @error('alamatForm.kabupaten') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="alamatForm.kecamatan" class="fw-semibold text-black">Kecamatan</label>
-                                        <input type="text" class="form-control" wire:model="alamatForm.kecamatan" id="alamatForm.kecamatan" placeholder="Masukan Kecamatan">
-                                        @error('alamatForm.kecamatan') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="alamatForm.kelurahan" class="fw-semibold text-black">Kelurahan</label>
-                                        <input type="text" class="form-control" wire:model="alamatForm.kelurahan" id="alamatForm.kelurahan" placeholder="Masukan Kelurahan">
-                                        @error('alamatForm.kelurahan') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="alamatForm.rt" class="fw-semibold text-black">RT</label>
-                                        <input type="text" class="form-control" wire:model="alamatForm.rt" id="alamatForm.rt" placeholder="Masukan RT">
-                                        @error('alamatForm.rt') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="alamatForm.rw" class="fw-semibold text-black">RW</label>
-                                        <input type="text" class="form-control" wire:model="alamatForm.rw" id="alamatForm.rw" placeholder="Masukan RW">
-                                        @error('alamatForm.rw') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-4 mb-3">
-                                        <label for="alamatForm.kode_pos" class="fw-semibold text-black">Kode Pos</label>
-                                        <input type="text" class="form-control" wire:model="alamatForm.kode_pos" id="alamatForm.kode_pos" placeholder="Masukan Kode Pos">
-                                        @error('alamatForm.kode_pos') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                    <div class="form-group col-lg-12 mb-3">
-                                        <label for="alamatForm.alamat" class="fw-semibold text-black">Alamat Lengkap</label>
-                                        <textarea class="form-control" wire:model="alamatForm.alamat" id="alamatForm.alamat" placeholder="Masukan Alamat Lengkap" rows="4"></textarea>
-                                        @error('alamatForm.alamat') <span class="text-danger">{{ $message }}</span> @enderror
-                                    </div>
-                                </div>
-                            @endif
-                            <div class="d-flex justify-content-between">
-                                <div class="form-paginate d-flex">
-                                    <button type="button" class="btn btn-secondary me-1" wire:click="prevForm" {{ $formPage == 1 ? 'disabled' : '' }}>Sebelumnya</button>
-                                    <button type="button" class="btn btn-success" wire:click="nextForm" {{ $formPage == 3 ? 'disabled' : '' }}>Selanjutnya</button>
-                                </div>
-                                @if($formPage == 3)     
-                                <div class="cta-buttons">
-                                    <button type="button" class="btn btn-light-secondary me-1" wire:click="resetForm">Reset</button>
-                                    <button type="submit" class="btn btn-success" wire:loading.attr="disabled">
-                                        <span wire:loading.remove>Simpan Data</span>
-                                        <span wire:loading>Sedang Menyimpan...</span>
-                                    </button>
-                                </div>
-                                @endif
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tempat Lahir *</label>
+                                <input type="text" wire:model="santriForm.tempat_lahir" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-300" placeholder="Kota tempat lahir" />
+                                @error('santriForm.tempat_lahir') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
                             </div>
-                        </form>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tanggal Lahir *</label>
+                                <input type="date" wire:model="santriForm.tanggal_lahir" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-300" />
+                                @error('santriForm.tanggal_lahir') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Jenis Kelamin *</label>
+                                <select wire:model="santriForm.jenis_kelamin" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-300">
+                                    <option value="">Pilih Jenis Kelamin</option>
+                                    <option value="L">Laki-laki</option>
+                                    <option value="P">Perempuan</option>
+                                </select>
+                                @error('santriForm.jenis_kelamin') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Agama *</label>
+                                <select wire:model="santriForm.agama" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-300">
+                                    <option value="">Pilih Agama</option>
+                                    <option value="Islam">Islam</option>
+                                    <option value="Kristen">Kristen</option>
+                                    <option value="Katolik">Katolik</option>
+                                    <option value="Hindu">Hindu</option>
+                                    <option value="Buddha">Buddha</option>
+                                    <option value="Konghucu">Konghucu</option>
+                                </select>
+                                @error('santriForm.agama') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Email *</label>
+                                <input type="email" wire:model="santriForm.email" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-300" placeholder="email@example.com" />
+                                @error('santriForm.email') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">No. HP/WhatsApp *</label>
+                                <input type="tel" wire:model="santriForm.no_whatsapp" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="08xxxxxxxxxx" />
+                                @error('santriForm.no_whatsapp') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Alamat Lengkap *</label>
+                            <textarea wire:model="alamatForm.alamat" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg"></textarea>
+                            @error('alamatForm.alamat') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                        </div>
+                        <div class="grid md:grid-cols-2 gap-6 mt-6">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Asal Sekolah *</label>
+                                <input type="text" wire:model="santriForm.asal_sekolah" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Nama SMP/MTs asal" />
+                                @error('santriForm.asal_sekolah') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 mb-2">Tahun Lulus *</label>
+                                <select wire:model="santriForm.tahun_lulus" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                    <option value="">Pilih Tahun Lulus</option>
+                                    <option value="2024">2024</option>
+                                    <option value="2025">2025</option>
+                                </select>
+                                @error('santriForm.tahun_lulus') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Program Pilihan *</label>
+                            <div class="grid md:grid-cols-3 gap-4">
+                                @foreach(['reguler' => 'Program Reguler', 'olimpiade' => 'Kelas Olimpiade', 'internasional' => 'Kelas Internasional'] as $value => $label)
+                                    <label class="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition duration-300">
+                                        <input type="radio" wire:model="santriForm.status_santri" value="{{ $value }}" class="text-primary focus:ring-primary" />
+                                        <div class="ml-3">
+                                            <div class="font-medium text-gray-900">{{ $label }}</div>
+                                            <div class="text-sm text-gray-600">
+                                                {{ $value == 'reguler' ? 'Kurikulum standar nasional' : ($value == 'olimpiade' ? 'Fokus sains dan matematika' : 'Bilingual curriculum') }}
+                                            </div>
+                                        </div>
+                                    </label>
+                                @endforeach
+                            </div>
+                            @error('santriForm.status_santri') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                        </div>
+                        <div class="flex justify-end mt-8">
+                            <button type="button" wire:click="nextForm" class="bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">
+                                Selanjutnya <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 2: Data Orang Tua -->
+                    <div id="step2" class="{{ $formPage == 2 ? 'block' : 'hidden' }} bg-white rounded-lg shadow-lg p-8">
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-2">Data Orang Tua/Wali</h2>
+                            <p class="text-gray-600">Lengkapi data orang tua atau wali siswa</p>
+                        </div>
+                        <div class="mb-8">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">Data Ayah</h3>
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Nama Ayah *</label>
+                                    <input type="text" wire:model="waliForm.nama_ayah" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Nama lengkap ayah" />
+                                    @error('waliForm.nama_ayah') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Pekerjaan Ayah *</label>
+                                    <input type="text" wire:model="waliForm.pekerjaan_ayah" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Pekerjaan ayah" />
+                                    @error('waliForm.pekerjaan_ayah') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Pendidikan Ayah *</label>
+                                    <select wire:model="waliForm.pendidikan_ayah" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                        <option value="">Pilih Pendidikan</option>
+                                        <option value="SD">SD</option>
+                                        <option value="SMP">SMP</option>
+                                        <option value="SMA">SMA</option>
+                                        <option value="D3">D3</option>
+                                        <option value="S1">S1</option>
+                                        <option value="S2">S2</option>
+                                        <option value="S3">S3</option>
+                                    </select>
+                                    @error('waliForm.pendidikan_ayah') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Penghasilan Ayah *</label>
+                                    <select wire:model="waliForm.penghasilan_ayah" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                        <option value="">Pilih Range Penghasilan</option>
+                                        <option value="< 2 juta">< Rp 2.000.000</option>
+                                        <option value="2-5 juta">Rp 2.000.000 - 5.000.000</option>
+                                        <option value="5-10 juta">Rp 5.000.000 - 10.000.000</option>
+                                        <option value="> 10 juta">> Rp 10.000.000</option>
+                                    </select>
+                                    @error('waliForm.penghasilan_ayah') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mb-8">
+                            <h3 class="text-lg font-semibold text-gray-900 mb-4 border-b pb-2">Data Ibu</h3>
+                            <div class="grid md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Nama Ibu *</label>
+                                    <input type="text" wire:model="waliForm.nama_ibu" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Nama lengkap ibu" />
+                                    @error('waliForm.nama_ibu') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Pekerjaan Ibu *</label>
+                                    <input type="text" wire:model="waliForm.pekerjaan_ibu" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="Pekerjaan ibu" />
+                                    @error('waliForm.pekerjaan_ibu') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">Pendidikan Ibu *</label>
+                                    <select wire:model="waliForm.pendidikan_ibu" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent">
+                                        <option value="">Pilih Pendidikan</option>
+                                        <option value="SD">SD</option>
+                                        <option value="SMP">SMP</option>
+                                        <option value="SMA">SMA</option>
+                                        <option value="D3">D3</option>
+                                        <option value="S1">S1</option>
+                                        <option value="S2">S2</option>
+                                        <option value="S3">S3</option>
+                                    </select>
+                                    @error('waliForm.pendidikan_ibu') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700 mb-2">No. HP Orang Tua *</label>
+                                    <input type="tel" wire:model="waliForm.no_telp_ibu" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="08xxxxxxxxxx" />
+                                    @error('waliForm.no_telp_ibu') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex justify-between mt-8">
+                            <button type="button" wire:click="prevForm" class="bg-gray-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-600 transition duration-300">
+                                <i class="fas fa-arrow-left mr-2"></i> Sebelumnya
+                            </button>
+                            <button type="button" wire:click="nextForm" class="bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">
+                                Selanjutnya <i class="fas fa-arrow-right ml-2"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Step 3: Upload Dokumen -->
+                    <div id="step3" class="{{ $formPage == 3 ? 'block' : 'hidden' }} bg-white rounded-lg shadow-lg p-8">
+                        <div class="mb-8">
+                            <h2 class="text-2xl font-bold text-gray-900 mb-2">Upload Dokumen</h2>
+                            <p class="text-gray-600">Upload dokumen persyaratan pendaftaran (Format: PDF, JPG, PNG. Max: 2MB)</p>
+                        </div>
+                        <div class="space-y-6">
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-primary transition duration-300">
+                                <div class="text-center">
+                                    <i class="fas fa-camera text-4xl text-gray-400 mb-4"></i>
+                                    <h3 class="text-lg font-medium text-gray-900 mb-2">Pas Foto 3x4 *</h3>
+                                    <p class="text-sm text-gray-600 mb-4">Background merah, format JPG/PNG</p>
+                                    <input type="file" wire:model="pas_foto" accept="image/*" class="hidden" id="pas_foto" />
+                                    <label for="pas_foto" class="bg-primary text-white px-6 py-2 rounded-lg cursor-pointer hover:bg-blue-700 transition duration-300">Pilih File</label>
+                                    <div id="pas_foto_preview" class="mt-4 {{ $pas_foto ? 'block' : 'hidden' }}">
+                                        <img src="{{ $pas_foto ? $pas_foto->temporaryUrl() : '' }}" class="mx-auto h-32 w-24 object-cover rounded-lg border" />
+                                        <p class="text-sm text-green-600 mt-2">✓ File berhasil dipilih</p>
+                                    </div>
+                                    @error('pas_foto') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-primary transition duration-300">
+                                <div class="text-center">
+                                    <i class="fas fa-file-pdf text-4xl text-gray-400 mb-4"></i>
+                                    <h3 class="text-lg font-medium text-gray-900 mb-2">Ijazah SMP/Sederajat *</h3>
+                                    <p class="text-sm text-gray-600 mb-4">Scan ijazah yang sudah dilegalisir</p>
+                                    <input type="file" wire:model="ijazah" accept=".pdf,image/*" class="hidden" id="ijazah" />
+                                    <label for="ijazah" class="bg-primary text-white px-6 py-2 rounded-lg cursor-pointer hover:bg-blue-700 transition duration-300">Pilih File</label>
+                                    <div id="ijazah_preview" class="mt-4 {{ $ijazah ? 'block' : 'hidden' }}">
+                                        <p class="text-sm text-green-600">✓ File berhasil dipilih</p>
+                                    </div>
+                                    @error('ijazah') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-primary transition duration-300">
+                                <div class="text-center">
+                                    <i class="fas fa-file-alt text-4xl text-gray-400 mb-4"></i>
+                                    <h3 class="text-lg font-medium text-gray-900 mb-2">SKHUN *</h3>
+                                    <p class="text-sm text-gray-600 mb-4">Surat Keterangan Hasil Ujian Nasional</p>
+                                    <input type="file" wire:model="skhun" accept=".pdf,image/*" class="hidden" id="skhun" />
+                                    <label for="skhun" class="bg-primary text-white px-6 py-2 rounded-lg cursor-pointer hover:bg-blue-700 transition duration-300">Pilih File</label>
+                                    <div id="skhun_preview" class="mt-4 {{ $skhun ? 'block' : 'hidden' }}">
+                                        <p class="text-sm text-green-600">✓ File berhasil dipilih</p>
+                                    </div>
+                                    @error('skhun') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-primary transition duration-300">
+                                <div class="text-center">
+                                    <i class="fas fa-id-card text-4xl text-gray-400 mb-4"></i>
+                                    <h3 class="text-lg font-medium text-gray-900 mb-2">Akta Kelahiran *</h3>
+                                    <p class="text-sm text-gray-600 mb-4">Fotocopy akta kelahiran</p>
+                                    <input type="file" wire:model="akta_kelahiran" accept=".pdf,image/*" class="hidden" id="akta_kelahiran" />
+                                    <label for="akta_kelahiran" class="bg-primary text-white px-6 py-2 rounded-lg cursor-pointer hover:bg-blue-700 transition duration-300">Pilih File</label>
+                                    <div id="akta_kelahiran_preview" class="mt-4 {{ $akta_kelahiran ? 'block' : 'hidden' }}">
+                                        <p class="text-sm text-green-600">✓ File berhasil dipilih</p>
+                                    </div>
+                                    @error('akta_kelahiran') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6 hover:border-primary transition duration-300">
+                                <div class="text-center">
+                                    <i class="fas fa-users text-4xl text-gray-400 mb-4"></i>
+                                    <h3 class="text-lg font-medium text-gray-900 mb-2">Kartu Keluarga *</h3>
+                                    <p class="text-sm text-gray-600 mb-4">Fotocopy Kartu Keluarga</p>
+                                    <input type="file" wire:model="kartu_keluarga" accept=".pdf,image/*" class="hidden" id="kartu_keluarga" />
+                                    <label for="kartu_keluarga" class="bg-primary text-white px-6 py-2 rounded-lg cursor-pointer hover:bg-blue-700 transition duration-300">Pilih File</label>
+                                    <div id="kartu_keluarga_preview" class="mt-4 {{ $kartu_keluarga ? 'block' : 'hidden' }}">
+                                        <p class="text-sm text-green-600">✓ File berhasil dipilih</p>
+                                    </div>
+                                    @error('kartu_keluarga') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                        </div>
+                        <div class="mt-8 p-6 bg-gray-50 rounded-lg">
+                            <label class="flex items-start">
+                                <input type="checkbox" wire:model="terms" class="mt-1 text-primary focus:ring-primary" />
+                                <span class="ml-3 text-sm text-gray-700">
+                                    Saya menyatakan bahwa data yang saya isi adalah benar dan dapat dipertanggungjawabkan. Saya bersedia mengikuti seluruh proses seleksi dan mematuhi peraturan yang berlaku di SMA Bina Prestasi.
+                                    <a href="#" class="text-primary hover:underline">Baca Syarat & Ketentuan</a>
+                                </span>
+                            </label>
+                            @error('terms') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                        </div>
+                        <div class="flex justify-between mt-8">
+                            <button type="button" wire:click="prevForm" class="bg-gray-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-600 transition duration-300">
+                                <i class="fas fa-arrow-left mr-2"></i> Sebelumnya
+                            </button>
+                            <button type="submit" class="bg-green-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-green-700 transition duration-300" wire:loading.attr="disabled">
+                                <i class="fas fa-paper-plane mr-2"></i> Kirim Pendaftaran
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="bg-gray-900 text-white py-8">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <div class="flex items-center justify-center mb-4">
+                    <img class="h-8 w-8 mr-3" src="https://via.placeholder.com/32x32/1e40af/ffffff?text=SMA" alt="Logo SMA" />
+                    <h3 class="text-lg font-bold">SMA Bina Prestasi</h3>
+                </div>
+                <p class="text-gray-400 mb-4">Jl. Pendidikan No. 123, Jakarta Selatan 12345</p>
+                <p class="text-gray-400">© 2025 SMA Bina Prestasi. All Rights Reserved.</p>
+            </div>
+        </footer>
+
+        <!-- Success Modal -->
+        <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 {{ $showSuccessModal ? 'flex' : 'hidden' }} items-center justify-center z-50">
+            <div class="bg-white rounded-lg p-8 max-w-md mx-4">
+                <div class="text-center">
+                    <div class="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                        <i class="fas fa-check text-green-600 text-2xl"></i>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-4">Pendaftaran Berhasil!</h3>
+                    <p class="text-gray-600 mb-6">
+                        Terima kasih telah mendaftar. Kami akan mengirimkan informasi selanjutnya melalui email dan WhatsApp yang telah Anda daftarkan.
+                    </p>
+                    <div class="bg-blue-50 p-4 rounded-lg mb-6">
+                        <p class="text-sm text-blue-800">
+                            <strong>No. Pendaftaran:</strong> <span id="registrationNumber">{{ $registrationNumber }}</span><br />
+                            Simpan nomor ini untuk keperluan selanjutnya.
+                        </p>
+                    </div>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <a href="/login" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300">Login ke Dashboard</a>
+                        <button wire:click="closeModal" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition duration-300">Tutup</button>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-</section>
+

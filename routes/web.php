@@ -12,9 +12,7 @@ Route::get('/', function () {
     return redirect('/auth/login');
 });
 
-Route::get('/register-santri', RegisterSantri::class)->name('register-santri');
 
-Route::get('/check-status', \App\Livewire\Guest\CheckStatus::class)->name('check-status');
 
 Route::prefix('auth')->group(function () {
     Route::get('/login', Auth\Login::class)->name('login');
@@ -40,6 +38,7 @@ Route::get('/generate', function () {
 // Route redirect
 require __DIR__ . '/superadmin.php';
 require __DIR__ . '/e-spp.php';
+require __DIR__ . '/e-ppdb.php';
 require __DIR__ . '/e-santri.php';
 require __DIR__ . '/e-cashless/petugas-e-cashless.php';
 require __DIR__ . '/e-cashless/petugas-laundry.php';
