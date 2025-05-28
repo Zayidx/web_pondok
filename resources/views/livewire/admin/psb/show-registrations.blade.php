@@ -152,7 +152,7 @@
             <div class="modal-dialog">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title">Alasan Penolakan</h5>
+                        <h5 class="modal-title">Tolak Pendaftaran</h5>
                         <button type="button" class="btn-close" wire:click="closeModal"></button>
                     </div>
                     <div class="modal-body">
@@ -180,4 +180,5 @@
         </div>
         <div class="modal-backdrop fade show" style="z-index: 1030;"></div>
     @endif
+
 </div>

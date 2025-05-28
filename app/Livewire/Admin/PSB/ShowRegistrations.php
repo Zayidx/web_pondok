@@ -108,8 +108,8 @@ class ShowRegistrations extends Component
         Log::info('saveInterview called with data: ', $this->interviewForm);
 
         $this->validate([
-            'interviewForm.tanggal_wawancara' => 'required|string|date_format:Y-m-d|after:today',
-            'interviewForm.jam_wawancara' => 'required|string',
+            'interviewForm.tanggal_wawancara' => 'required|date|after:today',
+            'interviewForm.jam_wawancara' => 'required',
             'interviewForm.mode' => 'required|in:online,offline',
             'interviewForm.link_online' => 'required_if:interviewForm.mode,online|url|nullable',
             'interviewForm.lokasi_offline' => 'required_if:interviewForm.mode,offline|nullable',
@@ -125,7 +125,7 @@ class ShowRegistrations extends Component
                 'jam_wawancara' => $this->interviewForm['jam_wawancara'],
                 'mode' => $this->interviewForm['mode'],
                 'link_online' => $this->interviewForm['link_online'],
-                'lokasi_offline' => $this->interviewFictionLinks['lokasi_offline'],
+                'lokasi_offline' => $this->interviewForm['lokasi_offline'],
             ]);
 
             DB::commit();
