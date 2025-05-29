@@ -9,38 +9,17 @@
     <div class="card">
         <div class="card-body">
             <div class="row mb-3">
-                <div class="col-md-2">
-                    <input type="text" class="form-control" wire:model.live="search" placeholder="Cari NISN/Nama...">
+                <div class="col-md-3">
+                    <input type="text" class="form-control" wire:model.live="search" placeholder="Cari NISN atau Nama Santri...">
                 </div>
                 <div class="col-md-2">
-                    <input type="text" class="form-control" wire:model.live="kota" placeholder="Kota...">
+                    <input type="date" class="form-control" wire:model.live="tanggal_wawancara_filter" placeholder="Tanggal Wawancara">
                 </div>
                 <div class="col-md-2">
-                    <select class="form-select" wire:model.live="status_santri">
-                        <option value="">Semua Status</option>
-                        @foreach ($statusSantriOptions as $value => $label)
-                            <option value="{{ $value }}">{{ $label }}</option>
-                        @endforeach
-                    </select>
+                    <input type="time" class="form-control" wire:model.live="jam_wawancara_filter" placeholder="Jam Wawancara">
                 </div>
                 <div class="col-md-2">
-                    <select class="form-select" wire:model.live="tipeFilter">
-                        <option value="">Semua Tipe</option>
-                        @foreach ($tipeOptions as $value => $label)
-                            <option value="{{ $value }}">{{ $label }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-md-2">
-                    <input type="date" class="form-control" wire:model.live="tanggal_wawancara" placeholder="Tanggal Wawancara">
-                </div>
-                <div class="col-md-2">
-                    <input type="time" class="form-control" wire:model.live="jam_wawancara">
-                </div>
-            </div>
-            <div class="row mb-3">
-                <div class="col-md-2">
-                    <input type="text" class="form-control" wire:model.live="lokasi_offline" placeholder="Lokasi Offline...">
+                    <input type="text" class="form-control" wire:model.live="lokasi_filter" placeholder="Lokasi/Link">
                 </div>
                 <div class="col-md-2">
                     <select class="form-select" wire:model.live="perPage">
@@ -58,9 +37,9 @@
                         <tr>
                             <th wire:click="sortBy('nama_lengkap')" class="cursor-pointer">Nama Santri @if($sortField == 'nama_lengkap') <i class="bi {{ $sortDirection == 'asc' ? 'bi-arrow-up' : 'bi-arrow-down' }}"></i> @endif</th>
                             <th wire:click="sortBy('nisn')" class="cursor-pointer">NISN @if($sortField == 'nisn') <i class="bi {{ $sortDirection == 'asc' ? 'bi-arrow-up' : 'bi-arrow-down' }}</i> @endif</th>
-                            <th>Kota</th>
-                            <th wire:click="sortBy('tipe_pendaftaran')" class="cursor-pointer">Tipe Pendaftaran @if($sortField == 'tipe_pendaftaran') <i class="bi {{ $sortDirection == 'asc' ? 'bi-arrow-up' : 'bi-arrow-down' }}</i> @endif</th>
-                            <th wire:click="sortBy('status_santri')" class="cursor-pointer">Status Santri @if($sortField == 'status_santri') <i class="bi {{ $sortDirection == 'asc' ? 'bi-arrow-up' : 'bi-arrow-down' }}</i> @endif</th>
+                            <th wire:click="sortBy('tanggal_wawancara')" class="cursor-pointer">Tanggal Wawancara @if($sortField == 'tanggal_wawancara') <i class="bi {{ $sortDirection == 'asc' ? 'bi-arrow-up' : 'bi-arrow-down' }}</i> @endif</th>
+                            <th wire:click="sortBy('jam_wawancara')" class="cursor-pointer">Jam Wawancara @if($sortField == 'jam_wawancara') <i class="bi {{ $sortDirection == 'asc' ? 'bi-arrow-up' : 'bi-arrow-down' }}</i> @endif</th>
+                            <th>Lokasi</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -69,9 +48,9 @@
                             <tr>
                                 <td>{{ $interview->nama_lengkap }}</td>
                                 <td>{{ $interview->nisn }}</td>
-                                <td>{{ $interview->wali->alamat ?? '-' }}</td>
-                                <td>{{ $tipeOptions[$interview->tipe_pendaftaran] ?? '-' }}</td>
-                                <td>{{ $statusSantriOptions[$interview->status_santri] ?? 'Dibatalkan' }}</td>
+                                <td>{{ $interview->tanggal_wawancara ? \Carbon\Carbon::parse($interview->tanggal_wawancara)->format('d-m-Y') : '-' }}</td>
+                                <td>{{ $interview->jam_wawancara ?? '-' }}</td>
+                                <td>{{ $interview->mode === 'offline' ? ($interview->lokasi_offline ?? '-') : ($interview->link_online ?? '-') }}</td>
                                 <td class="text-nowrap">
                                     <a href="{{ route('admin.show-registration.detail', $interview->id) }}" class="btn btn-sm btn-primary me-1">Detail</a>
                                     <button wire:click="openEditModal({{ $interview->id }})" class="btn btn-sm btn-warning me-1">Edit</button>
@@ -95,7 +74,7 @@
         <div class="modal fade show" id="interviewModal" tabindex="-1" role="dialog" style="display: block; z-index: 1050;">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <form wire:submit.prevent="saveInterview">
+                    <form wire:submit.prevent="saveInterview" wire:key="interview-modal-{{ $selectedSantriId }}">
                         <div class="modal-header">
                             <h5 class="modal-title">Edit Jadwal Wawancara</h5>
                             <button type="button" class="btn-close" wire:click="closeModal" aria-label="Close"></button>

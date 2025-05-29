@@ -15,7 +15,7 @@
                     <a href="/" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition duration-300">
                         <i class="fas fa-home mr-2"></i>Beranda
                     </a>
-                    <a href="/login" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition duration-300">
+                    <a href="{{ route('login-ppdb-santri') }}" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition duration-300">
                         Login
                     </a>
                 </div>
@@ -407,7 +407,7 @@
                     </p>
                 </div>
                 <div class="flex flex-col sm:flex-row gap-3">
-                    <a href="/login" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300">Login ke Dashboard</a>
+                    <a href="{{ route('login-ppdb-santri') }}" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300">Login ke Dashboard</a>
                     <button wire:click="closeModal" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition duration-300">Tutup</button>
                 </div>
             </div>

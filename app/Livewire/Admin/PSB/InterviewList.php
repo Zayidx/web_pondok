@@ -14,12 +14,9 @@ class InterviewList extends Component
 
     public $perPage = 5;
     public $search = '';
-    public $kota = '';
-    public $status_santri = '';
-    public $tipeFilter = '';
-    public $jam_wawancara = '';
-    public $tanggal_wawancara = '';
-    public $lokasi_offline = '';
+    public $tanggal_wawancara_filter = '';
+    public $jam_wawancara_filter = '';
+    public $lokasi_filter = '';
     public $sortField = 'nama_lengkap';
     public $sortDirection = 'asc';
     public $interviewModal = false;
@@ -35,12 +32,9 @@ class InterviewList extends Component
 
     protected $queryString = [
         'search' => ['except' => ''],
-        'kota' => ['except' => ''],
-        'status_santri' => ['except' => ''],
-        'tipeFilter' => ['except' => ''],
-        'jam_wawancara' => ['except' => ''],
-        'tanggal_wawancara' => ['except' => ''],
-        'lokasi_offline' => ['except' => ''],
+        'tanggal_wawancara_filter' => ['except' => ''],
+        'jam_wawancara_filter' => ['except' => ''],
+        'lokasi_filter' => ['except' => ''],
         'perPage' => ['except' => 5],
         'sortField' => ['except' => 'nama_lengkap'],
         'sortDirection' => ['except' => 'asc'],
@@ -52,39 +46,21 @@ class InterviewList extends Component
         $this->resetPage();
     }
 
-    public function updatingKota()
+    public function updatingTanggalWawancaraFilter()
     {
-        Log::info('Kota filter updated to: ' . $this->kota);
+        Log::info('Tanggal wawancara filter updated to: ' . $this->tanggal_wawancara_filter);
         $this->resetPage();
     }
 
-    public function updatingStatusSantri()
+    public function updatingJamWawancaraFilter()
     {
-        Log::info('Status santri filter updated to: ' . $this->status_santri);
+        Log::info('Jam wawancara filter updated to: ' . $this->jam_wawancara_filter);
         $this->resetPage();
     }
 
-    public function updatingTipeFilter()
+    public function updatingLokasiFilter()
     {
-        Log::info('Tipe filter updated to: ' . $this->tipeFilter);
-        $this->resetPage();
-    }
-
-    public function updatingJamWawancara()
-    {
-        Log::info('Jam wawancara filter updated to: ' . $this->jam_wawancara);
-        $this->resetPage();
-    }
-
-    public function updatingTanggalWawancara()
-    {
-        Log::info('Tanggal wawancara filter updated to: ' . $this->tanggal_wawancara);
-        $this->resetPage();
-    }
-
-    public function updatingLokasiOffline()
-    {
-        Log::info('Lokasi offline filter updated to: ' . $this->lokasi_offline);
+        Log::info('Lokasi filter updated to: ' . $this->lokasi_filter);
         $this->resetPage();
     }
 
@@ -111,7 +87,7 @@ class InterviewList extends Component
         try {
             $santri = PendaftaranSantri::findOrFail($santriId);
             if ($santri->status_santri !== 'diterima' || !$santri->tanggal_wawancara) {
-                Log::warning('Invalid santri for edit: status=' . $santri->status_santri . ', tanggal_wawancara=' . ($santri->tanggal_wawancara ?? 'null'));
+                Log::warning('Invalid santri for edit: ', ['status' => $santri->status_santri, 'tanggal_wawancara' => $santri->tanggal_wawancara]);
                 session()->flash('error', 'Jadwal wawancara tidak dapat diedit untuk santri ini.');
                 return;
             }
@@ -121,14 +97,14 @@ class InterviewList extends Component
                 'tanggal_wawancara' => $santri->tanggal_wawancara ? \Carbon\Carbon::parse($santri->tanggal_wawancara)->format('Y-m-d') : '',
                 'jam_wawancara' => $santri->jam_wawancara ?? '',
                 'mode' => $santri->mode ?? 'offline',
-                'link_online' => $santri->link_online,
-                'lokasi_offline' => $santri->lokasi_offline,
+                'link_online' => $santri->link_online ?? '',
+                'lokasi_offline' => $santri->lokasi_offline ?? '',
             ];
             Log::info('Edit modal opened with data: ', $this->interviewForm);
             $this->interviewModal = true;
             $this->resetValidation();
         } catch (\Exception $e) {
-            Log::error('Error opening edit modal: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            Log::error('Error in openEditModal: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             session()->flash('error', 'Gagal membuka modal edit: ' . $e->getMessage());
         }
     }
@@ -140,10 +116,10 @@ class InterviewList extends Component
         try {
             $this->validate([
                 'interviewForm.tanggal_wawancara' => 'required|date',
-                'interviewForm.jam_wawancara' => 'required',
+                'interviewForm.jam_wawancara' => 'required|date_format:H:i',
                 'interviewForm.mode' => 'required|in:online,offline',
-                'interviewForm.link_online' => 'nullable|url|required_if:interviewForm.mode,online',
-                'interviewForm.lokasi_offline' => 'nullable|string|max:255|required_if:interviewForm.mode,offline',
+                'interviewForm.link_online' => 'nullable|required_if:interviewForm.mode,online|url',
+                'interviewForm.lokasi_offline' => 'nullable|required_if:interviewForm.mode,offline|string|max:255',
             ]);
             Log::info('Validation passed for edit interview, santri ID: ' . $this->selectedSantriId);
         } catch (\Illuminate\Validation\ValidationException $e) {
@@ -204,30 +180,24 @@ class InterviewList extends Component
             $query->when($this->search, function ($q) {
                 $q->where('nama_lengkap', 'like', '%' . $this->search . '%')
                   ->orWhere('nisn', 'like', '%' . $this->search . '%');
-            })->when($this->kota, function ($q) {
-                $q->whereHas('wali', function ($subQ) {
-                    $subQ->where('alamat', 'like', '%' . $this->kota . '%');
+            })->when($this->tanggal_wawancara_filter, function ($q) {
+                $q->whereDate('tanggal_wawancara', $this->tanggal_wawancara_filter);
+            })->when($this->jam_wawancara_filter, function ($q) {
+                $q->where('jam_wawancara', 'like', '%' . $this->jam_wawancara_filter . '%');
+            })->when($this->lokasi_filter, function ($q) {
+                $q->where(function ($subQ) {
+                    $subQ->where('mode', 'offline')
+                         ->where('lokasi_offline', 'like', '%' . $this->lokasi_filter . '%')
+                         ->orWhere('mode', 'online')
+                         ->where('link_online', 'like', '%' . $this->lokasi_filter . '%');
                 });
-            })->when($this->status_santri, function ($q) {
-                $q->where('status_santri', $this->status_santri);
-            })->when($this->tipeFilter, function ($q) {
-                $q->where('tipe_pendaftaran', $this->tipeFilter);
-            })->when($this->jam_wawancara, function ($q) {
-                $q->where('jam_wawancara', 'like', '%' . $this->jam_wawancara . '%');
-            })->when($this->tanggal_wawancara, function ($q) {
-                $q->whereDate('tanggal_wawancara', $this->tanggal_wawancara);
-            })->when($this->lokasi_offline, function ($q) {
-                $q->where('lokasi_offline', 'like', '%' . $this->lokasi_offline . '%');
             });
 
             Log::info('Interview query parameters: ', [
                 'search' => $this->search,
-                'kota' => $this->kota,
-                'status_santri' => $this->status_santri,
-                'tipeFilter' => $this->tipeFilter,
-                'jam_wawancara' => $this->jam_wawancara,
-                'tanggal_wawancara' => $this->tanggal_wawancara,
-                'lokasi_offline' => $this->lokasi_offline,
+                'tanggal_wawancara_filter' => $this->tanggal_wawancara_filter,
+                'jam_wawancara_filter' => $this->jam_wawancara_filter,
+                'lokasi_filter' => $this->lokasi_filter,
                 'sortField' => $this->sortField,
                 'sortDirection' => $this->sortDirection,
             ]);
@@ -246,25 +216,12 @@ class InterviewList extends Component
 
             return view('livewire.admin.psb.interview-list', [
                 'interviews' => $interviews,
-                'statusSantriOptions' => [
-                    '' => 'Dibatalkan',
-                    'menunggu' => 'Menunggu',
-                    'diterima' => 'Diterima',
-                    'ditolak' => 'Ditolak',
-                ],
-                'tipeOptions' => [
-                    'reguler' => 'Reguler',
-                    'olimpiade' => 'Olimpiade',
-                    'internasional' => 'Internasional',
-                ],
             ]);
         } catch (\Exception $e) {
             Log::error('Error in InterviewList render: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
             session()->flash('error', 'Gagal memuat daftar wawancara: ' . $e->getMessage());
             return view('livewire.admin.psb.interview-list', [
                 'interviews' => collect([])->paginate($this->perPage),
-                'statusSantriOptions' => [],
-                'tipeOptions' => [],
             ]);
         }
     }
