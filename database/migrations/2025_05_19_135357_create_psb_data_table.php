@@ -37,7 +37,14 @@ class CreatePsbDataTable extends Migration
             $table->string('no_whatsapp', 13);
             $table->string('asal_sekolah', 255);
             $table->string('tahun_lulus', 4);
+            $table->enum('tipe_pendaftaran', ['reguler', 'olimpiade', 'internasional'])->nullable();
             $table->enum('status_santri', ['menunggu', 'diterima', 'ditolak'])->nullable();
+            $table->date('tanggal_wawancara')->nullable();
+            $table->time('jam_wawancara')->nullable();
+            $table->enum('mode', ['online', 'offline'])->nullable();
+            $table->string('link_online')->nullable();
+            $table->string('lokasi_offline', 255)->nullable();
+            $table->text('reason_rejected')->nullable();
             $table->enum('status_kesantrian', ['aktif', 'nonaktif'])->default('aktif');
             $table->unsignedBigInteger('periode_id');
             $table->timestamps();

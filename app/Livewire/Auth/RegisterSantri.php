@@ -17,6 +17,7 @@ class RegisterSantri extends Component
     public $showSuccessModal = false;
     public $registrationNumber = '';
     public $terms = false;
+    public $isRegistrationOpen = true;
 
     public $santriForm = [
         'nama_lengkap' => '',
@@ -29,7 +30,7 @@ class RegisterSantri extends Component
         'no_whatsapp' => '',
         'asal_sekolah' => '',
         'tahun_lulus' => '',
-        'status_santri' => '',
+        'tipe_pendaftaran' => '',
         'status_kesantrian' => 'aktif',
     ];
 
@@ -52,18 +53,17 @@ class RegisterSantri extends Component
 
     protected $rules = [
         'santriForm.nama_lengkap' => 'required|string|max:255|regex:/^[A-Za-z0-9\s\'\-]+$/',
-        'santriForm.nisn' => 'required|digits:10',
+        'santriForm.nisn' => 'required|digits:10|unique:psb_pendaftaran_santri,nisn',
         'santriForm.tempat_lahir' => 'required|string|max:255',
         'santriForm.tanggal_lahir' => 'required|date',
         'santriForm.jenis_kelamin' => 'required|in:L,P',
         'santriForm.agama' => 'required|in:Islam,Kristen,Katolik,Hindu,Buddha,Konghucu',
-        'santriForm.email' => 'required|email|max:255',
+        'santriForm.email' => 'required|email|max:255|unique:psb_pendaftaran_santri,email',
         'santriForm.no_whatsapp' => 'required|regex:/^[0-9]{10,13}$/',
         'santriForm.asal_sekolah' => 'required|string|max:255',
         'santriForm.tahun_lulus' => 'required|in:2024,2025',
-        'santriForm.status_santri' => 'required|in:reguler,olimpiade,internasional',
+        'santriForm.tipe_pendaftaran' => 'required|in:reguler,olimpiade,internasional',
         'santriForm.status_kesantrian' => 'required|in:aktif,nonaktif',
-
         'waliForm.nama_ayah' => 'required|string|max:255',
         'waliForm.pekerjaan_ayah' => 'required|string|max:255',
         'waliForm.pendidikan_ayah' => 'required|in:SD,SMP,SMA,D3,S1,S2,S3',
@@ -72,15 +72,12 @@ class RegisterSantri extends Component
         'waliForm.pekerjaan_ibu' => 'required|string|max:255',
         'waliForm.pendidikan_ibu' => 'required|in:SD,SMP,SMA,D3,S1,S2,S3',
         'waliForm.no_telp_ibu' => 'required|regex:/^[0-9]{10,13}$/',
-
         'alamatForm.alamat' => 'required|string|max:500',
-
         'pas_foto' => 'required|file|mimes:jpg,png|max:2048',
         'ijazah' => 'required|file|mimes:pdf,jpg,png|max:2048',
         'skhun' => 'required|file|mimes:pdf,jpg,png|max:2048',
         'akta_kelahiran' => 'required|file|mimes:pdf,jpg,png|max:2048',
         'kartu_keluarga' => 'required|file|mimes:pdf,jpg,png|max:2048',
-
         'terms' => 'accepted',
     ];
 
@@ -99,9 +96,8 @@ class RegisterSantri extends Component
         'santriForm.no_whatsapp.regex' => 'No. WhatsApp harus terdiri dari 10-13 digit angka.',
         'santriForm.asal_sekolah.required' => 'Asal sekolah wajib diisi.',
         'santriForm.tahun_lulus.required' => 'Tahun lulus wajib dipilih.',
-        'santriForm.status_santri.required' => 'Program pilihan wajib dipilih.',
+        'santriForm.tipe_pendaftaran.required' => 'Program pilihan wajib dipilih.',
         'santriForm.status_kesantrian.required' => 'Status kesantrian wajib dipilih.',
-
         'waliForm.nama_ayah.required' => 'Nama ayah wajib diisi.',
         'waliForm.pekerjaan_ayah.required' => 'Pekerjaan ayah wajib diisi.',
         'waliForm.pendidikan_ayah.required' => 'Pendidikan ayah wajib dipilih.',
@@ -111,9 +107,7 @@ class RegisterSantri extends Component
         'waliForm.pendidikan_ibu.required' => 'Pendidikan ibu wajib dipilih.',
         'waliForm.no_telp_ibu.required' => 'No. HP orang tua wajib diisi.',
         'waliForm.no_telp_ibu.regex' => 'No. HP harus terdiri dari 10-13 digit angka.',
-
         'alamatForm.alamat.required' => 'Alamat lengkap wajib diisi.',
-
         'pas_foto.required' => 'Pas foto wajib diunggah.',
         'pas_foto.mimes' => 'Pas foto harus berupa file JPG atau PNG.',
         'pas_foto.max' => 'Ukuran pas foto tidak boleh melebihi 2MB.',
@@ -129,12 +123,22 @@ class RegisterSantri extends Component
         'kartu_keluarga.required' => 'Kartu keluarga wajib diunggah.',
         'kartu_keluarga.mimes' => 'Kartu keluarga harus berupa file PDF, JPG, atau PNG.',
         'kartu_keluarga.max' => 'Ukuran kartu keluarga tidak boleh melebihi 2MB.',
-
         'terms.accepted' => 'Anda harus menyetujui syarat dan ketentuan.',
     ];
 
+    public function mount()
+    {
+        $periode = \App\Models\PSB\Periode::where('status_periode', 'active')->first();
+        if (!$periode) {
+            $this->isRegistrationOpen = false;
+        }
+    }
+
     public function nextForm()
     {
+        if (!$this->isRegistrationOpen) {
+            return;
+        }
         $this->validateStep();
         if ($this->formPage < 3) {
             $this->formPage++;
@@ -172,7 +176,12 @@ class RegisterSantri extends Component
 
     public function submit()
     {
-        $this->validate($this->rules, $this->messages);
+        if (!$this->isRegistrationOpen) {
+            $this->addError('submit', 'Pendaftaran ditutup.');
+            return;
+        }
+
+        $this->validate();
 
         DB::beginTransaction();
         try {
@@ -193,7 +202,8 @@ class RegisterSantri extends Component
                 'no_whatsapp' => $this->santriForm['no_whatsapp'],
                 'asal_sekolah' => $this->santriForm['asal_sekolah'],
                 'tahun_lulus' => $this->santriForm['tahun_lulus'],
-                'status_santri' => $this->santriForm['status_santri'],
+                'status_santri' => 'menunggu',
+                'tipe_pendaftaran' => $this->santriForm['tipe_pendaftaran'],
                 'status_kesantrian' => $this->santriForm['status_kesantrian'],
                 'periode_id' => $periode->id,
             ]);
@@ -251,7 +261,7 @@ class RegisterSantri extends Component
 
     public function resetForm()
     {
-        $this->santriForm = array_fill_keys(array_keys($this->santriForm), '');
+        $this->santriForm = array_merge(array_fill_keys(array_keys($this->santriForm), ''), ['status_kesantrian' => 'aktif']);
         $this->waliForm = array_fill_keys(array_keys($this->waliForm), '');
         $this->alamatForm = array_fill_keys(array_keys($this->alamatForm), '');
         $this->pas_foto = null;

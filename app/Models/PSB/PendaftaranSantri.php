@@ -24,6 +24,13 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property string $tahun_lulus
  * @property string $status_santri
  * @property string $status_kesantrian
+ * @property string $tipe_pendaftaran
+ * @property \Illuminate\Support\Carbon|null $tanggal_wawancara
+ * @property string|null $jam_wawancara
+ * @property string|null $mode
+ * @property string|null $link_online
+ * @property string|null $lokasi_offline
+ * @property string|null $reason_rejected
  * @property int $periode_id
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
@@ -56,6 +63,13 @@ class PendaftaranSantri extends Model
         'tahun_lulus',
         'status_santri',
         'status_kesantrian',
+        'tipe_pendaftaran',
+        'tanggal_wawancara',
+        'jam_wawancara',
+        'mode',
+        'link_online',
+        'lokasi_offline',
+        'reason_rejected',
         'periode_id',
     ];
 
@@ -66,10 +80,13 @@ class PendaftaranSantri extends Model
      */
     protected $casts = [
         'tanggal_lahir' => 'date',
+        'tanggal_wawancara' => 'date',
         'jenis_kelamin' => 'string',
         'agama' => 'string',
         'status_santri' => 'string',
         'status_kesantrian' => 'string',
+        'tipe_pendaftaran' => 'string',
+        'mode' => 'string',
     ];
 
     /**

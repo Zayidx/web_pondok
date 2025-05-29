@@ -1,40 +1,50 @@
-
-    <div>
-        <!-- Navigation -->
-        <nav class="bg-white shadow-lg">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex justify-between items-center h-16">
-                    <div class="flex items-center">
-                        <a href="/" class="flex items-center">
-                            <img class="h-10 w-10" src="https://via.placeholder.com/40x40/1e40af/ffffff?text=SMA" alt="Logo SMA" />
-                            <div class="ml-3">
-                                <h1 class="text-xl font-bold text-primary">SMA Bina Prestasi</h1>
-                            </div>
-                        </a>
-                    </div>
-                    <div class="flex items-center space-x-4">
-                        <a href="/" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition duration-300">
-                            <i class="fas fa-home mr-2"></i>Beranda
-                        </a>
-                        <a href="/login" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition duration-300">
-                            Login
-                        </a>
-                    </div>
+<div>
+    <!-- Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center h-16">
+                <div class="flex items-center">
+                    <a href="/" class="flex items-center">
+                        <img class="h-10 w-10" src="https://via.placeholder.com/40x40/1e40af/ffffff?text=SMA" alt="Logo SMA" />
+                        <div class="ml-3">
+                            <h1 class="text-xl font-bold text-primary">SMA Bina Prestasi</h1>
+                        </div>
+                    </a>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="/" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition duration-300">
+                        <i class="fas fa-home mr-2"></i>Beranda
+                    </a>
+                    <a href="/login" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition duration-300">
+                        Login
+                    </a>
                 </div>
             </div>
-        </nav>
+        </div>
+    </nav>
 
-        <!-- Header Section -->
-        <section class="bg-gradient-to-r from-primary to-blue-700 text-white py-12">
-            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <h1 class="text-3xl md:text-4xl font-bold mb-4">Pendaftaran Siswa Baru</h1>
-                <p class="text-xl mb-6">Tahun Ajaran 2025/2026</p>
-                <div class="bg-white bg-opacity-20 rounded-lg p-4 inline-block">
-                    <p class="text-lg font-semibold">📅 Pendaftaran Dibuka: 1 Januari - 31 Maret 2025</p>
+    <!-- Header Section -->
+    <section class="bg-gradient-to-r from-primary to-blue-700 text-white py-12">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <h1 class="text-3xl md:text-4xl font-bold mb-4">Pendaftaran Siswa Baru</h1>
+            <p class="text-xl mb-6">Tahun Ajaran 2025/2026</p>
+            <div class="bg-white bg-opacity-20 rounded-lg p-4 inline-block">
+                <p class="text-lg font-semibold">📅 Pendaftaran Dibuka: 1 Januari - 31 Maret 2025</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- Registration Closed Message -->
+    @if(!$isRegistrationOpen)
+        <section class="py-12">
+            <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 mb-6 rounded text-center">
+                    <h2 class="text-2xl font-bold">Pendaftaran Ditutup</h2>
+                    <p>Pendaftaran untuk tahun ajaran 2025/2026 saat ini tidak tersedia. Silakan hubungi pihak sekolah untuk informasi lebih lanjut.</p>
                 </div>
             </div>
         </section>
-
+    @else
         <!-- Progress Steps -->
         <section class="bg-white py-8 border-b">
             <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -160,7 +170,7 @@
                             <div class="grid md:grid-cols-3 gap-4">
                                 @foreach(['reguler' => 'Program Reguler', 'olimpiade' => 'Kelas Olimpiade', 'internasional' => 'Kelas Internasional'] as $value => $label)
                                     <label class="flex items-center p-4 border border-gray-300 rounded-lg cursor-pointer hover:bg-gray-50 transition duration-300">
-                                        <input type="radio" wire:model="santriForm.status_santri" value="{{ $value }}" class="text-primary focus:ring-primary" />
+                                        <input type="radio" wire:model="santriForm.tipe_pendaftaran" value="{{ $value }}" class="text-primary focus:ring-primary" />
                                         <div class="ml-3">
                                             <div class="font-medium text-gray-900">{{ $label }}</div>
                                             <div class="text-sm text-gray-600">
@@ -170,7 +180,7 @@
                                     </label>
                                 @endforeach
                             </div>
-                            @error('santriForm.status_santri') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                            @error('santriForm.tipe_pendaftaran') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
                         </div>
                         <div class="flex justify-end mt-8">
                             <button type="button" wire:click="nextForm" class="bg-primary text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300">
@@ -347,11 +357,11 @@
                             <label class="flex items-start">
                                 <input type="checkbox" wire:model="terms" class="mt-1 text-primary focus:ring-primary" />
                                 <span class="ml-3 text-sm text-gray-700">
-                                    Saya menyatakan bahwa data yang saya isi adalah benar dan dapat dipertanggungjawabkan. Saya bersedia mengikuti seluruh proses seleksi dan mematuhi peraturan yang berlaku di SMA Bina Prestasi.
+                                    Saya menyatakan bahwa data yang saya isi adalah benar dan dapat dibentangkan. Saya bersedia mengikuti seluruh proses seleksi dan mematuhi peraturan yang berlaku di SMA Bina Prestasi.
                                     <a href="#" class="text-primary hover:underline">Baca Syarat & Ketentuan</a>
                                 </span>
                             </label>
-                            @error('terms') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+                            @error('terms') <span class="text-red-600 text-sm">{{ $message }}</span> @endif
                         </div>
                         <div class="flex justify-between mt-8">
                             <button type="button" wire:click="prevForm" class="bg-gray-500 text-white px-8 py-3 rounded-lg font-semibold hover:bg-gray-600 transition duration-300">
@@ -365,42 +375,42 @@
                 </form>
             </div>
         </section>
+    @endif
 
-        <!-- Footer -->
-        <footer class="bg-gray-900 text-white py-8">
-            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-                <div class="flex items-center justify-center mb-4">
-                    <img class="h-8 w-8 mr-3" src="https://via.placeholder.com/32x32/1e40af/ffffff?text=SMA" alt="Logo SMA" />
-                    <h3 class="text-lg font-bold">SMA Bina Prestasi</h3>
-                </div>
-                <p class="text-gray-400 mb-4">Jl. Pendidikan No. 123, Jakarta Selatan 12345</p>
-                <p class="text-gray-400">© 2025 SMA Bina Prestasi. All Rights Reserved.</p>
+    <!-- Footer -->
+    <footer class="bg-gray-900 text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <div class="flex items-center mb-4">
+                <img class="h-8 w-8 mr-3" src="https://via.placeholder.com/32x32/1e40af/ffffff?text=SMA" alt="Logo SMA" />
+                <h3 class="text-lg font-semibold">SMA Bina Prestasi</h3>
             </div>
-        </footer>
+            <p class="text-gray-400 mb-4">Jl. Pendidikan No. 123, Jakarta Selatan 12345</p>
+            <p class="text-gray-400 text-sm">© 2025 SMA Bina Prestasi. All Rights Reserved.</p>
+        </div>
+    </footer>
 
-        <!-- Success Modal -->
-        <div id="successModal" class="fixed inset-0 bg-black bg-opacity-50 {{ $showSuccessModal ? 'flex' : 'hidden' }} items-center justify-center z-50">
-            <div class="bg-white rounded-lg p-8 max-w-md mx-4">
-                <div class="text-center">
-                    <div class="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
-                        <i class="fas fa-check text-green-600 text-2xl"></i>
-                    </div>
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Pendaftaran Berhasil!</h3>
-                    <p class="text-gray-600 mb-6">
-                        Terima kasih telah mendaftar. Kami akan mengirimkan informasi selanjutnya melalui email dan WhatsApp yang telah Anda daftarkan.
+    <!-- Success Modal -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-100 {{ $showSuccessModal ? 'flex' : 'hidden' }} items-center justify-center z-50">
+        <div class="bg-white rounded-lg p-8 max-w-md mx-auto">
+            <div class="text-center">
+                <div class="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-check text-green-600 text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900 mb-4">Pendaftaran Berhasil!</h3>
+                <p class="text-gray-600 mb-6">
+                    Terima kasih telah mendaftar. Kami akan mengirimkan informasi lebih lanjut melalui email dan WhatsApp yang telah Anda daftarkan.
+                </p>
+                <div class="bg-blue-50 p-4 rounded-lg mb-6">
+                    <p class="text-sm text-blue-800">
+                        <strong>No. Pendaftaran:</strong> <span id="registrationNumber">{{ $registrationNumber }}</span><br />
+                        Simpan nomor ini untuk keperluan selanjutnya.
                     </p>
-                    <div class="bg-blue-50 p-4 rounded-lg mb-6">
-                        <p class="text-sm text-blue-800">
-                            <strong>No. Pendaftaran:</strong> <span id="registrationNumber">{{ $registrationNumber }}</span><br />
-                            Simpan nomor ini untuk keperluan selanjutnya.
-                        </p>
-                    </div>
-                    <div class="flex flex-col sm:flex-row gap-3">
-                        <a href="/login" class="bg-primary text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300">Login ke Dashboard</a>
-                        <button wire:click="closeModal" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition duration-300">Tutup</button>
-                    </div>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-3">
+                    <a href="/login" class="bg-blue-600 text-white px-6 py-2 rounded-lg hover:bg-blue-700 transition duration-300">Login ke Dashboard</a>
+                    <button wire:click="closeModal" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition duration-300">Tutup</button>
                 </div>
             </div>
         </div>
     </div>
-
+</div>
