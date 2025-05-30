@@ -7,11 +7,12 @@ use Livewire\WithPagination;
 use App\Models\PSB\PendaftaranSantri;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Livewire\Attributes\Title;
 
 class InterviewList extends Component
 {
     use WithPagination;
-
+    #[Title('Halaman List Jadwal Wawancara Santri PPDB')]
     public $perPage = 5;
     public $search = '';
     public $tanggal_wawancara_filter = '';

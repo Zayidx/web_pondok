@@ -7,11 +7,13 @@ use Livewire\WithPagination;
 use App\Models\PSB\PendaftaranSantri;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Livewire\Attributes\Title;
 
 class ShowRegistrations extends Component
 {
+   
     use WithPagination;
-
+    #[Title('Halaman List Santri PPDB')]
     public $perPage = 5;
     public $search = '';
     public $kota = '';
