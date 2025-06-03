@@ -5,6 +5,7 @@ use App\Livewire\Auth\RegisterSantri;
 use App\Livewire\PSB\CheckStatus;
 use App\Livewire\PSB\DetailRegistration;
 use App\Livewire\PSB\ShowRegistrations;
+use App\Livewire\StudentExam;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
@@ -20,6 +21,8 @@ Route::prefix('auth')->group(function () {
     Route::get('/logout', Auth\Logout::class)->name('auth.logout');
     Route::get('/login-santri', Auth\LoginSantri::class)->name('login-santri');
 });
+
+Route::get('/questions', StudentExam::class)->name('questions');
 
 Route::fallback(function () {
     return view('404');

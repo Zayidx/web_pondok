@@ -12,7 +12,9 @@ class AddReasonRejectedToPsbPendaftaranSantri extends Migration
     public function up(): void
     {
         Schema::table('psb_pendaftaran_santri', function (Blueprint $table) {
-            $table->text('reason_rejected')->nullable()->after('status_santri');
+            if (!Schema::hasColumn('psb_pendaftaran_santri', 'reason_rejected')) {
+                $table->text('reason_rejected')->nullable()->after('status_santri');
+            }
         });
     }
 
@@ -22,7 +24,9 @@ class AddReasonRejectedToPsbPendaftaranSantri extends Migration
     public function down(): void
     {
         Schema::table('psb_pendaftaran_santri', function (Blueprint $table) {
-            $table->dropColumn('reason_rejected');
+            if (Schema::hasColumn('psb_pendaftaran_santri', 'reason_rejected')) {
+                $table->dropColumn('reason_rejected');
+            }
         });
     }
 }

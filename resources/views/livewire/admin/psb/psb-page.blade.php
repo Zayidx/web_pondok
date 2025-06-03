@@ -94,13 +94,14 @@
         <div class="lg:grid lg:grid-cols-2 lg:gap-8 items-center">
           <div class="mb-8 lg:mb-0">
             <h1
-              class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6"
+              class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight mb-6" data-aos="fade-up"
             >
               Wujudkan Potensi Terbaik
               <span class="text-primary">Putra-Putri Anda</span> Bersama SMA
               Bina Prestasi!
             </h1>
-            <p class="text-xl text-gray-600 mb-8 leading-relaxed">
+            <p class="text-xl text-gray-600 mb-8 leading-relaxed" data-aos="fade-up"
+            data-aos-delay="100">
               Sekolah Menengah Atas terakreditasi A dengan kurikulum inovatif,
               fasilitas lengkap, dan lingkungan belajar yang mendukung prestasi
               serta pengembangan karakter.
@@ -108,13 +109,13 @@
             <div class="flex flex-col sm:flex-row gap-4">
               <a
                 href="#pendaftaran"
-                class="bg-primary text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition duration-300 text-center"
+                class="bg-primary text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition duration-300 text-center" data-aos="fade-up" data-aos-delay="200"
               >
                 Daftar Sekarang!
               </a>
               <a
                 href="#"
-                class="border-2 border-primary text-primary px-8 py-4 rounded-lg text-lg font-semibold hover:bg-primary hover:text-white transition duration-300 text-center"
+                class="border-2 border-primary text-primary px-8 py-4 rounded-lg text-lg font-semibold hover:bg-primary hover:text-white transition duration-300 text-center" data-aos="fade-up" data-aos-delay="200"
               >
                 Unduh Brosur PPDB 2025/2026
               </a>
@@ -127,7 +128,7 @@
               class="rounded-lg shadow-2xl"
             />
             <div
-              class="absolute -bottom-4 -left-4 bg-white p-4 rounded-lg shadow-lg"
+              class="absolute -bottom-4 -left-4 bg-white p-4 rounded-lg shadow-lg" data-aos="fade-up" data-aos-delay="200" 
             >
               <div class="flex items-center">
                 <div class="bg-green-100 p-2 rounded-full mr-3">
@@ -148,14 +149,14 @@
     <section id="tentang" class="py-16 bg-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4" data-aos="fade-up" >
             Tentang SMA Bina Prestasi
           </h2>
           <div class="w-24 h-1 bg-primary mx-auto mb-8"></div>
         </div>
         <div class="lg:grid lg:grid-cols-2 lg:gap-12 items-center">
           <div>
-            <p class="text-lg text-gray-600 mb-6 leading-relaxed">
+            <p class="text-lg text-gray-600 mb-6 leading-relaxed" data-aos="fade-up" data-aos-delay="200" >
               Selamat datang di SMA Bina Prestasi, tempat kami berkomitmen untuk
               tidak hanya mencetak prestasi akademis, tetapi juga membentuk
               karakter pemimpin masa depan yang berintegritas dan berdaya saing.
@@ -164,18 +165,18 @@
               zaman.
             </p>
             <div class="space-y-4">
-              <div class="flex items-start">
+              <div class="flex items-start" data-aos="fade-up" data-aos-delay="100">
                 <div class="bg-primary p-2 rounded-full mr-4 mt-1">
                   <i class="fas fa-check text-white text-sm"></i>
                 </div>
-                <div>
+                <div >
                   <h4 class="font-semibold text-gray-900">Kurikulum Merdeka</h4>
                   <p class="text-gray-600">
                     Diperkaya dengan program STEAM dan Entrepreneurship
                   </p>
                 </div>
               </div>
-              <div class="flex items-start">
+              <div class="flex items-start" data-aos="fade-up" data-aos-delay="200">
                 <div class="bg-primary p-2 rounded-full mr-4 mt-1">
                   <i class="fas fa-check text-white text-sm"></i>
                 </div>
@@ -188,7 +189,7 @@
                   </p>
                 </div>
               </div>
-              <div class="flex items-start">
+              <div class="flex items-start" data-aos="fade-up" data-aos-delay="300">
                 <div class="bg-primary p-2 rounded-full mr-4 mt-1">
                   <i class="fas fa-check text-white text-sm"></i>
                 </div>
@@ -218,15 +219,15 @@
     <section id="keunggulan" class="py-16 bg-gray-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4" data-aos="fade-up" >
             Alasan Terbaik Mempercayakan Pendidikan Putra-Putri Anda kepada Kami
           </h2>
           <div class="w-24 h-1 bg-primary mx-auto mb-8"></div>
         </div>
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8"> 
           <!-- Keunggulan 1 -->
           <div
-            class="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition duration-300"
+            class="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition duration-300"  data-aos="flip-left" 
           >
             <div
               class="bg-blue-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-6"
@@ -249,7 +250,7 @@
 
           <!-- Keunggulan 2 -->
           <div
-            class="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition duration-300"
+            class="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition duration-300"  data-aos="flip-left" data-aos-delay="200"
           >
             <div
               class="bg-green-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-6"
@@ -272,7 +273,7 @@
 
           <!-- Keunggulan 3 -->
           <div
-            class="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition duration-300"
+            class="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition duration-300" data-aos="flip-left" data-aos-delay="400"
           >
             <div
               class="bg-yellow-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-6"
@@ -294,7 +295,7 @@
 
           <!-- Keunggulan 4 -->
           <div
-            class="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition duration-300"
+            class="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition duration-300" data-aos="flip-left" 
           >
             <div
               class="bg-purple-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-6"
@@ -316,7 +317,7 @@
 
           <!-- Keunggulan 5 -->
           <div
-            class="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition duration-300"
+            class="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition duration-300" data-aos="flip-left" data-aos-delay="200"
           >
             <div
               class="bg-red-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-6"
@@ -339,7 +340,7 @@
 
           <!-- Keunggulan 6 -->
           <div
-            class="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition duration-300"
+            class="bg-white p-8 rounded-lg shadow-lg hover:shadow-xl transition duration-300" data-aos="flip-left" data-aos-delay="400"
           >
             <div
               class="bg-indigo-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-6"
@@ -364,7 +365,7 @@
     <section id="program" class="py-16 bg-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4" data-aos="fade-up">
             Temukan Program yang Sesuai dengan Minat dan Bakat Anda!
           </h2>
           <div class="w-24 h-1 bg-primary mx-auto mb-8"></div>
@@ -372,14 +373,14 @@
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           <!-- Program 1 -->
           <div
-            class="bg-gradient-to-br from-blue-50 to-blue-100 p-8 rounded-lg border border-blue-200"
+            class="bg-gradient-to-br from-blue-50 to-blue-100 p-8 rounded-lg border border-blue-200" data-aos="fade-up" data-aos-delay="200"
           >
             <div
               class="bg-primary p-4 rounded-full w-16 h-16 flex items-center justify-center mb-6"
             >
               <i class="fas fa-flask text-white text-2xl"></i>
             </div>
-            <h3 class="text-xl font-bold text-gray-900 mb-4">
+            <h3 class="text-xl font-bold text-gray-900 mb-4" >
               Kelas Olimpiade Sains
             </h3>
             <p class="text-gray-600 mb-4">
@@ -397,7 +398,7 @@
 
           <!-- Program 2 -->
           <div
-            class="bg-gradient-to-br from-green-50 to-green-100 p-8 rounded-lg border border-green-200"
+            class="bg-gradient-to-br from-green-50 to-green-100 p-8 rounded-lg border border-green-200" data-aos="fade-up" data-aos-delay="400"
           >
             <div
               class="bg-green-600 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-6"
@@ -421,7 +422,7 @@
 
           <!-- Program 3 -->
           <div
-            class="bg-gradient-to-br from-purple-50 to-purple-100 p-8 rounded-lg border border-purple-200"
+            class="bg-gradient-to-br from-purple-50 to-purple-100 p-8 rounded-lg border border-purple-200" data-aos="fade-up" data-aos-delay="600"
           >
             <div
               class="bg-purple-600 p-4 rounded-full w-16 h-16 flex items-center justify-center mb-6"
@@ -450,14 +451,14 @@
     <section class="py-16 bg-gray-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4" data-aos="fade-up">
             Apa Kata Mereka Tentang SMA Bina Prestasi?
           </h2>
           <div class="w-24 h-1 bg-primary mx-auto mb-8"></div>
         </div>
         <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
           <!-- Testimoni 1 -->
-          <div class="bg-white p-8 rounded-lg shadow-lg">
+          <div class="bg-white p-8 rounded-lg shadow-lg" data-aos="fade-up" data-aos-delay="200">
             <div class="flex items-center mb-4">
               <img
                 src="https://via.placeholder.com/60x60/e5e7eb/374151?text=A"
@@ -486,7 +487,7 @@
           </div>
 
           <!-- Testimoni 2 -->
-          <div class="bg-white p-8 rounded-lg shadow-lg">
+          <div class="bg-white p-8 rounded-lg shadow-lg" data-aos="fade-up" data-aos-delay="400">
             <div class="flex items-center mb-4">
               <img
                 src="https://via.placeholder.com/60x60/e5e7eb/374151?text=S"
@@ -515,7 +516,7 @@
           </div>
 
           <!-- Testimoni 3 -->
-          <div class="bg-white p-8 rounded-lg shadow-lg">
+          <div class="bg-white p-8 rounded-lg shadow-lg" data-aos="fade-up" data-aos-delay="600">
             <div class="flex items-center mb-4">
               <img
                 src="https://via.placeholder.com/60x60/e5e7eb/374151?text=R"
@@ -549,13 +550,13 @@
     <section class="py-16 bg-white">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4" data-aos="fade-up">
             Lihat Lebih Dekat Kehidupan Seru dan Dinamis di SMA Bina Prestasi!
           </h2>
           <div class="w-24 h-1 bg-primary mx-auto mb-8"></div>
         </div>
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          <div class="relative group overflow-hidden rounded-lg">
+          <div class="relative group overflow-hidden rounded-lg" data-aos="flip-left" >
             <img
               src="https://via.placeholder.com/300x200/e5e7eb/374151?text=Lab+Sains"
               alt="Laboratorium Sains"
@@ -567,7 +568,7 @@
               <p class="text-white font-semibold">Laboratorium Sains</p>
             </div>
           </div>
-          <div class="relative group overflow-hidden rounded-lg">
+          <div class="relative group overflow-hidden rounded-lg" data-aos="flip-left" data-aos-delay="200">
             <img
               src="https://via.placeholder.com/300x200/e5e7eb/374151?text=Perpustakaan"
               alt="Perpustakaan Digital"
@@ -579,7 +580,7 @@
               <p class="text-white font-semibold">Perpustakaan Digital</p>
             </div>
           </div>
-          <div class="relative group overflow-hidden rounded-lg">
+          <div class="relative group overflow-hidden rounded-lg" data-aos="flip-left" data-aos-delay="400">
             <img
               src="https://via.placeholder.com/300x200/e5e7eb/374151?text=Olahraga"
               alt="Lapangan Olahraga"
@@ -591,7 +592,7 @@
               <p class="text-white font-semibold">Lapangan Olahraga</p>
             </div>
           </div>
-          <div class="relative group overflow-hidden rounded-lg">
+          <div class="relative group overflow-hidden rounded-lg" data-aos="flip-left" data-aos-delay="600">
             <img
               src="https://via.placeholder.com/300x200/e5e7eb/374151?text=Ruang+Seni"
               alt="Ruang Seni"
@@ -603,7 +604,7 @@
               <p class="text-white font-semibold">Ruang Seni</p>
             </div>
           </div>
-          <div class="relative group overflow-hidden rounded-lg">
+          <div class="relative group overflow-hidden rounded-lg" data-aos="flip-left" >
             <img
               src="https://via.placeholder.com/300x200/e5e7eb/374151?text=Kelas"
               alt="Ruang Kelas"
@@ -615,7 +616,7 @@
               <p class="text-white font-semibold">Ruang Kelas Modern</p>
             </div>
           </div>
-          <div class="relative group overflow-hidden rounded-lg">
+          <div class="relative group overflow-hidden rounded-lg" data-aos="flip-left" data-aos-delay="200">
             <img
               src="https://via.placeholder.com/300x200/e5e7eb/374151?text=Kantin"
               alt="Kantin Sehat"
@@ -627,7 +628,7 @@
               <p class="text-white font-semibold">Kantin Sehat</p>
             </div>
           </div>
-          <div class="relative group overflow-hidden rounded-lg">
+          <div class="relative group overflow-hidden rounded-lg" data-aos="flip-left" data-aos-delay="400">
             <img
               src="https://via.placeholder.com/300x200/e5e7eb/374151?text=Ekstrakurikuler"
               alt="Kegiatan Ekstrakurikuler"
@@ -639,7 +640,7 @@
               <p class="text-white font-semibold">Ekstrakurikuler</p>
             </div>
           </div>
-          <div class="relative group overflow-hidden rounded-lg">
+          <div class="relative group overflow-hidden rounded-lg" data-aos="flip-left" data-aos-delay="600">
             <img
               src="https://via.placeholder.com/300x200/e5e7eb/374151?text=Prestasi"
               alt="Prestasi Siswa"
@@ -662,13 +663,13 @@
     >
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4" data-aos="fade-up">
             Langkah Mudah Bergabung dengan Keluarga Besar SMA Bina Prestasi
           </h2>
-          <p class="text-xl text-primary font-semibold mb-4">
+          <p class="text-xl text-primary font-semibold mb-4" data-aos="fade-up" data-aos-delay="200">
             Jangan Lewatkan Kesempatan Emas Ini!
           </p>
-          <p class="text-lg text-gray-600">
+          <p class="text-lg text-gray-600" data-aos="fade-up" data-aos-delay="400">
             Pendaftaran Siswa Baru Tahun Ajaran 2025/2026 Telah Dibuka!
           </p>
           <div class="w-24 h-1 bg-primary mx-auto mt-8"></div>
@@ -676,11 +677,11 @@
 
         <!-- Jadwal Penting -->
         <div class="bg-white p-8 rounded-lg shadow-lg mb-12">
-          <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center">
+          <h3 class="text-2xl font-bold text-gray-900 mb-6 text-center" data-aos="fade-up" >
             Jadwal Penting
           </h3>
           <div class="grid md:grid-cols-3 gap-6">
-            <div class="text-center">
+            <div class="text-center" data-aos="fade-in">
               <div
                 class="bg-primary p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4"
               >
@@ -689,7 +690,7 @@
               <h4 class="font-semibold text-gray-900 mb-2">Pendaftaran</h4>
               <p class="text-primary font-bold">1 Januari - 31 Maret 2025</p>
             </div>
-            <div class="text-center">
+            <div class="text-center" data-aos="fade-in" data-aos-delay="200">
               <div
                 class="bg-green-600 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4"
               >
@@ -698,7 +699,7 @@
               <h4 class="font-semibold text-gray-900 mb-2">Tes Seleksi</h4>
               <p class="text-green-600 font-bold">5 - 10 April 2025</p>
             </div>
-            <div class="text-center">
+            <div class="text-center" data-aos="fade-in" data-aos-delay="400">
               <div
                 class="bg-yellow-600 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4"
               >
@@ -712,14 +713,14 @@
 
         <!-- Langkah Pendaftaran -->
         <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-12">
-          <div class="text-center">
+          <div class="text-center" data-aos="fade-up" >
             <div class="bg-white p-6 rounded-lg shadow-lg">
               <div
                 class="bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4 text-xl font-bold"
               >
                 1
               </div>
-              <h3 class="text-lg font-semibold text-gray-900 mb-3">
+              <h3 class="text-lg font-semibold text-gray-900 mb-3" >
                 Isi Formulir Online
               </h3>
               <p class="text-gray-600 text-sm">
@@ -728,7 +729,7 @@
               </p>
             </div>
           </div>
-          <div class="text-center">
+          <div class="text-center" data-aos="fade-up" data-aos-delay="200">
             <div class="bg-white p-6 rounded-lg shadow-lg">
               <div
                 class="bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4 text-xl font-bold"
@@ -743,7 +744,7 @@
               </p>
             </div>
           </div>
-          <div class="text-center">
+          <div class="text-center" data-aos="fade-up" data-aos-delay="400">
             <div class="bg-white p-6 rounded-lg shadow-lg">
               <div
                 class="bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4 text-xl font-bold"
@@ -759,7 +760,7 @@
               </p>
             </div>
           </div>
-          <div class="text-center">
+          <div class="text-center" data-aos="fade-up" data-aos-delay="600">
             <div class="bg-white p-6 rounded-lg shadow-lg">
               <div
                 class="bg-primary text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4 text-xl font-bold"
@@ -781,13 +782,13 @@
           <div class="flex flex-col sm:flex-row gap-4 justify-center">
             <a
               href="{{ route('register-santri') }}"
-              class="bg-primary text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition duration-300"
+              class="bg-primary text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-blue-700 transition duration-300" data-aos="fade-up"
             >
               Daftar Sekarang!
             </a>
             <a
               href="#"
-              class="border-2 border-primary text-primary px-8 py-4 rounded-lg text-lg font-semibold hover:bg-primary hover:text-white transition duration-300"
+              class="border-2 border-primary text-primary px-8 py-4 rounded-lg text-lg font-semibold hover:bg-primary hover:text-white transition duration-300" data-aos="fade-up" data-aos-delay="200"
             >
               Unduh Panduan Pendaftaran
             </a>
@@ -800,14 +801,14 @@
     <section class="py-16 bg-white">
       <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4" data-aos="fade-up">
             Masih Ada Pertanyaan? Kami Punya Jawabannya!
           </h2>
           <div class="w-24 h-1 bg-primary mx-auto mb-8"></div>
         </div>
         <div class="space-y-6">
           <!-- FAQ Item 1 -->
-          <div class="bg-gray-50 rounded-lg p-6">
+          <div class="bg-gray-50 rounded-lg p-6" data-aos="fade-right">
             <button
               class="faq-button w-full text-left flex justify-between items-center"
               onclick="toggleFAQ(this)"
@@ -830,7 +831,7 @@
           </div>
 
           <!-- FAQ Item 2 -->
-          <div class="bg-gray-50 rounded-lg p-6">
+          <div class="bg-gray-50 rounded-lg p-6" data-aos="fade-right" data-aos-delay="200">
             <button
               class="faq-button w-full text-left flex justify-between items-center"
               onclick="toggleFAQ(this)"
@@ -853,7 +854,7 @@
           </div>
 
           <!-- FAQ Item 3 -->
-          <div class="bg-gray-50 rounded-lg p-6">
+          <div class="bg-gray-50 rounded-lg p-6" data-aos="fade-right" data-aos-delay="400">
             <button
               class="faq-button w-full text-left flex justify-between items-center"
               onclick="toggleFAQ(this)"
@@ -877,7 +878,7 @@
           </div>
 
           <!-- FAQ Item 4 -->
-          <div class="bg-gray-50 rounded-lg p-6">
+          <div class="bg-gray-50 rounded-lg p-6" data-aos="fade-right" data-aos-delay="600">
             <button
               class="faq-button w-full text-left flex justify-between items-center"
               onclick="toggleFAQ(this)"
@@ -901,7 +902,7 @@
           </div>
 
           <!-- FAQ Item 5 -->
-          <div class="bg-gray-50 rounded-lg p-6">
+          <div class="bg-gray-50 rounded-lg p-6" data-aos="fade-right" data-aos-delay="800">
             <button
               class="faq-button w-full text-left flex justify-between items-center"
               onclick="toggleFAQ(this)"
@@ -929,27 +930,27 @@
 
     <!-- Final CTA -->
     <section class="py-16 bg-gradient-to-r from-primary to-blue-700 text-white">
-      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-        <h2 class="text-3xl md:text-4xl font-bold mb-4">
+      <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center" >
+        <h2 class="text-3xl md:text-4xl font-bold mb-4" data-aos="fade-up" >
           Jangan Tunda Lagi! Segera Amankan Tempat Anda di SMA Bina Prestasi
         </h2>
-        <p class="text-xl mb-2">dan Raih Masa Depan yang Lebih Cerah!</p>
+        <p class="text-xl mb-2" data-aos="fade-up" data-aos-delay="200">dan Raih Masa Depan yang Lebih Cerah!</p>
         <div
-          class="bg-yellow-400 text-gray-900 inline-block px-6 py-2 rounded-full font-semibold mb-8"
+          class="bg-yellow-400 text-gray-900 inline-block px-6 py-2 rounded-full font-semibold mb-8" data-aos="fade-up" data-aos-delay="400"
         >
           ⚡ Tempat Terbatas! Pendaftaran Gelombang Pertama Ditutup pada 31
           Januari 2025!
         </div>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+        <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8" >
           <a
             href="#"
-            class="bg-white text-primary px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition duration-300"
+            class="bg-white text-primary px-8 py-4 rounded-lg text-lg font-semibold hover:bg-gray-100 transition duration-300" data-aos="fade-up" data-aos-delay="600"
           >
             Daftar Sekarang Juga!
           </a>
           <a
             href="#kontak"
-            class="border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-white hover:text-primary transition duration-300"
+            class="border-2 border-white text-white px-8 py-4 rounded-lg text-lg font-semibold hover:bg-white hover:text-primary transition duration-300" data-aos="fade-up" data-aos-delay="800"
           >
             Hubungi Kami
           </a>
@@ -961,10 +962,10 @@
     <section id="kontak" class="py-16 bg-gray-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12">
-          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+          <h2 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4" data-aos="fade-up">
             Informasi Lebih Lanjut
           </h2>
-          <p class="text-lg text-gray-600">
+          <p class="text-lg text-gray-600" data-aos="fade-up" data-aos-delay="200">
             Hubungi Tim PPDB Kami untuk Konsultasi dan Informasi Lengkap
           </p>
           <div class="w-24 h-1 bg-primary mx-auto mt-8"></div>
@@ -972,7 +973,7 @@
         <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
           <!-- WhatsApp -->
           <div
-            class="bg-white p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition duration-300"
+            class="bg-white p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition duration-300" data-aos="flip-left"
           >
             <div
               class="bg-green-500 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4"
@@ -991,7 +992,7 @@
 
           <!-- Telepon -->
           <div
-            class="bg-white p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition duration-300"
+            class="bg-white p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition duration-300" data-aos="flip-left" data-aos-delay="200"
           >
             <div
               class="bg-blue-500 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4"
@@ -1010,7 +1011,7 @@
 
           <!-- Email -->
           <div
-            class="bg-white p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition duration-300"
+            class="bg-white p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition duration-300" data-aos="flip-left" data-aos-delay="400"
           >
             <div
               class="bg-red-500 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4"
@@ -1029,7 +1030,7 @@
 
           <!-- Alamat -->
           <div
-            class="bg-white p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition duration-300"
+            class="bg-white p-6 rounded-lg shadow-lg text-center hover:shadow-xl transition duration-300" data-aos="flip-left" data-aos-delay="600"
           >
             <div
               class="bg-purple-500 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4"
@@ -1053,31 +1054,31 @@
 
         <!-- Social Media -->
         <div class="mt-12 text-center">
-          <h3 class="text-xl font-semibold text-gray-900 mb-6">
+          <h3 class="text-xl font-semibold text-gray-900 mb-6" data-aos="fade-up">
             Ikuti Media Sosial Kami
           </h3>
           <div class="flex justify-center space-x-6">
             <a
               href="#"
-              class="bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 transition duration-300"
+              class="bg-blue-600 text-white p-3 rounded-full hover:bg-blue-700 transition duration-300" data-aos="fade-up" data-aos-delay="200"
             >
               <i class="fab fa-facebook-f text-xl"></i>
             </a>
             <a
               href="#"
-              class="bg-pink-600 text-white p-3 rounded-full hover:bg-pink-700 transition duration-300"
+              class="bg-pink-600 text-white p-3 rounded-full hover:bg-pink-700 transition duration-300" data-aos="fade-up" data-aos-delay="400"
             >
               <i class="fab fa-instagram text-xl"></i>
             </a>
             <a
               href="#"
-              class="bg-red-600 text-white p-3 rounded-full hover:bg-red-700 transition duration-300"
+              class="bg-red-600 text-white p-3 rounded-full hover:bg-red-700 transition duration-300" data-aos="fade-up" data-aos-delay="600"
             >
               <i class="fab fa-youtube text-xl"></i>
             </a>
             <a
               href="#"
-              class="bg-blue-400 text-white p-3 rounded-full hover:bg-blue-500 transition duration-300"
+              class="bg-blue-400 text-white p-3 rounded-full hover:bg-blue-500 transition duration-300" data-aos="fade-up" data-aos-delay="800"
             >
               <i class="fab fa-twitter text-xl"></i>
             </a>
