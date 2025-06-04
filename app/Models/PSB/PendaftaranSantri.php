@@ -2,6 +2,7 @@
 
 namespace App\Models\PSB;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -37,6 +38,8 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  */
 class PendaftaranSantri extends Model
 {
+    use HasFactory;
+
     /**
      * The table associated with the model.
      *
@@ -117,5 +120,25 @@ class PendaftaranSantri extends Model
     public function dokumen(): HasMany
     {
         return $this->hasMany(Dokumen::class, 'santri_id');
+    }
+
+    /**
+     * Get the jawaban santri records associated with this pendaftaran santri.
+     *
+     * @return HasMany
+     */
+    public function jawabanSantris(): HasMany
+    {
+        return $this->hasMany(\App\Models\JawabanSantri::class, 'santri_id');
+    }
+
+    /**
+     * Get the hasil ujian records associated with this pendaftaran santri.
+     *
+     * @return HasMany
+     */
+    public function hasilUjians(): HasMany
+    {
+        return $this->hasMany(\App\Models\HasilUjian::class, 'santri_id');
     }
 }

@@ -1,20 +1,44 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\PSB;
 
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Soal extends Model
 {
-    protected $table = 'psb_soals';
+    use HasFactory;
+
+    protected $table = 'soals';
+
+    protected $fillable = [
+        'ujian_id',
+        'tipe_soal',
+        'pertanyaan',
+        'opsi',
+        'kunci_jawaban',
+        'poin',
+    ];
+
+    protected $casts = [
+        'opsi' => 'array',
+        'kunci_jawaban' => 'integer',
+        'poin' => 'integer',
+    ];
+
+    const TIPE_PG = 'pg';
+    const TIPE_ESSAY = 'essay';
+
+    public static function getTipeOptions()
+    {
+        return [
+            self::TIPE_PG => 'Pilihan Ganda',
+            self::TIPE_ESSAY => 'Essay',
+        ];
+    }
 
     public function ujian()
     {
         return $this->belongsTo(Ujian::class, 'ujian_id');
-    }
-
-    public function pilihanJawabanSoals()
-    {
-        return $this->hasMany(PilihanJawabanSoal::class, 'soal_id');
     }
 }

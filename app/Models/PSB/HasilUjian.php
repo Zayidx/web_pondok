@@ -5,18 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class JawabanSantri extends Model
+class HasilUjian extends Model
 {
     use HasFactory;
 
-    protected $table = 'jawaban_santris';
+    protected $table = 'hasil_ujians';
     protected $fillable = [
         'santri_id',
         'ujian_id',
-        'soal_id',
-        'jawaban',
-        'skor',
-        'catatan',
+        'total_skor',
+        'status',
     ];
 
     public function santri()
@@ -27,10 +25,5 @@ class JawabanSantri extends Model
     public function ujian()
     {
         return $this->belongsTo(Ujian::class);
-    }
-
-    public function soal()
-    {
-        return $this->belongsTo(Soal::class);
     }
 }

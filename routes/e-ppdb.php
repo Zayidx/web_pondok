@@ -1,15 +1,21 @@
-
-
 <?php
+
 use App\Livewire\Admin\PSB\PsbPage;
 use App\Livewire\Auth\LoginPsb;
 use App\Livewire\Auth\RegisterSantri;
+use App\Livewire\Guest\CheckStatus;
+use App\Livewire\SantriDashboard;
+use App\Livewire\UjianSantri;
 use Illuminate\Support\Facades\Route;
 
+// Rute untuk tamu (tanpa autentikasi)
 Route::get('/registerppdb', RegisterSantri::class)->name('register-santri');
 Route::get('/loginppdbsantri', LoginPsb::class)->name('login-ppdb-santri');
-Route::get('/check-status', \App\Livewire\Guest\CheckStatus::class)->name('check-status');
+Route::get('/check-status', CheckStatus::class)->name('check-status');
 Route::get('/pendaftaran-santri', PsbPage::class)->name('psb-page');
 
-
-
+// Rute untuk santri PPDB (dengan autentikasi santri)
+Route::middleware(['auth:santri'])->group(function () {
+    Route::get('/ujian-santri/{ujianId}', \App\Livewire\SantriPPDB\UjianSantri::class)->name('santri.ujian');
+    Route::get('/santri-dashboard', \App\Livewire\SantriPPDB\SantriDashboard::class)->name('santri.dashboard');
+});

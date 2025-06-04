@@ -35,14 +35,4 @@ class Ujian extends Model
     {
         return $this->hasMany(Soal::class, 'ujian_id');
     }
-
-    public function jawabanSantris()
-    {
-        return $this->hasMany(JawabanSantri::class, 'ujian_id');
-    }
-
-    public function hasilUjians()
-    {
-        return $this->hasMany(HasilUjian::class, 'ujian_id');
-    }
 }

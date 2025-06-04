@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\PSB;
+namespace App\Livewire\SantriPPDB;
 
 use App\Models\JawabanSantri;
 use App\Models\Soal;
