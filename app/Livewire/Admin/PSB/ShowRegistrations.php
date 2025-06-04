@@ -98,6 +98,36 @@ class ShowRegistrations extends Component
         }
     }
 
+    public function cancelStatus($santriId)
+    {
+        try {
+            $santri = PendaftaranSantri::findOrFail($santriId);
+            
+            if (!in_array($santri->status_santri, ['diterima', 'ditolak'])) {
+                session()->flash('error', 'Hanya status diterima atau ditolak yang dapat dibatalkan.');
+                return;
+            }
+
+            $oldStatus = $santri->status_santri;
+            $santri->status_santri = 'wawancara';
+            $santri->save();
+
+            Log::info('Status cancelled successfully', [
+                'santri_id' => $santri->id,
+                'old_status' => $oldStatus,
+                'new_status' => 'wawancara'
+            ]);
+
+            session()->flash('success', 'Status berhasil dibatalkan dan dikembalikan ke tahap wawancara.');
+        } catch (\Exception $e) {
+            Log::error('Failed to cancel status', [
+                'santri_id' => $santriId,
+                'error' => $e->getMessage()
+            ]);
+            session()->flash('error', 'Terjadi kesalahan saat membatalkan status.');
+        }
+    }
+
     public function openInterviewModal($santriId)
     {
         Log::info('openInterviewModal called with santriId: ' . $santriId);
@@ -280,20 +310,32 @@ class ShowRegistrations extends Component
             ->paginate($this->perPage);
     }
 
+    #[Computed]
+    public function statusSantriOptions()
+    {
+        return [
+            'menunggu' => 'Menunggu',
+            'wawancara' => 'Wawancara',
+            'diterima' => 'Diterima',
+            'ditolak' => 'Ditolak'
+        ];
+    }
+
+    #[Computed]
+    public function tipeOptions()
+    {
+        return [
+            'reguler' => 'Reguler',
+            'tahfidz' => 'Tahfidz'
+        ];
+    }
+
     public function render()
     {
         return view('livewire.admin.psb.show-registrations', [
             'registrations' => $this->registrations,
-            'statusSantriOptions' => [
-                'wawancara' => 'Wawancara',
-                'diterima' => 'Diterima',
-                'ditolak' => 'Ditolak',
-            ],
-            'tipeOptions' => [
-                'reguler' => 'Reguler',
-                'olimpiade' => 'Olimpiade',
-                'internasional' => 'Internasional',
-            ],
+            'statusSantriOptions' => $this->statusSantriOptions(),
+            'tipeOptions' => $this->tipeOptions(),
         ]);
     }
 }

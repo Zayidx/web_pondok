@@ -103,6 +103,13 @@
                                             <i class="bi bi-calendar-plus"></i> Jadwal Wawancara
                                         </button>
                                     @endif
+                                    @if(in_array($registration->status_santri, ['diterima', 'ditolak']))
+                                        <button wire:click="cancelStatus({{ $registration->id }})"
+                                                wire:confirm="Apakah Anda yakin ingin membatalkan status {{ $registration->status_santri == 'diterima' ? 'penerimaan' : 'penolakan' }} santri ini?"
+                                                class="btn btn-sm btn-danger me-1">
+                                            <i class="bi bi-x-circle"></i> Batalkan Status
+                                        </button>
+                                    @endif
                                 </td>
                             </tr>
                         @empty
