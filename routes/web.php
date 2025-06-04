@@ -46,3 +46,7 @@ require __DIR__ . '/e-santri.php';
 require __DIR__ . '/e-cashless/petugas-e-cashless.php';
 require __DIR__ . '/e-cashless/petugas-laundry.php';
 require __DIR__ . '/e-cashless/petugas-warung.php';
+
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/master-psb/list-wawancara', App\Livewire\Admin\PSB\InterviewList::class)->name('master-psb.list-wawancara');
+});

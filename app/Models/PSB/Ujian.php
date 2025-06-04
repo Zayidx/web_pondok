@@ -1,7 +1,9 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\PSB;
 
+use App\Models\HasilUjian;
+use App\Models\JawabanSantri;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -28,7 +30,7 @@ class Ujian extends Model
 
     public function periode()
     {
-        return $this->belongsTo(\App\Models\PSB\Periode::class, 'periode_id');
+        return $this->belongsTo(Periode::class, 'periode_id');
     }
 
     public function soals()

@@ -24,7 +24,7 @@
     </script>
   </head>
   <body class="bg-gray-50 text-gray-800">
-   {{ $slot }}
+   @yield('content')
 
     <script>
       // Mobile Menu Toggle

@@ -1,3 +1,6 @@
+@extends('components.layouts.check-status')
+
+@section('content')
 <div>
     <!-- Navigation -->
     <nav class="bg-white shadow-lg fixed w-full top-0 z-50">
@@ -102,7 +105,7 @@
         </div>
     </section>
 
-    <!-- Status Timeline -->
+    <!-- Timeline Section -->
     <section class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
@@ -131,52 +134,50 @@
                                 <p class="text-sm text-green-600 font-medium">✓ Selesai - {{ $timelineStatus['pendaftaran_online']['date'] }}</p>
                             </div>
                         </div>
-                        <!-- Step 2 - Verifikasi Berkas -->
+
+                        <!-- Step 2 - Wawancara -->
                         <div class="relative flex items-center">
-                            <div class="bg-green-500 p-3 rounded-full text-white z-10">
-                                <i class="fas fa-check text-lg"></i>
-                            </div>
-                            <div class="ml-6">
-                                <h3 class="text-lg font-semibold text-gray-900">Verifikasi Berkas</h3>
-                                <p class="text-gray-600">Dokumen persyaratan telah diverifikasi</p>
-                                <p class="text-sm text-green-600 font-medium">✓ Selesai - {{ $timelineStatus['verifikasi_berkas']['date'] }}</p>
-                            </div>
-                        </div>
-                        <!-- Step 3 - Tes Potensi Akademik -->
-                        <div class="relative flex items-center">
-                            <div class="bg-green-500 p-3 rounded-full text-white z-10">
-                                <i class="fas fa-check text-lg"></i>
-                            </div>
-                            <div class="ml-6">
-                                <h3 class="text-lg font-semibold text-gray-900">Tes Potensi Akademik</h3>
-                                <p class="text-gray-600">Tes tertulis telah dilaksanakan</p>
-                                <p class="text-sm text-green-600 font-medium">✓ Selesai - {{ $timelineStatus['tes_potensi_akademik']['date'] }}</p>
-                            </div>
-                        </div>
-                        <!-- Step 4 - Wawancara -->
-                        <div class="relative flex items-center">
-                            <div class="{{ $timelineStatus['wawancara']['completed'] ? 'bg-green-500' : ($timelineStatus['wawancara']['current'] ? 'bg-yellow-500 animate-pulse' : 'bg-gray-300') }} p-3 rounded-full {{ $timelineStatus['wawancara']['completed'] ? 'text-white' : ($timelineStatus['wawancara']['current'] ? 'text-white' : 'text-gray-500') }} z-10">
-                                <i class="fas {{ $timelineStatus['wawancara']['completed'] ? 'fa-check' : ($timelineStatus['wawancara']['current'] ? 'fa-clock' : 'fa-clock') }} text-lg"></i>
+                            <div class="{{ $timelineStatus['wawancara']['completed'] ? 'bg-green-500' : ($timelineStatus['wawancara']['current'] ? 'bg-yellow-500 animate-pulse' : 'bg-gray-300') }} p-3 rounded-full text-white z-10">
+                                <i class="fas {{ $timelineStatus['wawancara']['completed'] ? 'fa-check' : 'fa-comments' }} text-lg"></i>
                             </div>
                             <div class="ml-6">
                                 <h3 class="text-lg font-semibold {{ $timelineStatus['wawancara']['completed'] ? 'text-gray-900' : ($timelineStatus['wawancara']['current'] ? 'text-gray-900' : 'text-gray-500') }}">Wawancara</h3>
-                                <p class="{{ $timelineStatus['wawancara']['completed'] ? 'text-gray-600' : ($timelineStatus['wawancara']['current'] ? 'text-gray-600' : 'text-gray-500') }}">Menunggu jadwal wawancara</p>
-                                <p class="text-sm {{ $timelineStatus['wawancara']['completed'] ? 'text-green-600' : ($timelineStatus['wawancara']['current'] ? 'text-yellow-600' : 'text-gray-500') }} font-medium">
-                                    {{ $timelineStatus['wawancara']['completed'] ? '✓ Selesai - ' . ($timelineStatus['wawancara']['date'] ?? 'N/A') : ($timelineStatus['wawancara']['current'] ? '⏳ Dalam Proses' : 'Menunggu tahap sebelumnya') }}
-                                </p>
+                                @if($timelineStatus['wawancara']['date'])
+                                    <p class="text-gray-600">
+                                        {{ $timelineStatus['wawancara']['mode'] == 'online' ? 'Wawancara Online' : 'Wawancara Tatap Muka' }}
+                                    </p>
+                                    <p class="text-sm {{ $timelineStatus['wawancara']['completed'] ? 'text-green-600' : 'text-blue-600' }} font-medium">
+                                        <i class="fas fa-calendar-alt mr-1"></i>
+                                        {{ $timelineStatus['wawancara']['date'] }} {{ $timelineStatus['wawancara']['time'] }}
+                                    </p>
+                                    <p class="text-sm text-gray-600">
+                                        <i class="fas fa-{{ $timelineStatus['wawancara']['mode'] == 'online' ? 'video' : 'building' }} mr-1"></i>
+                                        {{ $timelineStatus['wawancara']['location'] }}
+                                    </p>
+                                @else
+                                    <p class="text-gray-600">Menunggu jadwal wawancara</p>
+                                @endif
                             </div>
                         </div>
-                        <!-- Step 5 - Pengumuman Hasil -->
+
+                        <!-- Step 3 - Pengumuman Hasil -->
                         <div class="relative flex items-center">
-                            <div class="{{ $timelineStatus['pengumuman_hasil']['completed'] ? 'bg-green-500' : 'bg-gray-300' }} p-3 rounded-full {{ $timelineStatus['pengumuman_hasil']['completed'] ? 'text-white' : 'text-gray-500' }} z-10">
+                            <div class="{{ $timelineStatus['pengumuman_hasil']['completed'] ? 'bg-green-500' : 'bg-gray-300' }} p-3 rounded-full text-white z-10">
                                 <i class="fas {{ $timelineStatus['pengumuman_hasil']['completed'] ? 'fa-check' : 'fa-bullhorn' }} text-lg"></i>
                             </div>
                             <div class="ml-6">
                                 <h3 class="text-lg font-semibold {{ $timelineStatus['pengumuman_hasil']['completed'] ? 'text-gray-900' : 'text-gray-500' }}">Pengumuman Hasil</h3>
-                                <p class="{{ $timelineStatus['pengumuman_hasil']['completed'] ? 'text-gray-600' : 'text-gray-500' }}">Hasil seleksi akan diumumkan</p>
-                                <p class="text-sm {{ $timelineStatus['pengumuman_hasil']['completed'] ? 'text-green-600' : 'text-gray-500' }} font-medium">
-                                    {{ $timelineStatus['pengumuman_hasil']['completed'] ? '✓ Selesai - ' . $timelineStatus['pengumuman_hasil']['date'] : 'Menunggu tahap sebelumnya' }}
-                                </p>
+                                @if($timelineStatus['pengumuman_hasil']['completed'])
+                                    <p class="text-{{ $timelineStatus['pengumuman_hasil']['status'] == 'diterima' ? 'green' : 'red' }}-600">
+                                        {{ $timelineStatus['pengumuman_hasil']['status'] == 'diterima' ? 'Selamat! Anda dinyatakan DITERIMA' : 'Mohon maaf, Anda belum diterima' }}
+                                    </p>
+                                    <p class="text-sm text-gray-600 font-medium">
+                                        <i class="fas fa-calendar-alt mr-1"></i>
+                                        {{ $timelineStatus['pengumuman_hasil']['date'] }}
+                                    </p>
+                                @else
+                                    <p class="text-gray-500">Menunggu hasil seleksi</p>
+                                @endif
                             </div>
                         </div>
                     </div>
@@ -204,6 +205,52 @@
                             Pastikan Anda memeriksa email dan WhatsApp untuk update terbaru.
                         </p>
                     </div>
+                @elseif($santri->status_santri == 'wawancara')
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="bg-blue-100 p-3 rounded-full">
+                            <i class="fas fa-calendar-alt text-blue-600 text-2xl"></i>
+                        </div>
+                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">Wawancara</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Jadwal Wawancara</h3>
+                    @if($santri->tanggal_wawancara)
+                        <p class="text-gray-600 mb-4">Berikut adalah detail jadwal wawancara Anda:</p>
+                        <div class="bg-blue-50 p-4 rounded-lg">
+                            <div class="space-y-2">
+                                <p class="text-sm text-blue-800 font-medium">
+                                    <i class="fas fa-calendar mr-2"></i>
+                                    Tanggal: {{ \Carbon\Carbon::parse($santri->tanggal_wawancara)->format('d F Y') }}
+                                </p>
+                                <p class="text-sm text-blue-800 font-medium">
+                                    <i class="fas fa-clock mr-2"></i>
+                                    Waktu: {{ \Carbon\Carbon::parse($santri->tanggal_wawancara)->format('H:i') }} WIB
+                                </p>
+                                <p class="text-sm text-blue-800 font-medium">
+                                    <i class="fas fa-{{ $santri->mode == 'online' ? 'video' : 'building' }} mr-2"></i>
+                                    Mode: {{ ucfirst($santri->mode) }}
+                                </p>
+                                @if($santri->mode == 'online')
+                                    <p class="text-sm text-blue-800 font-medium">
+                                        <i class="fas fa-link mr-2"></i>
+                                        Link: <a href="{{ $santri->link_online }}" target="_blank" class="underline">{{ $santri->link_online }}</a>
+                                    </p>
+                                @else
+                                    <p class="text-sm text-blue-800 font-medium">
+                                        <i class="fas fa-map-marker-alt mr-2"></i>
+                                        Lokasi: {{ $santri->lokasi_offline }}
+                                    </p>
+                                @endif
+                            </div>
+                        </div>
+                    @else
+                        <p class="text-gray-600 mb-4">Jadwal wawancara Anda akan segera diinformasikan. Harap menunggu.</p>
+                        <div class="bg-yellow-50 p-4 rounded-lg">
+                            <p class="text-sm text-yellow-800 font-medium">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                Kami akan menghubungi Anda melalui email dan WhatsApp ketika jadwal sudah ditentukan.
+                            </p>
+                        </div>
+                    @endif
                 @elseif($santri->status_santri == 'diterima')
                     <div class="flex items-center justify-between mb-4">
                         <div class="bg-green-100 p-3 rounded-full">
@@ -212,23 +259,14 @@
                         <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">Diterima</span>
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 mb-2">Selamat! Anda Diterima</h3>
-                    <p class="text-gray-600 mb-4">Anda dinyatakan LULUS dan diterima di SMA Bina Prestasi. Berikut adalah jadwal wawancara Anda:</p>
-                    @if($santri->tanggal_wawancara && $santri->jam_wawancara)
-                        <div class="bg-green-50 p-4 rounded-lg">
-                            <p class="text-sm text-green-800 font-medium">
-                                <i class="fas fa-calendar mr-2"></i>
-                                Tanggal: {{ \Carbon\Carbon::parse($santri->tanggal_wawancara)->format('d F Y') }} | Jam: {{ $santri->jam_wawancara }} | Lokasi: {{ $santri->mode == 'offline' ? $santri->lokasi_offline : $santri->link_online }}
-                            </p>
-                        </div>
-                    @else
-                        <div class="bg-yellow-50 p-4 rounded-lg">
-                            <p class="text-sm text-yellow-800 font-medium">
-                                <i class="fas fa-info-circle mr-2"></i>
-                                Jadwal wawancara akan segera diinformasikan.
-                            </p>
-                        </div>
-                    @endif
-                @else
+                    <p class="text-gray-600 mb-4">Anda dinyatakan LULUS dan diterima di SMA Bina Prestasi. Silakan melakukan daftar ulang sesuai jadwal yang ditentukan.</p>
+                    <div class="bg-green-50 p-4 rounded-lg">
+                        <p class="text-sm text-green-800 font-medium">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            Informasi lengkap tentang daftar ulang akan dikirimkan melalui email dan WhatsApp.
+                        </p>
+                    </div>
+                @elseif($santri->status_santri == 'ditolak')
                     <div class="flex items-center justify-between mb-4">
                         <div class="bg-red-100 p-3 rounded-full">
                             <i class="fas fa-times-circle text-red-600 text-2xl"></i>
@@ -345,3 +383,4 @@
         });
     </script>
 </div>
+@endsection

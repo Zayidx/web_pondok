@@ -9,6 +9,7 @@ use App\Livewire\Admin\PSB\InterviewList;
 use App\Livewire\Admin\PSB\PeriodeManager;
 use App\Livewire\Admin\PSB\ShowRegistrations;
 use App\Livewire\Admin\PSB\UjianEssay;
+use App\Livewire\Admin\PSB\PreviewUjian;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix('admin')->middleware('auth')->group(function () {
@@ -44,6 +45,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::prefix('master-psb')->group(function () {
         Route::get('/registrations', ShowRegistrations::class)->name('admin.master-psb.show-registrations');
         Route::get('/registrations/{santriId}', DetailRegistration::class)->name('admin.master-psb.detail-registration');
+        Route::get('/registrations/{santriId}/edit', \App\Livewire\Admin\PSB\EditRegistration::class)->name('admin.master-psb.edit-registration');
         Route::get('/wawancara-santri', InterviewList::class)->name('admin.master-psb.interview-list');
     });
 
@@ -54,6 +56,7 @@ Route::prefix('admin')->middleware('auth')->group(function () {
     Route::prefix('master-ujian')->group(function () {
         Route::get('/dashboard', DashboardUjian::class)->name('admin.master-ujian.dashboard');
         Route::get('/detail/{ujianId}', DetailUjian::class)->name('admin.master-ujian.detail');
+        Route::get('/preview/{ujianId}', PreviewUjian::class)->name('admin.psb.ujian.preview');
         Route::get('/essay/{ujianId}', UjianEssay::class)->name('admin.master-ujian.essay');
     });
 });

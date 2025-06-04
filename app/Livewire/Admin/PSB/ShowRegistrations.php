@@ -8,22 +8,31 @@ use App\Models\PSB\PendaftaranSantri;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Title;
+use Carbon\Carbon;
+use Livewire\Attributes\Computed;
 
 class ShowRegistrations extends Component
 {
-   
     use WithPagination;
     #[Title('Halaman List Santri PPDB')]
-    public $perPage = 5;
+    public $perPage = 10;
     public $search = '';
-    public $kota = '';
-    public $status_santri = '';
-    public $tipeFilter = '';
-    public $sortField = 'nama_lengkap';
-    public $sortDirection = 'asc';
+    public $filters = [
+        'status' => '',
+        'tipe' => ''
+    ];
+    public $sortField = 'created_at';
+    public $sortDirection = 'desc';
     public $interviewModal = false;
     public $selectedSantriId;
+    public $editModal = false;
+    public $editForm = [
+        'nama_lengkap' => '',
+        'nisn' => '',
+        'tipe_pendaftaran' => '',
+    ];
 
+    public $showInterviewModal = false;
     public $interviewForm = [
         'tanggal_wawancara' => '',
         'jam_wawancara' => '',
@@ -34,41 +43,48 @@ class ShowRegistrations extends Component
 
     protected $queryString = [
         'search' => ['except' => ''],
-        'kota' => ['except' => ''],
-        'status_santri' => ['except' => ''],
-        'tipeFilter' => ['except' => ''],
-        'perPage' => ['except' => 5],
-        'sortField' => ['except' => 'nama_lengkap'],
-        'sortDirection' => ['except' => 'asc'],
+        'filters' => ['except' => ['status' => '', 'tipe' => '']],
+        'perPage' => ['except' => 10],
+        'sortField' => ['except' => 'created_at'],
+        'sortDirection' => ['except' => 'desc']
     ];
+
+    protected function rules()
+    {
+        return [
+            'interviewForm.tanggal_wawancara' => 'required|date|after_or_equal:today',
+            'interviewForm.jam_wawancara' => 'required',
+            'interviewForm.mode' => 'required|in:offline,online',
+            'interviewForm.link_online' => 'required_if:interviewForm.mode,online|url|nullable',
+            'interviewForm.lokasi_offline' => 'required_if:interviewForm.mode,offline|string|nullable',
+        ];
+    }
+
+    protected $messages = [
+        'interviewForm.tanggal_wawancara.required' => 'Tanggal wawancara harus diisi.',
+        'interviewForm.tanggal_wawancara.date' => 'Format tanggal tidak valid.',
+        'interviewForm.tanggal_wawancara.after_or_equal' => 'Tanggal wawancara tidak boleh kurang dari hari ini.',
+        'interviewForm.jam_wawancara.required' => 'Waktu wawancara harus diisi.',
+        'interviewForm.mode.required' => 'Mode wawancara harus dipilih.',
+        'interviewForm.mode.in' => 'Mode wawancara tidak valid.',
+        'interviewForm.link_online.required_if' => 'Link meeting harus diisi untuk wawancara online.',
+        'interviewForm.link_online.url' => 'Format link meeting tidak valid.',
+        'interviewForm.lokasi_offline.required_if' => 'Lokasi wawancara harus diisi untuk wawancara offline.',
+    ];
+
+    public function mount()
+    {
+        $this->interviewForm['tanggal_wawancara'] = now()->format('Y-m-d');
+        $this->interviewForm['jam_wawancara'] = '09:00';
+    }
 
     public function updatingSearch()
     {
-        Log::info('Search updated to: ' . $this->search);
         $this->resetPage();
     }
 
-    public function updatingKota()
+    public function updatingFilters()
     {
-        Log::info('Kota filter updated to: ' . $this->kota);
-        $this->resetPage();
-    }
-
-    public function updatingStatusSantri()
-    {
-        Log::info('Status santri filter updated to: ' . $this->status_santri);
-        $this->resetPage();
-    }
-
-    public function updatingTipeFilter()
-    {
-        Log::info('Tipe filter updated to: ' . $this->tipeFilter);
-        $this->resetPage();
-    }
-
-    public function updatingPerPage()
-    {
-        Log::info('PerPage updated to: ' . $this->perPage);
         $this->resetPage();
     }
 
@@ -80,46 +96,123 @@ class ShowRegistrations extends Component
             $this->sortField = $field;
             $this->sortDirection = 'asc';
         }
-        Log::info("Sorting by $field in $this->sortDirection order");
     }
 
     public function openInterviewModal($santriId)
     {
         Log::info('openInterviewModal called with santriId: ' . $santriId);
         $santri = PendaftaranSantri::findOrFail($santriId);
-        if ($santri->status_santri !== 'menunggu') {
-            Log::warning('Santri ID: ' . $santriId . ' has status: ' . $santri->status_santri);
-            session()->flash('error', 'Jadwal wawancara hanya dapat dibuat untuk santri dengan status menunggu.');
-            return;
-        }
 
         $this->selectedSantriId = $santriId;
         $this->interviewForm = [
-            'tanggal_wawancara' => '',
-            'jam_wawancara' => '',
+            'tanggal_wawancara' => now()->format('Y-m-d'),
+            'jam_wawancara' => '09:00',
             'mode' => 'offline',
             'link_online' => '',
-            'lokasi_offline' => '',
+            'lokasi_offline' => 'Ruang Meeting Lt. 2',
         ];
-        $this->interviewModal = true;
+        $this->showInterviewModal = true;
         $this->resetValidation();
+    }
+
+    public function closeInterviewModal()
+    {
+        $this->showInterviewModal = false;
+        $this->selectedSantriId = null;
+        $this->interviewForm['tanggal_wawancara'] = now()->format('Y-m-d');
+        $this->interviewForm['jam_wawancara'] = '09:00';
     }
 
     public function saveInterview()
     {
-        Log::info('saveInterview called with data: ', $this->interviewForm);
+        $this->validate([
+            'interviewForm.tanggal_wawancara' => 'required|date|after_or_equal:today',
+            'interviewForm.jam_wawancara' => 'required',
+            'interviewForm.mode' => 'required|in:offline,online',
+            'interviewForm.link_online' => 'required_if:interviewForm.mode,online',
+            'interviewForm.lokasi_offline' => 'required_if:interviewForm.mode,offline',
+        ]);
+
+        DB::beginTransaction();
+        try {
+            $santri = PendaftaranSantri::findOrFail($this->selectedSantriId);
+
+            // Combine date and time into a single datetime
+            $tanggalWawancara = \Carbon\Carbon::parse($this->interviewForm['tanggal_wawancara'])
+                ->setTimeFromTimeString($this->interviewForm['jam_wawancara'])
+                ->format('Y-m-d H:i:s');
+
+            $updateData = [
+                'tanggal_wawancara' => $tanggalWawancara,
+                'mode' => $this->interviewForm['mode'],
+                'link_online' => $this->interviewForm['mode'] === 'online' ? $this->interviewForm['link_online'] : null,
+                'lokasi_offline' => $this->interviewForm['mode'] === 'offline' ? $this->interviewForm['lokasi_offline'] : null,
+                'status_santri' => 'wawancara'
+            ];
+
+            $santri->update($updateData);
+            DB::commit();
+            
+            $this->showInterviewModal = false;
+            $this->selectedSantriId = null;
+            $this->reset(['interviewForm']);
+            session()->flash('success', 'Jadwal wawancara berhasil dibuat.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to save interview schedule', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'data' => $updateData ?? null
+            ]);
+            session()->flash('error', 'Gagal menyimpan jadwal wawancara: ' . $e->getMessage());
+        }
+    }
+
+    public function closeModal()
+    {
+        $this->showInterviewModal = false;
+        $this->reset(['interviewForm', 'selectedSantriId']);
+    }
+
+    public function openEditModal($registrationId)
+    {
+        Log::info('openEditModal called with registrationId: ' . $registrationId);
+        try {
+            $registration = PendaftaranSantri::findOrFail($registrationId);
+            $this->selectedSantriId = $registrationId;
+            $this->editForm = [
+                'nama_lengkap' => $registration->nama_lengkap,
+                'nisn' => $registration->nisn,
+                'tipe_pendaftaran' => $registration->tipe_pendaftaran,
+            ];
+            Log::info('Edit modal opened with data: ', $this->editForm);
+            $this->editModal = true;
+            $this->resetValidation();
+        } catch (\Exception $e) {
+            Log::error('Error in openEditModal: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            session()->flash('error', 'Gagal membuka modal edit: ' . $e->getMessage());
+        }
+    }
+
+    public function closeEditModal()
+    {
+        $this->editModal = false;
+        $this->reset(['editForm', 'selectedSantriId']);
+    }
+
+    public function saveRegistration()
+    {
+        Log::info('saveRegistration called with data: ', $this->editForm);
 
         try {
             $this->validate([
-                'interviewForm.tanggal_wawancara' => 'required|date',
-                'interviewForm.jam_wawancara' => 'required',
-                'interviewForm.mode' => 'required|in:online,offline',
-                'interviewForm.link_online' => 'required_if:interviewForm.mode,online|url|nullable',
-                'interviewForm.lokasi_offline' => 'required_if:interviewForm.mode,offline|string|max:255|nullable',
+                'editForm.nama_lengkap' => 'required|string|max:255',
+                'editForm.nisn' => 'required|string|max:20',
+                'editForm.tipe_pendaftaran' => 'required|in:' . implode(',', array_keys($this->tipeOptions)),
             ]);
-            Log::info('Validation passed for santri ID: ' . $this->selectedSantriId);
+            Log::info('Validation passed for edit registration, santri ID: ' . $this->selectedSantriId);
         } catch (\Illuminate\Validation\ValidationException $e) {
-            Log::error('Validation failed: ', $e->errors());
+            Log::error('Validation failed for edit registration: ', $e->errors());
             session()->flash('error', 'Validasi gagal: ' . implode(', ', array_merge(...array_values($e->errors()))));
             return;
         }
@@ -127,147 +220,72 @@ class ShowRegistrations extends Component
         DB::beginTransaction();
         try {
             $santri = PendaftaranSantri::findOrFail($this->selectedSantriId);
-            if ($santri->status_santri !== 'menunggu') {
-                throw new \Exception('Santri ini tidak dalam status menunggu.');
-            }
 
             $updateData = [
-                'status_santri' => 'diterima',
-                'tanggal_wawancara' => $this->interviewForm['tanggal_wawancara'],
-                'jam_wawancara' => $this->interviewForm['jam_wawancara'],
-                'mode' => $this->interviewForm['mode'],
-                'link_online' => $this->interviewForm['link_online'],
-                'lokasi_offline' => $this->interviewForm['lokasi_offline'],
-                'tipe_pendaftaran' => $santri->tipe_pendaftaran ?? 'reguler', // Ensure tipe_pendaftaran is set
+                'nama_lengkap' => $this->editForm['nama_lengkap'],
+                'nisn' => $this->editForm['nisn'],
+                'tipe_pendaftaran' => $this->editForm['tipe_pendaftaran'],
             ];
 
-            Log::info('Attempting to update santri ID: ' . $santri->id, $updateData);
+            Log::info('Updating registration for santri ID: ' . $santri->id, $updateData);
             $updated = $santri->update($updateData);
             Log::info('Update result for santri ID: ' . $santri->id, ['updated' => $updated]);
 
-            // Verify database state
             $santri->refresh();
             Log::info('Santri after update: ', $santri->toArray());
 
-            // Check database directly
-            $dbRecord = DB::table('psb_pendaftaran_santri')->where('id', $santri->id)->first();
-            Log::info('Raw database record for santri ID: ' . $santri->id, (array) $dbRecord);
-
-            if ($dbRecord->status_santri !== 'diterima' || !$dbRecord->tanggal_wawancara) {
-                throw new \Exception('Data gagal tersimpan di database.');
-            }
-
             DB::commit();
-            $this->interviewModal = false;
-            session()->flash('success', 'Santri diterima dan jadwal wawancara berhasil disimpan.');
+            $this->editModal = false;
+            session()->flash('success', 'Data santri berhasil diperbarui.');
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Error in saveInterview: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            session()->flash('error', 'Gagal menyimpan jadwal: ' . $e->getMessage());
+            Log::error('Error in saveRegistration: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
+            session()->flash('error', 'Gagal memperbarui data: ' . $e->getMessage());
         }
     }
 
-    public function reject($santriId)
+    public function updated($propertyName)
     {
-        Log::info('reject called with santriId: ' . $santriId);
-        DB::beginTransaction();
-        try {
-            $santri = PendaftaranSantri::findOrFail($santriId);
-            if ($santri->status_santri !== 'menunggu') {
-                throw new \Exception('Santri ini tidak dalam status menunggu.');
-            }
+        $this->validateOnly($propertyName);
+    }
 
-            Log::info('Rejecting santri ID: ' . $santri->id);
-            $updated = $santri->update([
-                'status_santri' => 'ditolak',
-                'reason_rejected' => null,
-                'tanggal_wawancara' => null,
-                'jam_wawancara' => null,
-                'mode' => null,
-                'link_online' => null,
-                'lokasi_offline' => null,
-            ]);
-
-            Log::info('Reject update result for santri ID: ' . $santri->id, ['updated' => $updated]);
-            $santri->refresh();
-            Log::info('Santri after reject: ', $santri->toArray());
-
-            DB::commit();
-            session()->flash('success', 'Santri berhasil ditolak.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error in reject: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            session()->flash('error', 'Gagal menolak santri: ' . $e->getMessage());
+    public function updatedInterviewFormMode($value)
+    {
+        // Reset the corresponding field when mode changes
+        if ($value === 'online') {
+            $this->interviewForm['lokasi_offline'] = '';
+        } else {
+            $this->interviewForm['link_online'] = '';
         }
     }
 
-    public function cancelStatus($santriId)
+    #[Computed]
+    public function registrations()
     {
-        Log::info('cancelStatus called with santriId: ' . $santriId);
-        DB::beginTransaction();
-        try {
-            $santri = PendaftaranSantri::findOrFail($santriId);
-            if (!in_array($santri->status_santri, ['diterima', 'ditolak'])) {
-                throw new \Exception('Status santri ini tidak dapat dibatalkan.');
-            }
-
-            Log::info('Canceling status for santri ID: ' . $santri->id);
-            $updated = $santri->update([
-                'status_santri' => 'menunggu',
-                'tanggal_wawancara' => null,
-                'jam_wawancara' => null,
-                'mode' => null,
-                'link_online' => null,
-                'lokasi_offline' => null,
-                'reason_rejected' => null,
-            ]);
-
-            Log::info('Cancel update result for santri ID: ' . $santri->id, ['updated' => $updated]);
-            $santri->refresh();
-            Log::info('Santri after cancel: ', $santri->toArray());
-
-            DB::commit();
-            session()->flash('success', 'Status santri berhasil dibatalkan.');
-        } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Error in cancelStatus: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);
-            session()->flash('error', 'Gagal membatalkan status: ' . $e->getMessage());
-        }
-    }
-
-    public function closeModal()
-    {
-        $this->interviewModal = false;
-        $this->reset(['interviewForm', 'selectedSantriId']);
+        return PendaftaranSantri::query()
+            ->with('wali')
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
+                    $q->where('nama_lengkap', 'like', '%' . $this->search . '%')
+                        ->orWhere('nisn', 'like', '%' . $this->search . '%');
+                });
+            })
+            ->when($this->filters['status'], function ($query) {
+                $query->where('status_santri', $this->filters['status']);
+            })
+            ->when($this->filters['tipe'], function ($query) {
+                $query->where('tipe_pendaftaran', $this->filters['tipe']);
+            })
+            ->orderBy($this->sortField, $this->sortDirection)
+            ->paginate($this->perPage);
     }
 
     public function render()
     {
-        $registrations = PendaftaranSantri::query()
-            ->with('wali')
-            ->when($this->search, function ($query) {
-                $query->where('nama_lengkap', 'like', '%' . $this->search . '%')
-                    ->orWhere('nisn', 'like', '%' . $this->search . '%');
-            })
-            ->when($this->kota, function ($query) {
-                $query->whereHas('wali', function ($q) {
-                    $q->where('alamat', 'like', '%' . $this->kota . '%');
-                });
-            })
-            ->when($this->status_santri, function ($query) {
-                $query->where('status_santri', $this->status_santri);
-            })
-            ->when($this->tipeFilter, function ($query) {
-                $query->where('tipe_pendaftaran', $this->tipeFilter);
-            })
-            ->orderBy($this->sortField, $this->sortDirection)
-            ->paginate($this->perPage);
-
         return view('livewire.admin.psb.show-registrations', [
-            'registrations' => $registrations,
+            'registrations' => $this->registrations,
             'statusSantriOptions' => [
-                '' => 'Dibatalkan',
-                'menunggu' => 'Menunggu',
+                'wawancara' => 'Wawancara',
                 'diterima' => 'Diterima',
                 'ditolak' => 'Ditolak',
             ],

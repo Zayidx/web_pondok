@@ -10,16 +10,32 @@ use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
 
+/**
+ * DetailUjian Component
+ * 
+ * Komponen ini menangani manajemen soal-soal dalam sebuah ujian, termasuk:
+ * - Menampilkan daftar soal
+ * - Menambah soal baru (PG atau Essay)
+ * - Mengubah soal yang sudah ada
+ * - Menghapus soal
+ */
 class DetailUjian extends Component
 {
-    use WithPagination;
-    #[Title('Halaman Soal Ujian')]
+    use WithPagination; // Trait untuk fitur pagination di Livewire
 
-    public SoalForm $soalForm;
-    public $soalId;
-    public $ujianId;
-    public $ujian;
+    #[Title('Halaman Soal Ujian')] // Judul halaman yang akan ditampilkan di browser
 
+    // Properties untuk form dan data
+    public SoalForm $soalForm;    // Form untuk input/edit soal
+    public $soalId;               // ID soal yang sedang diedit (null jika membuat baru)
+    public $ujianId;              // ID ujian yang sedang dikelola
+    public $ujian;                // Data ujian yang sedang dikelola
+
+    /**
+     * Inisialisasi komponen saat pertama kali dimuat
+     * 
+     * @param int $ujianId ID ujian yang akan dikelola soal-soalnya
+     */
     public function mount($ujianId)
     {
         $this->ujianId = $ujianId;
@@ -28,12 +44,21 @@ class DetailUjian extends Component
         $this->soalForm->ujian_id = $this->ujianId;
     }
 
+    /**
+     * Mengambil daftar soal untuk ujian yang sedang aktif
+     * dengan pagination 10 item per halaman
+     * 
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     */
     #[Computed]
     public function listSoal()
     {
         return Soal::where('ujian_id', $this->ujianId)->paginate(10);
     }
 
+    /**
+     * Menyiapkan form untuk membuat soal baru
+     */
     public function create()
     {
         $this->soalId = null;
@@ -42,16 +67,30 @@ class DetailUjian extends Component
         $this->soalForm->tipe_soal = 'pg';
     }
 
+    /**
+     * Menambah opsi baru untuk soal pilihan ganda
+     */
     public function addOption()
     {
         $this->soalForm->addOption();
     }
 
+    /**
+     * Menghapus opsi dari soal pilihan ganda
+     * 
+     * @param int $index Index opsi yang akan dihapus
+     */
     public function removeOption($index)
     {
         $this->soalForm->removeOption($index);
     }
 
+    /**
+     * Mencari index jawaban yang benar berdasarkan bobot nilai tertinggi
+     * 
+     * @param array $options Array opsi jawaban dengan bobot nilainya
+     * @return int Index dari opsi dengan bobot tertinggi
+     */
     protected function findCorrectAnswerIndex($options)
     {
         $maxBobot = -1;
@@ -68,6 +107,16 @@ class DetailUjian extends Component
         return $correctIndex;
     }
 
+    /**
+     * Menyimpan soal baru ke database
+     * 
+     * Untuk soal PG:
+     * - Menyimpan opsi jawaban
+     * - Menentukan kunci jawaban berdasarkan bobot tertinggi
+     * 
+     * Untuk Essay:
+     * - Hanya menyimpan pertanyaan
+     */
     public function createSoal()
     {
         try {
@@ -91,6 +140,11 @@ class DetailUjian extends Component
         }
     }
 
+    /**
+     * Menyiapkan form untuk mengedit soal yang sudah ada
+     * 
+     * @param int $id ID soal yang akan diedit
+     */
     public function edit($id)
     {
         $this->soalId = $id;
@@ -104,6 +158,17 @@ class DetailUjian extends Component
         ]);
     }
 
+    /**
+     * Mengupdate soal yang sudah ada di database
+     * 
+     * Untuk soal PG:
+     * - Update opsi jawaban
+     * - Update kunci jawaban berdasarkan bobot tertinggi
+     * 
+     * Untuk Essay:
+     * - Hanya update pertanyaan
+     * - Hapus opsi dan kunci jawaban
+     */
     public function updateSoal()
     {
         try {
@@ -129,6 +194,11 @@ class DetailUjian extends Component
         }
     }
 
+    /**
+     * Menghapus soal dari database
+     * 
+     * @param int $id ID soal yang akan dihapus
+     */
     public function deleteSoal($id)
     {
         try {
@@ -140,6 +210,20 @@ class DetailUjian extends Component
         }
     }
 
+    /**
+     * Menyiapkan data untuk preview ujian dari perspektif santri
+     */
+    public function previewUjian()
+    {
+        // Method ini kosong karena preview hanya membutuhkan data yang sudah ada
+        // Data ujian dan soal-soal sudah tersedia melalui properti $ujian dan method listSoal()
+    }
+
+    /**
+     * Render view untuk komponen ini
+     * 
+     * @return \Illuminate\View\View
+     */
     public function render()
     {
         return view('livewire.admin.psb.detail-ujian');

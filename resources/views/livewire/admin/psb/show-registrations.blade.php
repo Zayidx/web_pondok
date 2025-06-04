@@ -1,55 +1,70 @@
+<?php /** @var \Illuminate\Support\ViewErrorBag $errors */ ?>
 <div>
-    @if (session('success'))
-        <div class="alert alert-success" style="z-index: 1050; position: relative;">{{ session('success') }}</div>
-    @endif
-    @if (session('error'))
-        <div class="alert alert-danger" style="z-index: 1050; position: relative;">{{ session('error') }}</div>
-    @endif
+    <!-- Alert Messages -->
+    <div class="position-fixed top-0 end-0 p-3" style="z-index: 1100;">
+        @if (session('success'))
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                {{ session('success') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+        @if (session('error'))
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                {{ session('error') }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+    </div>
 
     <div class="card">
+        <div class="card-header">
+            <h4>Daftar Pendaftaran Santri</h4>
+        </div>
         <div class="card-body">
-            <div class="row mb-3">
+            <div class="row mb-4">
                 <div class="col-md-3">
-                    <input type="text" class="form-control" wire:model.live="search" placeholder="Cari NISN atau Nama Santri...">
+                    <input type="text" wire:model.live="search" class="form-control" placeholder="Cari nama atau NISN...">
                 </div>
-                <div class="col-md-2">
-                    <input type="text" class="form-control" wire:model.live="kota" placeholder="Kota...">
-                </div>
-                <div class="col-md-2">
-                    <select class="form-select" wire:model.live="status_santri">
+                <div class="col-md-3">
+                    <select wire:model.live="filters.status" class="form-select">
                         <option value="">Semua Status</option>
-                        @foreach ($statusSantriOptions as $value => $label)
+                        @foreach($statusSantriOptions as $value => $label)
                             <option value="{{ $value }}">{{ $label }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <select class="form-select" wire:model.live="tipeFilter">
-                        <option value="">Semua Tipe</option>
-                        @foreach ($tipeOptions as $value => $label)
+                <div class="col-md-3">
+                    <select wire:model.live="filters.tipe" class="form-select">
+                        <option value="">Semua Program</option>
+                        @foreach($tipeOptions as $value => $label)
                             <option value="{{ $value }}">{{ $label }}</option>
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-2">
-                    <select class="form-select" wire:model.live="perPage">
-                        <option value="5">5</option>
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
+                <div class="col-md-3">
+                    <select wire:model.live="perPage" class="form-select">
+                        <option value="10">10 per halaman</option>
+                        <option value="25">25 per halaman</option>
+                        <option value="50">50 per halaman</option>
+                        <option value="100">100 per halaman</option>
                     </select>
                 </div>
             </div>
 
             <div class="table-responsive">
-                <table class="table table-bordered">
+                <table class="table table-hover">
                     <thead>
                         <tr>
-                            <th wire:click="sortBy('nama_lengkap')" class="cursor-pointer">Nama Santri @if($sortField == 'nama_lengkap') <i class="bi {{ $sortDirection == 'asc' ? 'bi-arrow-up' : 'bi-arrow-down' }}"></i> @endif</th>
-                            <th wire:click="sortBy('nisn')" class="cursor-pointer">NISN @if($sortField == 'nisn') <i class="bi {{ $sortDirection == 'asc' ? 'bi-arrow-up' : 'bi-arrow-down' }}"></i> @endif</th>
-                            <th>Kota</th>
-                            <th wire:click="sortBy('tipe_pendaftaran')" class="cursor-pointer">Tipe Pendaftaran @if($sortField == 'tipe_pendaftaran') <i class="bi {{ $sortDirection == 'asc' ? 'bi-arrow-up' : 'bi-arrow-down' }}</i> @endif</th>
-                            <th wire:click="sortBy('status_santri')" class="cursor-pointer">Status Santri @if($sortField == 'status_santri') <i class="bi {{ $sortDirection == 'asc' ? 'bi-arrow-up' : 'bi-arrow-down' }}</i> @endif</th>
+                            <th wire:click="sortBy('nama_lengkap')" style="cursor: pointer;">
+                                Nama Lengkap
+                                @if ($sortField === 'nama_lengkap')
+                                    <i class="bi bi-arrow-{{ $sortDirection === 'asc' ? 'up' : 'down' }}"></i>
+                                @endif
+                            </th>
+                            <th>NISN</th>
+                            <th>Alamat</th>
+                            <th>Program</th>
+                            <th>Status</th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -60,15 +75,33 @@
                                 <td>{{ $registration->nisn }}</td>
                                 <td>{{ $registration->wali->alamat ?? '-' }}</td>
                                 <td>{{ $tipeOptions[$registration->tipe_pendaftaran] ?? '-' }}</td>
-                                <td>{{ $statusSantriOptions[$registration->status_santri] ?? 'Dibatalkan' }}</td>
-                                <td class="text-nowrap">
-                                    <a href="{{ route('admin.show-registration.detail', $registration->id) }}" class="btn btn-sm btn-primary me-1">Detail</a>
-                                    @if($registration->status_santri == 'menunggu')
-                                        <button wire:click="openInterviewModal({{ $registration->id }})" class="btn btn-sm btn-success me-1">Diterima</button>
-                                        <button wire:click="reject({{ $registration->id }})" class="btn btn-sm btn-danger me-1">Ditolak</button>
+                                <td>
+                                    @if($registration->status_santri === 'wawancara')
+                                        @if($registration->tanggal_wawancara)
+                                            <span class="badge bg-info">Jadwal Wawancara Sudah Keluar</span>
+                                        @else
+                                            <span class="badge bg-warning">Menunggu Jadwal Wawancara</span>
+                                        @endif
+                                    @elseif($registration->status_santri === 'diterima')
+                                        <span class="badge bg-success">Diterima</span>
+                                    @elseif($registration->status_santri === 'ditolak')
+                                        <span class="badge bg-danger">Ditolak</span>
                                     @endif
-                                    @if(in_array($registration->status_santri, ['diterima', 'ditolak']))
-                                        <button wire:click="cancelStatus({{ $registration->id }})" class="btn btn-sm btn-warning me-1">Batalkan</button>
+                                </td>
+                                <td class="text-nowrap">
+                                    <a href="{{ route('admin.master-psb.detail-registration', ['santriId' => $registration->id]) }}" 
+                                       class="btn btn-sm btn-primary me-1">
+                                        <i class="bi bi-eye"></i> Detail
+                                    </a>
+                                    <a href="{{ route('admin.master-psb.edit-registration', ['santriId' => $registration->id]) }}" 
+                                       class="btn btn-sm btn-warning me-1">
+                                        <i class="bi bi-pencil"></i> Edit
+                                    </a>
+                                    @if(!$registration->tanggal_wawancara)
+                                        <button wire:click="openInterviewModal({{ $registration->id }})" 
+                                                class="btn btn-sm btn-info me-1">
+                                            <i class="bi bi-calendar-plus"></i> Jadwal Wawancara
+                                        </button>
                                     @endif
                                 </td>
                             </tr>
@@ -81,70 +114,79 @@
                 </table>
             </div>
 
-            {{ $registrations->links() }}
+            <div class="mt-4">
+                {{ $registrations->links() }}
+            </div>
         </div>
     </div>
 
     <!-- Interview Modal -->
-    @if($interviewModal)
-        <div class="modal fade show" id="interviewModal" tabindex="-1" role="dialog" style="display: block; z-index: 1050;">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <form wire:submit.prevent="saveInterview">
-                        <div class="modal-header">
-                            <h5 class="modal-title">Jadwal Wawancara</h5>
-                            <button type="button" class="btn-close" wire:click="closeModal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body" style="max-height: 60vh; overflow-y: auto;">
-                            @if($errors->any())
-                                <div class="alert alert-danger">
-                                    <ul>
-                                        @foreach($errors->all() as $error)
-                                            <li>{{ $error }}</li>
-                                        @endforeach
-                                    </ul>
-                                </div>
-                            @endif
-                            <div class="form-group mb-3">
-                                <label>Tanggal Wawancara *</label>
-                                <input type="date" class="form-control" wire:model="interviewForm.tanggal_wawancara">
-                                @error('interviewForm.tanggal_wawancara') <span class="text-danger">{{ $message }}</span> @enderror
-                            </div>
-                            <div class="form-group mb-3">
-                                <label>Jam Wawancara *</label>
-                                <input type="time" class="form-control" wire:model="interviewForm.jam_wawancara">
-                                @error('interviewForm.jam_wawancara') <span class="text-danger">{{ $message }}</span> @enderror
-                            </div>
-                            <div class="form-group mb-3">
-                                <label>Mode Wawancara *</label>
-                                <select class="form-select" wire:model.live="interviewForm.mode">
-                                    <option value="offline">Offline</option>
-                                    <option value="online">Online</option>
-                                </select>
-                                @error('interviewForm.mode') <span class="text-danger">{{ $message }}</span> @enderror
-                            </div>
-                            @if($interviewForm['mode'] === 'online')
-                                <div class="form-group mb-3">
-                                    <label>Link Online *</label>
-                                    <input type="url" class="form-control" wire:model="interviewForm.link_online" placeholder="https://zoom.us/...">
-                                    @error('interviewForm.link_online') <span class="text-danger">{{ $message }}</span> @enderror
-                                </div>
-                            @else
-                                <div class="form-group mb-3">
-                                    <label>Lokasi Offline *</label>
-                                    <input type="text" class="form-control" wire:model="interviewForm.lokasi_offline" placeholder="Gedung Serbaguna Pesantren">
-                                    @error('interviewForm.lokasi_offline') <span class="text-danger">{{ $message }}</span> @enderror
-                                </div>
-                            @endif
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" wire:click="closeModal">Batal</button>
-                            <button type="submit" class="btn btn-primary">Simpan</button>
-                        </div>
-                    </form>
+    @if($showInterviewModal)
+    <div class="modal fade show" style="display: block;" tabindex="-1" role="dialog">
+        <div class="modal-backdrop fade show" style="z-index: 1040;"></div>
+        <div class="modal-dialog" style="z-index: 1050;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Jadwalkan Wawancara</h5>
+                    <button type="button" class="btn-close" wire:click="closeInterviewModal"></button>
                 </div>
+                <form wire:submit.prevent="saveInterview">
+                    <div class="modal-body">
+                        @if($errors->any())
+                            <div class="alert alert-danger">
+                                <ul class="mb-0">
+                                    @foreach ($errors->all() as $error)
+                                        <li>{{ $error }}</li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        @endif
+
+                        <div class="mb-3">
+                            <label class="form-label">Mode Wawancara</label>
+                            <select class="form-select" wire:model.live="interviewForm.mode">
+                                <option value="offline">Offline (Tatap Muka)</option>
+                                <option value="online">Online (Virtual)</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Tanggal Wawancara</label>
+                            <input type="date" class="form-control" wire:model.live="interviewForm.tanggal_wawancara" min="{{ now()->format('Y-m-d') }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Waktu Wawancara</label>
+                            <input type="time" class="form-control" wire:model.live="interviewForm.jam_wawancara">
+                        </div>
+
+                        @if($interviewForm['mode'] === 'online')
+                        <div class="online-form">
+                            <div class="mb-3">
+                                <label class="form-label">Link Meeting</label>
+                                <input type="url" class="form-control" wire:model.live="interviewForm.link_online" 
+                                       placeholder="https://meet.google.com/...">
+                                <small class="text-muted">Masukkan link Google Meet atau Zoom untuk wawancara online</small>
+                            </div>
+                        </div>
+                        @else
+                        <div class="offline-form">
+                            <div class="mb-3">
+                                <label class="form-label">Lokasi Wawancara</label>
+                                <input type="text" class="form-control" wire:model.live="interviewForm.lokasi_offline" 
+                                       placeholder="Contoh: Ruang Meeting Lt. 2">
+                                <small class="text-muted">Masukkan lokasi tempat wawancara akan dilaksanakan</small>
+                            </div>
+                        </div>
+                        @endif
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" wire:click="closeInterviewModal">Batal</button>
+                        <button type="submit" class="btn btn-primary">Simpan</button>
+                    </div>
+                </form>
             </div>
         </div>
-        <div class="modal-backdrop fade show" style="z-index: 1040;"></div>
+    </div>
     @endif
 </div>

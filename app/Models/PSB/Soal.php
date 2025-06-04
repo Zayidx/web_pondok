@@ -34,7 +34,7 @@ class Soal extends Model
         return [
             self::TIPE_PG => 'Pilihan Ganda',
             self::TIPE_ESSAY => 'Essay',
-        ];
+    ];
     }
 
     public function ujian()

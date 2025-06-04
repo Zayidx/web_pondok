@@ -3,6 +3,7 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 class UpdatePsbPendaftaranSantriTable extends Migration
 {
@@ -16,18 +17,18 @@ class UpdatePsbPendaftaranSantriTable extends Migration
 
             // Add status_santri column if it doesn't exist
             if (!Schema::hasColumn('psb_pendaftaran_santri', 'status_santri')) {
-                $table->enum('status_santri', ['menunggu', 'diterima', 'ditolak'])->nullable()->after('tipe_pendaftaran');
+                $table->enum('status_santri', ['menunggu', 'wawancara', 'diterima', 'ditolak'])->nullable()->after('tipe_pendaftaran');
+            } else {
+                // Modify existing status_santri column to include 'wawancara'
+                DB::statement("ALTER TABLE psb_pendaftaran_santri MODIFY COLUMN status_santri ENUM('menunggu', 'wawancara', 'diterima', 'ditolak')");
             }
 
             // Add interview-related columns if they don't exist
             if (!Schema::hasColumn('psb_pendaftaran_santri', 'tanggal_wawancara')) {
-                $table->date('tanggal_wawancara')->nullable()->after('status_santri');
-            }
-            if (!Schema::hasColumn('psb_pendaftaran_santri', 'jam_wawancara')) {
-                $table->time('jam_wawancara')->nullable()->after('tanggal_wawancara');
+                $table->datetime('tanggal_wawancara')->nullable()->after('status_santri');
             }
             if (!Schema::hasColumn('psb_pendaftaran_santri', 'mode')) {
-                $table->enum('mode', ['online', 'offline'])->nullable()->after('jam_wawancara');
+                $table->enum('mode', ['online', 'offline'])->nullable()->after('tanggal_wawancara');
             }
             if (!Schema::hasColumn('psb_pendaftaran_santri', 'link_online')) {
                 $table->string('link_online')->nullable()->after('mode');
@@ -35,17 +36,14 @@ class UpdatePsbPendaftaranSantriTable extends Migration
             if (!Schema::hasColumn('psb_pendaftaran_santri', 'lokasi_offline')) {
                 $table->string('lokasi_offline', 255)->nullable()->after('link_online');
             }
-            if (!Schema::hasColumn('psb_pendaftaran_santri', 'reason_rejected')) {
-                $table->text('reason_rejected')->nullable()->after('lokasi_offline');
-            }
         });
 
         // Update existing data: move status_santri values to tipe_pendaftaran
         if (Schema::hasColumn('psb_pendaftaran_santri', 'tipe_pendaftaran')) {
-            \DB::statement("UPDATE psb_pendaftaran_santri SET tipe_pendaftaran = 'reguler' WHERE tipe_pendaftaran IN ('reguler', 'olimpiade', 'internasional')");
+            DB::statement("UPDATE psb_pendaftaran_santri SET tipe_pendaftaran = 'reguler' WHERE tipe_pendaftaran IN ('reguler', 'olimpiade', 'internasional')");
         }
         if (Schema::hasColumn('psb_pendaftaran_santri', 'status_santri')) {
-            \DB::statement("UPDATE psb_pendaftaran_santri SET status_santri = 'menunggu' WHERE tipe_pendaftaran IS NOT NULL");
+            DB::statement("UPDATE psb_pendaftaran_santri SET status_santri = 'menunggu' WHERE status_santri IS NULL");
         }
     }
 
