@@ -36,12 +36,19 @@ class CheckStatus extends Component
                 'date' => $this->santri->created_at ? $this->santri->created_at->format('d F Y') : 'N/A',
             ],
             'wawancara' => [
-                'completed' => in_array($this->santri->status_santri, ['diterima', 'ditolak']),
+                'completed' => in_array($this->santri->status_santri, ['sedang_ujian', 'diterima', 'ditolak']),
                 'current' => $this->santri->status_santri == 'wawancara',
                 'date' => $this->santri->tanggal_wawancara ? \Carbon\Carbon::parse($this->santri->tanggal_wawancara)->format('d F Y') : null,
                 'time' => $this->santri->tanggal_wawancara ? \Carbon\Carbon::parse($this->santri->tanggal_wawancara)->format('H:i') : null,
                 'mode' => $this->santri->mode,
                 'location' => $this->santri->mode == 'offline' ? $this->santri->lokasi_offline : $this->santri->link_online,
+            ],
+            'ujian' => [
+                'completed' => in_array($this->santri->status_santri, ['diterima', 'ditolak']),
+                'current' => $this->santri->status_santri == 'sedang_ujian',
+                'date' => $this->santri->updated_at && in_array($this->santri->status_santri, ['diterima', 'ditolak']) 
+                    ? $this->santri->updated_at->format('d F Y') 
+                    : null,
             ],
             'pengumuman_hasil' => [
                 'completed' => in_array($this->santri->status_santri, ['diterima', 'ditolak']),

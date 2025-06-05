@@ -15,10 +15,16 @@
         </div>
     @endif
 
+    <div class="mb-3">
+        <a href="{{ route('admin.master-ujian.dashboard') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left"></i> Kembali ke Dashboard Ujian
+        </a>
+    </div>
+
     <div class="row">
         {{-- Exam Info Card --}}
         <div class="col-md-4 mb-3">
-            <div class="card">
+    <div class="card">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Informasi Ujian</h5>
                 </div>
@@ -57,43 +63,43 @@
                         <i class="bi bi-plus-circle"></i> Tambah Soal
                     </button>
                 </div>
-                <div class="card-body">
+        <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-hover">
-                            <thead>
-                                <tr>
-                                    <th>No</th>
-                                    <th>Pertanyaan</th>
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Pertanyaan</th>
                                     <th>Tipe</th>
-                                    <th>Aksi</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @forelse ($this->listSoal() as $soal)
-                                    <tr>
-                                        <td>{{ $loop->iteration }}</td>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($this->listSoal() as $soal)
+                        <tr>
+                            <td>{{ $loop->iteration }}</td>
                                         <td>{{ Str::limit($soal->pertanyaan, 50) }}</td>
                                         <td>
                                             <span class="badge {{ $soal->tipe_soal === 'pg' ? 'bg-info' : 'bg-warning' }}">
                                                 {{ $soal->tipe_soal === 'pg' ? 'Pilihan Ganda' : 'Essay' }}
                                             </span>
                                         </td>
-                                        <td>
+                            <td>
                                             <button wire:click="edit({{ $soal->id }})" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#createOrUpdateSoal">
                                                 <i class="bi bi-pencil"></i>
                                             </button>
                                             <button wire:click="deleteSoal({{ $soal->id }})" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus soal ini?')">
                                                 <i class="bi bi-trash"></i>
                                             </button>
-                                        </td>
-                                    </tr>
-                                @empty
-                                    <tr>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
                                         <td colspan="4" class="text-center">Belum ada soal</td>
-                                    </tr>
-                                @endforelse
-                            </tbody>
-                        </table>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
                     </div>
                 </div>
             </div>
@@ -158,17 +164,17 @@
                                         </div>
                                         @error("soalForm.opsi.{$index}.teks")
                                             <small class="text-danger">{{ $message }}</small>
-                                        @enderror
+                            @enderror
                                         @error("soalForm.opsi.{$index}.bobot")
                                             <small class="text-danger">{{ $message }}</small>
-                                        @enderror
-                                    </div>
+                            @enderror
+                        </div>
                                 @endforeach
 
                                 @error('soalForm.opsi')
                                     <div class="text-danger">{{ $message }}</div>
-                                @enderror
-                            </div>
+                            @enderror
+                        </div>
                         @endif
                     </div>
                     <div class="modal-footer">

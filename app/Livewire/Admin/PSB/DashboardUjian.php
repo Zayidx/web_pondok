@@ -19,20 +19,58 @@ class DashboardUjian extends Component
 
     public $ujianId;
 
-    public $search = '';
-
     public $perPage = 10;
+    public $search = '';
+    public $sortField = 'created_at';
+    public $sortDirection = 'desc';
+    public $sortMataPelajaran = '';
+    public $filterTanggal = '';
+    public $sortStatus = '';
+
+    protected $queryString = [
+        'search' => ['except' => ''],
+        'sortMataPelajaran' => ['except' => ''],
+        'filterTanggal' => ['except' => ''],
+        'sortStatus' => ['except' => ''],
+        'perPage' => ['except' => 10],
+        'sortField' => ['except' => 'created_at'],
+        'sortDirection' => ['except' => 'desc']
+    ];
 
     public function mount()
     {
         $this->ujianForm = new UjianForm($this, 'ujianForm');
     }
 
+    public function resetFilters()
+    {
+        $this->reset([
+            'search',
+            'sortMataPelajaran',
+            'filterTanggal',
+            'sortStatus',
+            'sortField',
+            'sortDirection'
+        ]);
+    }
+
     #[Computed]
     public function listUjian()
     {
         return Ujian::select('id', 'nama_ujian', 'mata_pelajaran', 'tanggal_ujian', 'waktu_mulai', 'waktu_selesai', 'status_ujian')
-            ->where('nama_ujian', 'like', '%' . $this->search . '%')
+            ->when($this->search, function ($query) {
+                $query->where('nama_ujian', 'like', '%' . $this->search . '%');
+            })
+            ->when($this->sortMataPelajaran, function ($query) {
+                $query->orderBy('mata_pelajaran', $this->sortMataPelajaran);
+            })
+            ->when($this->filterTanggal, function ($query) {
+                $query->whereDate('tanggal_ujian', $this->filterTanggal);
+            })
+            ->when($this->sortStatus, function ($query) {
+                $query->where('status_ujian', $this->sortStatus);
+            })
+            ->orderBy($this->sortField, $this->sortDirection)
             ->paginate($this->perPage);
     }
 

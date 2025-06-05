@@ -41,7 +41,7 @@ class EditRegistration extends Component
         'tahun_lulus' => '',
         'agama' => '',
         'no_whatsapp' => '',
-        'status_santri' => 'wawancara', // Default status is interview
+        'status_santri' => '',
         // Data Wali
         'nama_ayah' => '',
         'pekerjaan_ayah' => '',
@@ -86,7 +86,7 @@ class EditRegistration extends Component
                 'tahun_lulus' => $this->santri->tahun_lulus ?? '',
                 'agama' => $this->santri->agama ?? '',
                 'no_whatsapp' => $this->santri->no_whatsapp ?? '',
-                'status_santri' => $this->santri->status_santri ?? 'wawancara',
+                'status_santri' => $this->santri->status_santri ?? '',
                 // Data Wali
                 'nama_ayah' => $this->santri->wali->nama_ayah ?? '',
                 'pekerjaan_ayah' => $this->santri->wali->pekerjaan_ayah ?? '',
@@ -155,7 +155,7 @@ class EditRegistration extends Component
             'editForm.tahun_lulus' => 'required|string|max:4',
             'editForm.agama' => 'required|string|max:50',
             'editForm.no_whatsapp' => 'required|string|max:15',
-            'editForm.status_santri' => 'required|in:wawancara,diterima,ditolak',
+            'editForm.status_santri' => 'required|in:menunggu,wawancara,diterima,ditolak',
             // Data Wali
             'editForm.nama_ayah' => 'required|string|max:255',
             'editForm.pekerjaan_ayah' => 'required|string|max:100',
@@ -268,6 +268,7 @@ class EditRegistration extends Component
                 'Konghucu' => 'Konghucu',
             ],
             'statusOptions' => [
+                'menunggu' => 'Menunggu Jadwal Wawancara',
                 'wawancara' => 'Wawancara',
                 'diterima' => 'Diterima',
                 'ditolak' => 'Ditolak',

@@ -18,4 +18,5 @@ Route::get('/pendaftaran-santri', PsbPage::class)->name('psb-page');
 Route::middleware(['auth:santri'])->group(function () {
     Route::get('/ujian-santri/{ujianId}', \App\Livewire\SantriPPDB\UjianSantri::class)->name('santri.ujian');
     Route::get('/santri-dashboard', \App\Livewire\SantriPPDB\SantriDashboard::class)->name('santri.dashboard');
+    Route::get('/dashboard-ujian', \App\Livewire\SantriPPDB\DashboardUjianSantri::class)->name('santri.dashboard-ujian');
 });

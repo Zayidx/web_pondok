@@ -2,18 +2,18 @@
 <div>
     <!-- Alert Messages -->
     <div class="position-fixed top-0 end-0 p-3" style="z-index: 1100;">
-        @if (session('success'))
+    @if (session('success'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
                 {{ session('success') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-        @endif
-        @if (session('error'))
+    @endif
+    @if (session('error'))
             <div class="alert alert-danger alert-dismissible fade show" role="alert">
                 {{ session('error') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-        @endif
+    @endif
     </div>
 
     <div class="card">
@@ -25,7 +25,10 @@
                 <div class="col-md-3">
                     <input type="text" wire:model.live="search" class="form-control" placeholder="Cari nama atau NISN...">
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
+                    <input type="text" wire:model.live="searchAlamat" class="form-control" placeholder="Cari alamat...">
+                </div>
+                <div class="col-md-2">
                     <select wire:model.live="filters.status" class="form-select">
                         <option value="">Semua Status</option>
                         @foreach($statusSantriOptions as $value => $label)
@@ -33,7 +36,7 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <select wire:model.live="filters.tipe" class="form-select">
                         <option value="">Semua Program</option>
                         @foreach($tipeOptions as $value => $label)
@@ -41,13 +44,18 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-1">
                     <select wire:model.live="perPage" class="form-select">
-                        <option value="10">10 per halaman</option>
-                        <option value="25">25 per halaman</option>
-                        <option value="50">50 per halaman</option>
-                        <option value="100">100 per halaman</option>
+                        <option value="10">10</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
                     </select>
+                </div>
+                <div class="col-md-2">
+                    <button wire:click="resetFilters" class="btn btn-secondary">
+                        <i class="bi bi-x-circle"></i>Reset Filter
+                    </button>
                 </div>
             </div>
 
@@ -64,7 +72,12 @@
                             <th>NISN</th>
                             <th>Alamat</th>
                             <th>Program</th>
-                            <th>Status</th>
+                            <th wire:click="sortBy('status_santri')" style="cursor: pointer;">
+                                Status
+                                @if ($sortField === 'status_santri')
+                                    <i class="bi bi-arrow-{{ $sortDirection === 'asc' ? 'up' : 'down' }}"></i>
+                                @endif
+                            </th>
                             <th>Aksi</th>
                         </tr>
                     </thead>
@@ -82,10 +95,14 @@
                                         @else
                                             <span class="badge bg-warning">Menunggu Jadwal Wawancara</span>
                                         @endif
+                                    @elseif($registration->status_santri === 'sedang_ujian')
+                                        <span class="badge bg-primary">Sedang Ujian</span>
                                     @elseif($registration->status_santri === 'diterima')
                                         <span class="badge bg-success">Diterima</span>
                                     @elseif($registration->status_santri === 'ditolak')
                                         <span class="badge bg-danger">Ditolak</span>
+                                    @elseif($registration->status_santri === 'menunggu')
+                                        <span class="badge bg-warning">Menunggu Wawancara</span>
                                     @endif
                                 </td>
                                 <td class="text-nowrap">
@@ -101,6 +118,12 @@
                                         <button wire:click="openInterviewModal({{ $registration->id }})" 
                                                 class="btn btn-sm btn-info me-1">
                                             <i class="bi bi-calendar-plus"></i> Jadwal Wawancara
+                                        </button>
+                                    @elseif($registration->status_santri === 'wawancara')
+                                        <button wire:click="cancelInterview({{ $registration->id }})"
+                                                wire:confirm="Apakah Anda yakin ingin membatalkan jadwal wawancara santri ini?"
+                                                class="btn btn-sm btn-danger me-1">
+                                            <i class="bi bi-calendar-x"></i> Batalkan Wawancara
                                         </button>
                                     @endif
                                     @if(in_array($registration->status_santri, ['diterima', 'ditolak']))
@@ -122,7 +145,7 @@
             </div>
 
             <div class="mt-4">
-                {{ $registrations->links() }}
+            {{ $registrations->links() }}
             </div>
         </div>
     </div>
@@ -132,22 +155,22 @@
     <div class="modal fade show" style="display: block;" tabindex="-1" role="dialog">
         <div class="modal-backdrop fade show" style="z-index: 1040;"></div>
         <div class="modal-dialog" style="z-index: 1050;">
-            <div class="modal-content">
-                <div class="modal-header">
+                <div class="modal-content">
+                        <div class="modal-header">
                     <h5 class="modal-title">Jadwalkan Wawancara</h5>
                     <button type="button" class="btn-close" wire:click="closeInterviewModal"></button>
-                </div>
+                        </div>
                 <form wire:submit.prevent="saveInterview">
                     <div class="modal-body">
-                        @if($errors->any())
-                            <div class="alert alert-danger">
+                            @if($errors->any())
+                                <div class="alert alert-danger">
                                 <ul class="mb-0">
                                     @foreach ($errors->all() as $error)
-                                        <li>{{ $error }}</li>
-                                    @endforeach
-                                </ul>
-                            </div>
-                        @endif
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            @endif
 
                         <div class="mb-3">
                             <label class="form-label">Mode Wawancara</label>
@@ -175,7 +198,7 @@
                                        placeholder="https://meet.google.com/...">
                                 <small class="text-muted">Masukkan link Google Meet atau Zoom untuk wawancara online</small>
                             </div>
-                        </div>
+                            </div>
                         @else
                         <div class="offline-form">
                             <div class="mb-3">
@@ -184,16 +207,16 @@
                                        placeholder="Contoh: Ruang Meeting Lt. 2">
                                 <small class="text-muted">Masukkan lokasi tempat wawancara akan dilaksanakan</small>
                             </div>
+                                </div>
+                            @endif
                         </div>
-                        @endif
-                    </div>
-                    <div class="modal-footer">
+                        <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" wire:click="closeInterviewModal">Batal</button>
-                        <button type="submit" class="btn btn-primary">Simpan</button>
-                    </div>
-                </form>
+                            <button type="submit" class="btn btn-primary">Simpan</button>
+                        </div>
+                    </form>
+                </div>
             </div>
         </div>
-    </div>
     @endif
 </div>

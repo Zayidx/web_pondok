@@ -177,7 +177,32 @@
                             </div>
                         </div>
 
-                        <!-- Step 3 - Pengumuman Hasil -->
+                        <!-- Step 3 - Ujian Online -->
+                        <div class="relative flex items-center">
+                            <div class="{{ $timelineStatus['ujian']['completed'] ? 'bg-green-500' : ($timelineStatus['ujian']['current'] ? 'bg-yellow-500 animate-pulse' : 'bg-gray-300') }} p-3 rounded-full text-white z-10">
+                                <i class="fas {{ $timelineStatus['ujian']['completed'] ? 'fa-check' : 'fa-edit' }} text-lg"></i>
+                            </div>
+                            <div class="ml-6">
+                                <h3 class="text-lg font-semibold {{ $timelineStatus['ujian']['completed'] ? 'text-gray-900' : ($timelineStatus['ujian']['current'] ? 'text-gray-900' : 'text-gray-500') }}">Ujian Online</h3>
+                                @if($timelineStatus['ujian']['current'])
+                                    <p class="text-gray-600">Silahkan mengikuti ujian online</p>
+                                    <a href="{{ route('santri.dashboard-ujian') }}" class="inline-block mt-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition duration-300">
+                                        <i class="fas fa-external-link-alt mr-2"></i>
+                                        Menuju Dashboard Ujian
+                                    </a>
+                                @elseif($timelineStatus['ujian']['completed'])
+                                    <p class="text-green-600">Ujian telah selesai</p>
+                                    <p class="text-sm text-gray-600 font-medium">
+                                        <i class="fas fa-calendar-alt mr-1"></i>
+                                        {{ $timelineStatus['ujian']['date'] }}
+                                    </p>
+                                @else
+                                    <p class="text-gray-500">Menunggu tahap ujian</p>
+                                @endif
+                            </div>
+                        </div>
+
+                        <!-- Step 4 - Pengumuman Hasil -->
                         <div class="relative flex items-center">
                             <div class="{{ $timelineStatus['pengumuman_hasil']['completed'] ? 'bg-green-500' : 'bg-gray-300' }} p-3 rounded-full text-white z-10">
                                 <i class="fas {{ $timelineStatus['pengumuman_hasil']['completed'] ? 'fa-check' : 'fa-bullhorn' }} text-lg"></i>
@@ -268,6 +293,25 @@
                             </p>
                         </div>
                     @endif
+                @elseif($santri->status_santri == 'sedang_ujian')
+                    <div class="flex items-center justify-between mb-4">
+                        <div class="bg-blue-100 p-3 rounded-full">
+                            <i class="fas fa-edit text-blue-600 text-2xl"></i>
+                        </div>
+                        <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">Sedang Ujian</span>
+                    </div>
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Tahap Ujian Online</h3>
+                    <p class="text-gray-600 mb-4">Selamat! Anda telah lulus tahap wawancara dan dapat melanjutkan ke tahap ujian online.</p>
+                    <div class="bg-blue-50 p-4 rounded-lg">
+                        <p class="text-sm text-blue-800 font-medium mb-4">
+                            <i class="fas fa-info-circle mr-2"></i>
+                            Silahkan klik tombol di bawah untuk mengakses dashboard ujian Anda.
+                        </p>
+                        <a href="{{ route('santri.dashboard-ujian') }}" class="inline-block px-6 py-3 bg-primary text-white rounded-lg hover:bg-primary-dark transition duration-300">
+                            <i class="fas fa-external-link-alt mr-2"></i>
+                            Menuju Dashboard Ujian
+                        </a>
+                    </div>
                 @elseif($santri->status_santri == 'diterima')
                     <div class="flex items-center justify-between mb-4">
                         <div class="bg-green-100 p-3 rounded-full">
@@ -277,12 +321,12 @@
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 mb-2">Selamat! Anda Diterima</h3>
                     <p class="text-gray-600 mb-4">Anda dinyatakan LULUS dan diterima di SMA Bina Prestasi. Silakan melakukan daftar ulang sesuai jadwal yang ditentukan.</p>
-                    <div class="bg-green-50 p-4 rounded-lg">
-                        <p class="text-sm text-green-800 font-medium">
-                            <i class="fas fa-info-circle mr-2"></i>
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <p class="text-sm text-green-800 font-medium">
+                                <i class="fas fa-info-circle mr-2"></i>
                             Informasi lengkap tentang daftar ulang akan dikirimkan melalui email dan WhatsApp.
-                        </p>
-                    </div>
+                            </p>
+                        </div>
                 @elseif($santri->status_santri == 'ditolak')
                     <div class="flex items-center justify-between mb-4">
                         <div class="bg-red-100 p-3 rounded-full">

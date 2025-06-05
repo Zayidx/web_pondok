@@ -53,7 +53,10 @@ class DetailUjian extends Component
     #[Computed]
     public function listSoal()
     {
-        return Soal::where('ujian_id', $this->ujianId)->paginate(10);
+        return Soal::where('ujian_id', $this->ujianId)
+            ->orderByRaw("CASE WHEN tipe_soal = 'pg' THEN 0 ELSE 1 END")
+            ->orderBy('created_at', 'asc')
+            ->paginate(10);
     }
 
     /**
@@ -202,9 +205,9 @@ class DetailUjian extends Component
     public function deleteSoal($id)
     {
         try {
-            $soal = Soal::findOrFail($id);
+        $soal = Soal::findOrFail($id);
             $soal->delete();
-            session()->flash('success', 'Berhasil hapus soal');
+        session()->flash('success', 'Berhasil hapus soal');
         } catch (\Exception $e) {
             session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }

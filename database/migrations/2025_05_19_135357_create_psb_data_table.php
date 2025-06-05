@@ -8,7 +8,7 @@ class CreatePsbDataTable extends Migration
 {
     /**
      * Menjalankan migrasi untuk membuat tabel-tabel baru
-     * - Membuat tabel untuk periode, pendaftaran santri, wali santri, dan dokumen
+     * - Membuat tabel untuk periode, pendaftaran santri, wali santri, dokumen, dan ujian
      */
     public function up()
     {
@@ -38,13 +38,14 @@ class CreatePsbDataTable extends Migration
             $table->string('asal_sekolah', 255);
             $table->string('tahun_lulus', 4);
             $table->enum('tipe_pendaftaran', ['reguler', 'olimpiade', 'internasional'])->nullable();
-            $table->enum('status_santri', ['menunggu', 'diterima', 'ditolak'])->nullable();
+            $table->enum('status_santri', ['menunggu', 'wawancara', 'sedang_ujian', 'diterima', 'ditolak'])->nullable();
             $table->date('tanggal_wawancara')->nullable();
             $table->time('jam_wawancara')->nullable();
             $table->enum('mode', ['online', 'offline'])->nullable();
             $table->string('link_online')->nullable();
             $table->string('lokasi_offline', 255)->nullable();
             $table->text('reason_rejected')->nullable();
+            $table->text('riwayat_penyakit')->nullable();
             $table->enum('status_kesantrian', ['aktif', 'nonaktif'])->default('aktif');
             $table->unsignedBigInteger('periode_id');
             $table->timestamps();
@@ -81,6 +82,35 @@ class CreatePsbDataTable extends Migration
 
             $table->foreign('santri_id')->references('id')->on('psb_pendaftaran_santri')->onDelete('cascade');
         });
+
+        // Membuat tabel 'psb_questions' untuk menyimpan soal ujian
+        Schema::create('psb_questions', function (Blueprint $table) {
+            $table->id();
+            $table->text('pertanyaan');
+            $table->enum('tipe_soal', ['pg', 'essay']);
+            $table->text('pilihan_a')->nullable();
+            $table->text('pilihan_b')->nullable();
+            $table->text('pilihan_c')->nullable();
+            $table->text('pilihan_d')->nullable();
+            $table->text('pilihan_e')->nullable();
+            $table->string('jawaban_benar')->nullable();
+            $table->integer('poin')->default(1);
+            $table->boolean('is_active')->default(true);
+            $table->timestamps();
+        });
+
+        // Membuat tabel 'psb_ujian_santri' untuk menyimpan jawaban ujian santri
+        Schema::create('psb_ujian_santri', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('santri_id');
+            $table->unsignedBigInteger('question_id');
+            $table->text('jawaban')->nullable();
+            $table->integer('poin_diperoleh')->default(0);
+            $table->timestamps();
+
+            $table->foreign('santri_id')->references('id')->on('psb_pendaftaran_santri')->onDelete('cascade');
+            $table->foreign('question_id')->references('id')->on('psb_questions')->onDelete('cascade');
+        });
     }
 
     /**
@@ -89,6 +119,8 @@ class CreatePsbDataTable extends Migration
      */
     public function down()
     {
+        Schema::dropIfExists('psb_ujian_santri');
+        Schema::dropIfExists('psb_questions');
         Schema::dropIfExists('psb_dokumen');
         Schema::dropIfExists('psb_wali_santri');
         Schema::dropIfExists('psb_pendaftaran_santri');

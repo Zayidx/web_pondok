@@ -17,6 +17,7 @@ class ShowRegistrations extends Component
     #[Title('Halaman List Santri PPDB')]
     public $perPage = 10;
     public $search = '';
+    public $searchAlamat = '';
     public $filters = [
         'status' => '',
         'tipe' => ''
@@ -43,6 +44,7 @@ class ShowRegistrations extends Component
 
     protected $queryString = [
         'search' => ['except' => ''],
+        'searchAlamat' => ['except' => ''],
         'filters' => ['except' => ['status' => '', 'tipe' => '']],
         'perPage' => ['except' => 10],
         'sortField' => ['except' => 'created_at'],
@@ -289,6 +291,55 @@ class ShowRegistrations extends Component
         }
     }
 
+    public function resetFilters()
+    {
+        $this->reset([
+            'search',
+            'searchAlamat',
+            'filters',
+            'sortField',
+            'sortDirection'
+        ]);
+    }
+
+    public function cancelInterview($santriId)
+    {
+        DB::beginTransaction();
+        try {
+            $santri = PendaftaranSantri::findOrFail($santriId);
+            
+            if (!$santri->tanggal_wawancara) {
+                session()->flash('error', 'Santri ini belum memiliki jadwal wawancara.');
+                return;
+            }
+
+            $updateData = [
+                'tanggal_wawancara' => null,
+                'mode' => null,
+                'link_online' => null,
+                'lokasi_offline' => null,
+                'status_santri' => 'menunggu'
+            ];
+
+            $santri->update($updateData);
+            DB::commit();
+
+            Log::info('Interview schedule cancelled successfully', [
+                'santri_id' => $santri->id,
+                'old_schedule' => $santri->getOriginal('tanggal_wawancara')
+            ]);
+
+            session()->flash('success', 'Jadwal wawancara berhasil dibatalkan.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to cancel interview schedule', [
+                'santri_id' => $santriId,
+                'error' => $e->getMessage()
+            ]);
+            session()->flash('error', 'Terjadi kesalahan saat membatalkan jadwal wawancara.');
+        }
+    }
+
     #[Computed]
     public function registrations()
     {
@@ -297,7 +348,12 @@ class ShowRegistrations extends Component
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
                     $q->where('nama_lengkap', 'like', '%' . $this->search . '%')
-                        ->orWhere('nisn', 'like', '%' . $this->search . '%');
+                    ->orWhere('nisn', 'like', '%' . $this->search . '%');
+                });
+            })
+            ->when($this->searchAlamat, function ($query) {
+                $query->whereHas('wali', function ($q) {
+                    $q->where('alamat', 'like', '%' . $this->searchAlamat . '%');
                 });
             })
             ->when($this->filters['status'], function ($query) {
@@ -316,6 +372,7 @@ class ShowRegistrations extends Component
         return [
             'menunggu' => 'Menunggu',
             'wawancara' => 'Wawancara',
+            'sedang_ujian' => 'Sedang Ujian',
             'diterima' => 'Diterima',
             'ditolak' => 'Ditolak'
         ];
@@ -326,7 +383,9 @@ class ShowRegistrations extends Component
     {
         return [
             'reguler' => 'Reguler',
-            'tahfidz' => 'Tahfidz'
+            'olimpiade' => 'Olimpiade',
+            'internasional' => 'Internasional',
+            
         ];
     }
 

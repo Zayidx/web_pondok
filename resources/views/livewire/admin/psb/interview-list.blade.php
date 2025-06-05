@@ -12,15 +12,50 @@
         </div>
         <div class="card-body">
             <div class="row mb-4">
-                <div class="col-md-6">
-                    <input type="text" wire:model.debounce.300ms="search" class="form-control" placeholder="Cari nama atau NISN...">
+
+            <div class="col-md-2">
+                    <input type="text" wire:model.debounce.300ms="search" class="form-control" placeholder="Cari nama/NISN...">
                 </div>
-                <div class="col-md-3">
+                <div class="col-md-2">
+                    <select wire:model.live="sortNisn" class="form-select">
+                        <option value="">Sort NISN</option>
+                        <option value="asc">NISN (A-Z)</option>
+                        <option value="desc">NISN (Z-A)</option>
+                    </select>
+                </div>
+              
+               
+                <div class="col-md-1">
+                    <select wire:model.live="sortTanggal" class="form-select">
+                        <option value="">Tanggal</option>
+                        <option value="desc">Terbaru</option>
+                        <option value="asc">Terlama</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <select wire:model.live="sortJam" class="form-select">
+                        <option value="">Jam</option>
+                        <option value="desc">Terbaru</option>
+                        <option value="asc">Terlama</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <input type="text" wire:model.debounce.300ms="searchLokasi" class="form-control" placeholder="Cari lokasi...">
+                </div>
+                <div class="col-md-2">
+                    <select wire:model.live="sortMode" class="form-select">
+                        <option value="">Mode</option>
+                        <option value="online">Online</option>
+                        <option value="offline">Offline</option>
+                    </select>
+                </div>
+              
+                <div class="col-md-2">
                     <select wire:model="perPage" class="form-select">
-                        <option value="10">10 per halaman</option>
-                        <option value="25">25 per halaman</option>
-                        <option value="50">50 per halaman</option>
-                        <option value="100">100 per halaman</option>
+                        <option value="10">10 per hal</option>
+                        <option value="25">25 per hal</option>
+                        <option value="50">50 per hal</option>
+                        <option value="100">100 per hal</option>
                     </select>
                 </div>
             </div>
@@ -88,7 +123,7 @@
             </div>
 
             <div class="mt-4">
-                {{ $interviews->links() }}
+            {{ $interviews->links() }}
             </div>
         </div>
     </div>
@@ -98,10 +133,10 @@
         <div class="modal fade show" id="editInterviewModal" tabindex="-1" role="dialog" style="display: block;">
             <div class="modal-dialog">
                 <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Edit Jadwal Wawancara</h5>
+                        <div class="modal-header">
+                            <h5 class="modal-title">Edit Jadwal Wawancara</h5>
                         <button type="button" class="btn-close" wire:click="closeEditModal"></button>
-                    </div>
+                        </div>
                     <form wire:submit.prevent="saveInterview">
                         <div class="modal-body">
                             <div class="mb-3">
