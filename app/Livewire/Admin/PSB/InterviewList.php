@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Title;
 use Carbon\Carbon;
+use Livewire\Attributes\Computed;
 
 class InterviewList extends Component
 {
@@ -18,12 +19,11 @@ class InterviewList extends Component
     public $perPage = 10;
     public $search = '';
     public $searchLokasi = '';
-    public $sortNisn = '';
     public $filterTanggal = '';
     public $sortJam = '';
     public $sortMode = '';
     public $sortField = 'tanggal_wawancara';
-    public $sortDirection = 'desc';
+    public $sortDirection = 'asc';
     public $showEditModal = false;
     public $selectedSantriId;
     public $interviewForm = [
@@ -36,9 +36,13 @@ class InterviewList extends Component
 
     protected $queryString = [
         'search' => ['except' => ''],
+        'searchLokasi' => ['except' => ''],
+        'filterTanggal' => ['except' => ''],
+        'sortJam' => ['except' => ''],
+        'sortMode' => ['except' => ''],
         'perPage' => ['except' => 10],
         'sortField' => ['except' => 'tanggal_wawancara'],
-        'sortDirection' => ['except' => 'asc'],
+        'sortDirection' => ['except' => 'asc']
     ];
 
     public function mount()
@@ -165,37 +169,50 @@ class InterviewList extends Component
         }
     }
 
-    public function getInterviewsProperty()
+    public function resetFilters()
+    {
+        $this->reset([
+            'search',
+            'searchLokasi',
+            'filterTanggal',
+            'sortJam',
+            'sortMode',
+            'perPage',
+            'sortField',
+            'sortDirection'
+        ]);
+    }
+
+    #[Computed]
+    public function interviews()
     {
         return PendaftaranSantri::query()
             ->where('status_santri', 'wawancara')
-                ->whereNotNull('tanggal_wawancara')
             ->when($this->search, function ($query) {
                 $query->where(function ($q) {
-                $q->where('nama_lengkap', 'like', '%' . $this->search . '%')
-                  ->orWhere('nisn', 'like', '%' . $this->search . '%');
+                    $q->where('nama_lengkap', 'like', '%' . $this->search . '%')
+                      ->orWhere('nisn', 'like', '%' . $this->search . '%');
                 });
             })
             ->when($this->searchLokasi, function ($query) {
                 $query->where(function ($q) {
                     $q->where('lokasi_offline', 'like', '%' . $this->searchLokasi . '%')
-                        ->orWhere('link_online', 'like', '%' . $this->searchLokasi . '%');
+                      ->orWhere('link_online', 'like', '%' . $this->searchLokasi . '%');
                 });
-            })
-            ->when($this->sortNisn, function ($query) {
-                $query->orderBy('nisn', $this->sortNisn);
             })
             ->when($this->filterTanggal, function ($query) {
                 $query->whereDate('tanggal_wawancara', $this->filterTanggal);
             })
             ->when($this->sortJam, function ($query) {
-                $query->orderByRaw('TIME(tanggal_wawancara) ' . $this->sortJam);
+                $query->orderBy('jam_wawancara', $this->sortJam);
             })
             ->when($this->sortMode, function ($query) {
                 $query->where('mode', $this->sortMode);
             })
-            ->orderBy($this->sortField, $this->sortDirection)
-                               ->paginate($this->perPage);
+            ->when($this->sortField && $this->sortDirection, function ($query) {
+                $query->orderBy($this->sortField, $this->sortDirection);
+            })
+            ->paginate($this->perPage);
     }
 
     public function render()
@@ -203,17 +220,5 @@ class InterviewList extends Component
             return view('livewire.admin.psb.interview-list', [
             'interviews' => $this->interviews
             ]);
-    }
-
-    public function resetFilters()
-    {
-        $this->reset([
-            'search',
-            'searchLokasi',
-            'sortNisn',
-            'filterTanggal',
-            'sortJam',
-            'sortMode'
-        ]);
     }
 }
