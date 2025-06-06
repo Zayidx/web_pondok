@@ -7,7 +7,7 @@
             <div class="flex-shrink-0">
               <img
                 class="h-10 w-10"
-                src="https://via.placeholder.com/40x40/1e40af/ffffff?text=SMA"
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Logo_SMK_Negeri_1_Kota_Bekasi.png/2048px-Logo_SMK_Negeri_1_Kota_Bekasi.png"
                 alt="Logo SMA"
               />
             </div>
@@ -123,7 +123,7 @@
           </div>
           <div class="relative">
             <img
-              src="https://via.placeholder.com/600x400/e5e7eb/374151?text=Siswa+Berprestasi"
+              src="https://i.postimg.cc/qMbC4XqV/image.png"
               alt="Siswa Berprestasi"
               class="rounded-lg shadow-2xl"
             />
@@ -206,7 +206,7 @@
           </div>
           <div class="mt-8 lg:mt-0">
             <img
-              src="https://via.placeholder.com/500x400/e5e7eb/374151?text=Fasilitas+Sekolah"
+              src="https://smamuh1jkt.sch.id/wp-content/uploads/2025/04/photo_2025-04-18_18-05-20.jpg"
               alt="Fasilitas Sekolah"
               class="rounded-lg shadow-lg"
             />
@@ -461,9 +461,9 @@
           <div class="bg-white p-8 rounded-lg shadow-lg" data-aos="fade-up" data-aos-delay="200">
             <div class="flex items-center mb-4">
               <img
-                src="https://via.placeholder.com/60x60/e5e7eb/374151?text=A"
+                src="https://i.postimg.cc/nL7s4ykp/cropped-image.png"
                 alt="Alumni"
-                class="w-15 h-15 rounded-full mr-4"
+                class="w-11 h-11 rounded-full mr-4"
               />
               <div>
                 <h4 class="font-semibold text-gray-900">Andi Pratama</h4>
@@ -490,9 +490,9 @@
           <div class="bg-white p-8 rounded-lg shadow-lg" data-aos="fade-up" data-aos-delay="400">
             <div class="flex items-center mb-4">
               <img
-                src="https://via.placeholder.com/60x60/e5e7eb/374151?text=S"
+                src="https://i.postimg.cc/xT4qWfp9/cropped-image-2.png"
                 alt="Orang Tua"
-                class="w-15 h-15 rounded-full mr-4"
+                class="w-11 h-11 rounded-full mr-4"
               />
               <div>
                 <h4 class="font-semibold text-gray-900">Sari Indrawati</h4>
@@ -519,12 +519,12 @@
           <div class="bg-white p-8 rounded-lg shadow-lg" data-aos="fade-up" data-aos-delay="600">
             <div class="flex items-center mb-4">
               <img
-                src="https://via.placeholder.com/60x60/e5e7eb/374151?text=R"
+                src="https://i.postimg.cc/6QwKPFK9/cropped-image-3.png"
                 alt="Siswa"
-                class="w-15 h-15 rounded-full mr-4"
+                class="w-11 h-11 rounded-full mr-4"
               />
               <div>
-                <h4 class="font-semibold text-gray-900">Rina Maharani</h4>
+                <h4 class="font-semibold text-gray-900">Agus Wibowo</h4>
                 <p class="text-sm text-gray-600">Siswa Kelas XII</p>
                 <p class="text-sm text-gray-600">Juara OSN Kimia</p>
               </div>
@@ -558,7 +558,7 @@
         <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
           <div class="relative group overflow-hidden rounded-lg" data-aos="flip-left" >
             <img
-              src="https://via.placeholder.com/300x200/e5e7eb/374151?text=Lab+Sains"
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcR0pniLAhd3XlQg3u27aaoO06ZZSQIVp2DTjA&s"
               alt="Laboratorium Sains"
               class="w-full h-48 object-cover group-hover:scale-110 transition duration-300"
             />
@@ -570,7 +570,7 @@
           </div>
           <div class="relative group overflow-hidden rounded-lg" data-aos="flip-left" data-aos-delay="200">
             <img
-              src="https://via.placeholder.com/300x200/e5e7eb/374151?text=Perpustakaan"
+              src="https://unair.ac.id/wp-content/uploads/2021/01/Ilustrasi-oleh-DPK-Banten.jpg"
               alt="Perpustakaan Digital"
               class="w-full h-48 object-cover group-hover:scale-110 transition duration-300"
             />
@@ -582,7 +582,7 @@
           </div>
           <div class="relative group overflow-hidden rounded-lg" data-aos="flip-left" data-aos-delay="400">
             <img
-              src="https://via.placeholder.com/300x200/e5e7eb/374151?text=Olahraga"
+              src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQT7PvyjGkKjqvdAuqT78HgS8td9slLf03lYw&s"
               alt="Lapangan Olahraga"
               class="w-full h-48 object-cover group-hover:scale-110 transition duration-300"
             />
@@ -594,7 +594,7 @@
           </div>
           <div class="relative group overflow-hidden rounded-lg" data-aos="flip-left" data-aos-delay="600">
             <img
-              src="https://via.placeholder.com/300x200/e5e7eb/374151?text=Ruang+Seni"
+              src="https://assets-a1.kompasiana.com/items/album/2022/12/24/whatsapp-image-2022-12-24-at-17-18-51-63a6d27308a8b5343e6640f2.jpeg"
               alt="Ruang Seni"
               class="w-full h-48 object-cover group-hover:scale-110 transition duration-300"
             />
@@ -606,7 +606,7 @@
           </div>
           <div class="relative group overflow-hidden rounded-lg" data-aos="flip-left" >
             <img
-              src="https://via.placeholder.com/300x200/e5e7eb/374151?text=Kelas"
+              src="https://feb.unr.ac.id/?igd_preview_image=eyJpZCI6IjFOMnJNTGk5elZIazd0XzNJOUwzbS1LdkgxWE5oTjFDNiIsImFjY291bnRJZCI6IjAwODg2ODU5OTg5MjI2ODcwOTA4Iiwic2l6ZSI6Im1lZGl1bSJ9"
               alt="Ruang Kelas"
               class="w-full h-48 object-cover group-hover:scale-110 transition duration-300"
             />
@@ -618,7 +618,7 @@
           </div>
           <div class="relative group overflow-hidden rounded-lg" data-aos="flip-left" data-aos-delay="200">
             <img
-              src="https://via.placeholder.com/300x200/e5e7eb/374151?text=Kantin"
+              src="https://apidev.smarteschool.net/uploads/download_9_38acd66ec0.jpg"
               alt="Kantin Sehat"
               class="w-full h-48 object-cover group-hover:scale-110 transition duration-300"
             />
@@ -630,7 +630,7 @@
           </div>
           <div class="relative group overflow-hidden rounded-lg" data-aos="flip-left" data-aos-delay="400">
             <img
-              src="https://via.placeholder.com/300x200/e5e7eb/374151?text=Ekstrakurikuler"
+              src="https://www.smadwiwarna.sch.id/wp-content/uploads/2021/04/Basket.jpg"
               alt="Kegiatan Ekstrakurikuler"
               class="w-full h-48 object-cover group-hover:scale-110 transition duration-300"
             />
@@ -642,7 +642,7 @@
           </div>
           <div class="relative group overflow-hidden rounded-lg" data-aos="flip-left" data-aos-delay="600">
             <img
-              src="https://via.placeholder.com/300x200/e5e7eb/374151?text=Prestasi"
+              src="https://awsimages.detik.net.id/community/media/visual/2023/12/12/siswa-smp-eraih-medali-di-olimpiade-sains-internasional.jpeg?w=1200"
               alt="Prestasi Siswa"
               class="w-full h-48 object-cover group-hover:scale-110 transition duration-300"
             />
@@ -1096,7 +1096,7 @@
             <div class="flex items-center mb-4">
               <img
                 class="h-10 w-10 mr-3"
-                src="https://via.placeholder.com/40x40/1e40af/ffffff?text=SMA"
+                src="https://upload.wikimedia.org/wikipedia/commons/thumb/2/20/Logo_SMK_Negeri_1_Kota_Bekasi.png/2048px-Logo_SMK_Negeri_1_Kota_Bekasi.png"
                 alt="Logo SMA"
               />
               <h3 class="text-xl font-bold">SMA Bina Prestasi</h3>

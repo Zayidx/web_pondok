@@ -47,9 +47,8 @@
 
             {{-- @include('components.layouts.partials.footer') --}}
 
-
             <!-- Include ApexCharts library -->
-            <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+            <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.45.1/dist/apexcharts.min.js"></script>
 
             <!-- Livewire Charts Scripts -->
             @livewireChartsScripts
@@ -65,8 +64,7 @@
     <script src="{{ asset('dist/assets/compiled/js/app.js') }}"></script>
 
     <!-- Need: Apexcharts -->
-    {{-- <script src="assets/extensions/apexcharts/apexcharts.min.js"></script> --}}
-    <script src="assets/static/js/pages/dashboard.js"></script>
+    <script src="{{ asset('dist/assets/static/js/pages/dashboard.js') }}"></script>
 
     {{-- PWA Script --}}
     <script src="{{ asset('/sw.js') }}"></script>

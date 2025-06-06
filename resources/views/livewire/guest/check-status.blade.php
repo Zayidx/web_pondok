@@ -137,12 +137,12 @@
                 </div>
                 <div class="relative">
                     <!-- Timeline Line -->
-                    <div class="absolute left-8 top-0 bottom-0 w-0.5 bg-gray-300"></div>
+                    <div class="absolute left-8 top-0 bottom-0 w-1 bg-gray-300"></div>
                     <!-- Timeline Items -->
                     <div class="space-y-8">
                         <!-- Step 1 - Pendaftaran Online -->
                         <div class="relative flex items-center">
-                            <div class="bg-green-500 p-3 rounded-full text-white z-10">
+                            <div class="bg-green-500 p-6 rounded-full text-white z-10">
                                 <i class="fas fa-check text-lg"></i>
                             </div>
                             <div class="ml-6">
@@ -154,7 +154,7 @@
 
                         <!-- Step 2 - Wawancara -->
                         <div class="relative flex items-center">
-                            <div class="{{ $timelineStatus['wawancara']['completed'] ? 'bg-green-500' : ($timelineStatus['wawancara']['current'] ? 'bg-yellow-500 animate-pulse' : 'bg-gray-300') }} p-3 rounded-full text-white z-10">
+                            <div class="{{ $timelineStatus['wawancara']['completed'] ? 'bg-green-500' : ($timelineStatus['wawancara']['current'] ? 'bg-yellow-500 animate-pulse' : 'bg-gray-300') }} p-6 rounded-full text-white z-10">
                                 <i class="fas {{ $timelineStatus['wawancara']['completed'] ? 'fa-check' : 'fa-comments' }} text-lg"></i>
                             </div>
                             <div class="ml-6">
@@ -179,7 +179,7 @@
 
                         <!-- Step 3 - Ujian Online -->
                         <div class="relative flex items-center">
-                            <div class="{{ $timelineStatus['ujian']['completed'] ? 'bg-green-500' : ($timelineStatus['ujian']['current'] ? 'bg-yellow-500 animate-pulse' : 'bg-gray-300') }} p-3 rounded-full text-white z-10">
+                            <div class="{{ $timelineStatus['ujian']['completed'] ? 'bg-green-500' : ($timelineStatus['ujian']['current'] ? 'bg-yellow-500 animate-pulse' : 'bg-gray-300') }} p-6 rounded-full text-white z-10">
                                 <i class="fas {{ $timelineStatus['ujian']['completed'] ? 'fa-check' : 'fa-edit' }} text-lg"></i>
                             </div>
                             <div class="ml-6">
@@ -204,19 +204,21 @@
 
                         <!-- Step 4 - Pengumuman Hasil -->
                         <div class="relative flex items-center">
-                            <div class="{{ $timelineStatus['pengumuman_hasil']['completed'] ? 'bg-green-500' : 'bg-gray-300' }} p-3 rounded-full text-white z-10">
-                                <i class="fas {{ $timelineStatus['pengumuman_hasil']['completed'] ? 'fa-check' : 'fa-bullhorn' }} text-lg"></i>
+                            <div class="{{ isset($timelineStatus['pengumuman_hasil']) && $timelineStatus['pengumuman_hasil']['completed'] ? 'bg-green-500' : 'bg-gray-300' }} p-6 rounded-full text-white z-10">
+                                <i class="fas {{ isset($timelineStatus['pengumuman_hasil']) && $timelineStatus['pengumuman_hasil']['completed'] ? 'fa-check' : 'fa-bullhorn' }} text-lg"></i>
                             </div>
                             <div class="ml-6">
-                                <h3 class="text-lg font-semibold {{ $timelineStatus['pengumuman_hasil']['completed'] ? 'text-gray-900' : 'text-gray-500' }}">Pengumuman Hasil</h3>
-                                @if($timelineStatus['pengumuman_hasil']['completed'])
-                                    <p class="text-{{ $timelineStatus['pengumuman_hasil']['status'] == 'diterima' ? 'green' : 'red' }}-600">
-                                        {{ $timelineStatus['pengumuman_hasil']['status'] == 'diterima' ? 'Selamat! Anda dinyatakan DITERIMA' : 'Mohon maaf, Anda belum diterima' }}
+                                <h3 class="text-lg font-semibold {{ isset($timelineStatus['pengumuman_hasil']) && $timelineStatus['pengumuman_hasil']['completed'] ? 'text-gray-900' : 'text-gray-500' }}">Pengumuman Hasil</h3>
+                                @if(isset($timelineStatus['pengumuman_hasil']) && $timelineStatus['pengumuman_hasil']['completed'])
+                                    <p class="text-{{ isset($timelineStatus['pengumuman_hasil']['status']) && $timelineStatus['pengumuman_hasil']['status'] == 'diterima' ? 'green' : 'red' }}-600">
+                                        {{ isset($timelineStatus['pengumuman_hasil']['status']) && $timelineStatus['pengumuman_hasil']['status'] == 'diterima' ? 'Selamat! Anda dinyatakan DITERIMA' : 'Mohon maaf, Anda belum diterima' }}
                                     </p>
+                                    @if(isset($timelineStatus['pengumuman_hasil']['date']))
                                     <p class="text-sm text-gray-600 font-medium">
                                         <i class="fas fa-calendar-alt mr-1"></i>
                                         {{ $timelineStatus['pengumuman_hasil']['date'] }}
                                     </p>
+                                    @endif
                                 @else
                                     <p class="text-gray-500">Menunggu hasil seleksi</p>
                                 @endif

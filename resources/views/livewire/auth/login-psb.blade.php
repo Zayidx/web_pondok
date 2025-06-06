@@ -11,7 +11,7 @@
                     </a>
                 </div>
                 <div class="flex items-center space-x-4">
-                    <a href="index.html" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition duration-300">
+                    <a href="{{ route('psb-page') }}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition duration-300">
                         <i class="fas fa-home mr-2"></i>Beranda
                     </a>
                     <a href="register.html" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition duration-300">

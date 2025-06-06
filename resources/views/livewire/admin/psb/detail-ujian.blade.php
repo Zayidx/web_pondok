@@ -1,7 +1,7 @@
 <section>
     @if (session()->has('success'))
         <div class="d-flex justify-content-end">
-            <div class="alert alert-success">
+            <div wire:poll class="alert alert-success">
                 {{ session('success') }}
             </div>
         </div>
@@ -9,7 +9,7 @@
 
     @if (session()->has('error'))
         <div class="d-flex justify-content-end">
-            <div class="alert alert-danger">
+            <div wire:poll class="alert alert-danger">
                 {{ session('error') }}
             </div>
         </div>
@@ -59,8 +59,8 @@
             <div class="card">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Daftar Soal</h5>
-                    <button wire:click="create" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createOrUpdateSoal">
-                        <i class="bi bi-plus-circle"></i> Tambah Soal
+                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createOrUpdateSoal" wire:click="create">
+                        Tambah Soal +
                     </button>
                 </div>
         <div class="card-body">
@@ -110,7 +110,7 @@
     <div class="modal fade" id="createOrUpdateSoal" tabindex="-1" wire:ignore.self>
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
-                <form wire:submit="{{ $soalId ? 'updateSoal' : 'createSoal' }}">
+                <form wire:submit.prevent="{{ $soalId ? 'updateSoal' : 'createSoal' }}">
                     <div class="modal-header">
                         <h5 class="modal-title">{{ $soalId ? 'Edit Soal' : 'Tambah Soal' }}</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
@@ -138,37 +138,37 @@
                         @if($soalForm->tipe_soal === 'pg')
                             <div class="mb-3">
                                 <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <label class="form-label mb-0">Pilihan Jawaban</label>
-                                    <button type="button" class="btn btn-sm btn-primary" wire:click="addOption">
-                                        <i class="bi bi-plus"></i> Tambah Pilihan
+                                    <label class="form-label mb-0">Opsi Jawaban</label>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" wire:click="addOption">
+                                        Tambah Opsi +
                                     </button>
                                 </div>
                                 
                                 @foreach($soalForm->opsi as $index => $option)
-                                    <div class="mb-2">
-                                        <div class="input-group">
-                                            <span class="input-group-text">{{ chr(65 + $index) }}</span>
-                                            <input type="text" class="form-control" 
-                                                wire:model="soalForm.opsi.{{$index}}.teks" 
-                                                placeholder="Pilihan {{ chr(65 + $index) }}">
-                                            <input type="number" class="form-control" style="max-width: 120px"
-                                                wire:model="soalForm.opsi.{{$index}}.bobot" 
-                                                placeholder="Bobot"
-                                                min="0">
+                                    <div class="row mb-2">
+                                        <div class="col-1">
+                                            <span class="fw-bold">{{ chr(65 + $index) }}.</span>
+                                        </div>
+                                        <div class="col-8">
+                                            <input type="text" class="form-control" wire:model="soalForm.opsi.{{ $index }}.teks" placeholder="Teks opsi">
+                                            @error("soalForm.opsi.{$index}.teks")
+                                                <div class="text-danger">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                        <div class="col-2">
+                                            <input type="number" class="form-control" wire:model="soalForm.opsi.{{ $index }}.bobot" placeholder="Bobot" min="0">
+                                            @error("soalForm.opsi.{$index}.bobot")
+                                                <div class="text-danger">{{ $message }}</div>
+                                            @enderror
+                                        </div>
+                                        <div class="col-1">
                                             @if(count($soalForm->opsi) > 2)
-                                                <button type="button" class="btn btn-danger" 
-                                                    wire:click="removeOption({{$index}})">
+                                                <button type="button" class="btn btn-sm btn-danger" wire:click="removeOption({{ $index }})">
                                                     <i class="bi bi-trash"></i>
                                                 </button>
                                             @endif
                                         </div>
-                                        @error("soalForm.opsi.{$index}.teks")
-                                            <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                                        @error("soalForm.opsi.{$index}.bobot")
-                                            <small class="text-danger">{{ $message }}</small>
-                            @enderror
-                        </div>
+                                    </div>
                                 @endforeach
 
                                 @error('soalForm.opsi')

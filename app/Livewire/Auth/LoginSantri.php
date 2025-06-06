@@ -10,11 +10,13 @@ use Illuminate\Support\Facades\Hash;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
+use App\Models\PSB\PendaftaranSantri;
+use Livewire\Attributes\Layout;
 
+#[Layout('components.layouts.auth')]
+#[Title('Login Santri')]
 class LoginSantri extends Component
 {
-    #[Title('Halaman Login Santri')]
-
     #[Validate('required')]
     public $nisn;
 
@@ -31,22 +33,17 @@ class LoginSantri extends Component
 
     public function login()
     {
-        try {
-            $this->validate();
+        $credentials = [
+            'nisn' => $this->nisn,
+            'password' => $this->password,
+        ];
 
-            $data = [
-                'nisn' => $this->nisn,
-                'password' => $this->password,
-            ];
-
-            if (Auth::guard('santri')->attempt($data)) {
-                return to_route('santri.dashboard');
-            }
-
-            return back()->withErrors(['credentials' => 'NISN atau password salah']);
-        } catch (\Throwable $th) {
-            return back()->withErrors(['credentials' => $th->getMessage()]);
+        if (Auth::guard('santri')->attempt($credentials)) {
+            session()->regenerate();
+            return redirect()->intended(route('santri.dashboard'));
         }
+
+        $this->addError('credentials', 'Login gagal, password atau NISN salah.');
     }
 
     public function logout()
@@ -58,6 +55,6 @@ class LoginSantri extends Component
     public function render()
     {
         if ($this->is_mobile) return view('livewire.mobile.auth.login-mobile-santri')->layout('components.layouts.auth-mobile');
-        return view('livewire.auth.login-santri')->layout('components.layouts.auth');
+        return view('livewire.auth.login-santri');
     }
 }

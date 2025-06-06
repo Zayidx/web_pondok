@@ -6,9 +6,14 @@ use Livewire\Component;
 use App\Models\PSB\PendaftaranSantri;
 use App\Models\PSB\WaliSantri;
 use App\Models\PSB\Dokumen;
+use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 
 class DetailRegistration extends Component
 {
+    #[Layout('components.layouts.app')]
+    #[Title('Detail Pendaftaran Santri')]
+
     public $santri;
     public $wali;
     public $dokumen;
@@ -17,10 +22,18 @@ class DetailRegistration extends Component
 
     public function mount($santriId)
     {
-        $this->santri = PendaftaranSantri::with(['dokumen'])->findOrFail($santriId);
-        $this->wali = WaliSantri::where('pendaftaran_santri_id', $santriId)->firstOrFail();
+        // Load santri with relationships
+        $this->santri = PendaftaranSantri::with(['dokumen', 'wali'])->findOrFail($santriId);
+        
+        // Use empty WaliSantri object if wali doesn't exist
+        $this->wali = $this->santri->wali ?? new WaliSantri();
+        
+        // Use empty collection if no documents
         $this->dokumen = $this->santri->dokumen ?? collect();
-        $this->fotoSantri = $this->dokumen->where('jenis_berkas', 'Pas Foto')->first()?->file_path;
+        
+        // Check for photo, set to null if doesn't exist
+        $fotoDokumen = $this->dokumen->where('jenis_berkas', 'Pas Foto')->first();
+        $this->fotoSantri = $fotoDokumen ? $fotoDokumen->file_path : null;
     }
 
     public function nextForm()

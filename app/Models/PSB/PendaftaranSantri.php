@@ -7,6 +7,8 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
 /**
  * Model for the psb_pendaftaran_santri table.
@@ -36,9 +38,9 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  */
-class PendaftaranSantri extends Model
+class PendaftaranSantri extends Authenticatable
 {
-    use HasFactory;
+    use HasFactory, Notifiable;
 
     /**
      * The table associated with the model.
@@ -74,6 +76,7 @@ class PendaftaranSantri extends Model
         'lokasi_offline',
         'reason_rejected',
         'periode_id',
+        'password',
     ];
 
     /**
@@ -140,5 +143,10 @@ class PendaftaranSantri extends Model
     public function hasilUjians(): HasMany
     {
         return $this->hasMany(\App\Models\HasilUjian::class, 'santri_id');
+    }
+
+    public function getAuthPassword()
+    {
+        return $this->password;
     }
 }

@@ -1,29 +1,44 @@
 <?php
 
-namespace App\Models;
+namespace App\Models\PSB;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class HasilUjian extends Model
 {
     use HasFactory;
 
     protected $table = 'hasil_ujians';
+
     protected $fillable = [
         'santri_id',
         'ujian_id',
-        'total_skor',
+        'waktu_mulai',
+        'waktu_selesai',
         'status',
+        'nilai',
     ];
 
-    public function santri()
+    protected $casts = [
+        'waktu_mulai' => 'datetime',
+        'waktu_selesai' => 'datetime',
+    ];
+
+    public function santri(): BelongsTo
     {
-        return $this->belongsTo(\App\Models\PSB\PendaftaranSantri::class, 'santri_id');
+        return $this->belongsTo(PendaftaranSantri::class, 'santri_id');
     }
 
-    public function ujian()
+    public function ujian(): BelongsTo
     {
-        return $this->belongsTo(Ujian::class);
+        return $this->belongsTo(Ujian::class, 'ujian_id');
+    }
+
+    public function jawabanUjians(): HasMany
+    {
+        return $this->hasMany(JawabanUjian::class, 'hasil_ujian_id');
     }
 }

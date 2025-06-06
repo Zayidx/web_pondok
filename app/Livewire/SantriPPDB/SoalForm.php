@@ -110,12 +110,12 @@ class SoalForm extends Form
     {
         return [
             'ujian_id' => 'required|exists:ujians,id',
-            'tipe_soal' => 'required|in:' . implode(',', array_keys(Soal::getTipeOptions())),
+            'tipe_soal' => 'required|in:pg,essay',
             'pertanyaan' => 'required|string',
-            'opsi' => 'required_if:tipe_soal,' . Soal::TIPE_PG . '|array|min:2',
-            'opsi.*.teks' => 'required_if:tipe_soal,' . Soal::TIPE_PG . '|string',
-            'opsi.*.bobot' => 'required_if:tipe_soal,' . Soal::TIPE_PG . '|integer|min:0',
-            'kunci_jawaban' => 'required_if:tipe_soal,' . Soal::TIPE_PG . '|integer|min:0',
+            'opsi' => 'required_if:tipe_soal,pg|array|min:2',
+            'opsi.*.teks' => 'required_if:tipe_soal,pg|string',
+            'opsi.*.bobot' => 'required_if:tipe_soal,pg|integer|min:0',
+            'kunci_jawaban' => 'required_if:tipe_soal,pg|integer|min:0',
         ];
     }
 }

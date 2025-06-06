@@ -21,6 +21,9 @@ class RedirectIfAuthenticated
 
         foreach ($guards as $guard) {
             if (Auth::guard($guard)->check()) {
+                if ($guard === 'santri') {
+                    return redirect()->route('e-ppdb.check-status');
+                }
                 return redirect(RouteServiceProvider::HOME);
             }
         }

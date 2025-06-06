@@ -4,7 +4,7 @@ namespace App\Livewire\Admin\PSB;
 
 use App\Livewire\SantriPPDB\SoalForm;
 use App\Models\PSB\Soal;
-use App\Models\Ujian;
+use App\Models\PSB\Ujian;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -127,11 +127,15 @@ class DetailUjian extends Component
                 'ujian_id' => $this->ujianId,
                 'tipe_soal' => $this->soalForm->tipe_soal,
                 'pertanyaan' => $this->soalForm->pertanyaan,
+                'poin' => 1
             ];
 
             if ($this->soalForm->tipe_soal === 'pg') {
                 $data['opsi'] = $this->soalForm->opsi;
                 $data['kunci_jawaban'] = $this->findCorrectAnswerIndex($this->soalForm->opsi);
+            } else {
+                $data['opsi'] = null;
+                $data['kunci_jawaban'] = null;
             }
 
             Soal::create($data);
@@ -157,7 +161,7 @@ class DetailUjian extends Component
             'ujian_id' => $soal->ujian_id,
             'tipe_soal' => $soal->tipe_soal,
             'pertanyaan' => $soal->pertanyaan,
-            'opsi' => $soal->opsi,
+            'opsi' => $soal->opsi ?? []
         ]);
     }
 
@@ -177,7 +181,7 @@ class DetailUjian extends Component
         try {
             $data = [
                 'tipe_soal' => $this->soalForm->tipe_soal,
-                'pertanyaan' => $this->soalForm->pertanyaan,
+                'pertanyaan' => $this->soalForm->pertanyaan
             ];
 
             if ($this->soalForm->tipe_soal === 'pg') {
@@ -205,9 +209,9 @@ class DetailUjian extends Component
     public function deleteSoal($id)
     {
         try {
-        $soal = Soal::findOrFail($id);
+            $soal = Soal::findOrFail($id);
             $soal->delete();
-        session()->flash('success', 'Berhasil hapus soal');
+            session()->flash('success', 'Berhasil hapus soal');
         } catch (\Exception $e) {
             session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
