@@ -172,20 +172,18 @@
                                 <strong>Nilai (Maks. {{ $soal->poin }}):</strong>
                                 <input type="number" class="form-control w-auto d-inline-block ms-2" 
                                     min="0" max="{{ $soal->poin }}"
-                                    wire:model.debounce.500ms="nilaiEssay.{{ $soal->id }}"
-                                    wire:change="simpanNilai({{ $soal->id }}, $event.target.value)"
+                                    wire:model.defer="nilaiEssay.{{ $soal->id }}"
                                     value="{{ isset($jawabanUjian[$soal->id]) ? $jawabanUjian[$soal->id]['nilai'] : 0 }}">
-                                <button class="btn btn-primary btn-sm ms-2" 
-                                    wire:click="simpanNilai({{ $soal->id }}, nilaiEssay.{{ $soal->id }})">
-                                    Simpan Nilai
-                                </button>
                             </div>
                         @endif
                     </div>
                 @endforeach
 
-                <div class="total-nilai mt-4">
-                    <h5>Total Nilai: {{ $totalNilai }}</h5>
+                <div class="total-nilai mt-4 d-flex align-items-center">
+                    <h5 class="me-3">Total Nilai: {{ $totalNilai }}</h5>
+                    <button wire:click="perbaruiSemuaNilai" class="btn btn-primary btn-sm">
+                        <i class="fas fa-save"></i> Perbarui Nilai
+                    </button>
                 </div>
             </div>
         </div>

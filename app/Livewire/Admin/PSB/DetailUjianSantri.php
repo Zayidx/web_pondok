@@ -23,7 +23,7 @@ class DetailUjianSantri extends Component
     public $selectedUjian;
     public $hasilUjian;
     public $jawabanUjian = [];
-    public $nilaiEssay = []; // Properti untuk nilai sementara essay
+    public $nilaiEssay = [];
     public $totalNilai = 0;
 
     public function mount($id)
@@ -59,11 +59,14 @@ class DetailUjianSantri extends Component
                 })
                 ->keyBy('soal_id')
                 ->toArray();
-            
+
             // Inisialisasi nilaiEssay untuk soal essay
+            $this->nilaiEssay = [];
             foreach ($this->selectedUjian->soals as $soal) {
                 if ($soal->tipe_soal === 'essay') {
-                    $this->nilaiEssay[$soal->id] = isset($this->jawabanUjian[$soal->id]) ? $this->jawabanUjian[$soal->id]['nilai'] : 0;
+                    $this->nilaiEssay[$soal->id] = isset($this->jawabanUjian[$soal->id]) 
+                        ? ($this->jawabanUjian[$soal->id]['nilai'] ?? 0)
+                        : 0;
                 }
             }
             
@@ -77,24 +80,55 @@ class DetailUjianSantri extends Component
             return;
         }
 
-        $nilai = (int) $nilai; // Pastikan nilai adalah integer
-        $soal = Soal::find($soalId);
-        if ($soal && $nilai >= 0 && $nilai <= $soal->poin) {
+        $jawaban = JawabanUjian::where('hasil_ujian_id', $this->hasilUjian->id)
+            ->where('soal_id', $soalId)
+            ->first();
+
+        if ($jawaban) {
+            $jawaban->update(['nilai' => $nilai]);
+            $this->jawabanUjian[$soalId]['nilai'] = $nilai;
+            $this->nilaiEssay[$soalId] = $nilai;
+            $this->hitungTotalNilai();
+        }
+    }
+
+    public function perbaruiSemuaNilai()
+    {
+        if (!$this->hasilUjian) {
+            return;
+        }
+
+        foreach ($this->nilaiEssay as $soalId => $nilai) {
             $jawaban = JawabanUjian::where('hasil_ujian_id', $this->hasilUjian->id)
                 ->where('soal_id', $soalId)
                 ->first();
+
             if ($jawaban) {
+                $soal = Soal::find($soalId);
+                $nilai = min(max((int)$nilai, 0), $soal->poin); // Validasi nilai
                 $jawaban->update(['nilai' => $nilai]);
                 $this->jawabanUjian[$soalId]['nilai'] = $nilai;
-                $this->nilaiEssay[$soalId] = $nilai;
-                $this->hitungTotalNilai();
             }
         }
+
+        $this->hitungTotalNilai();
+        session()->flash('message', 'Semua nilai essay berhasil diperbarui.');
     }
 
     public function hitungTotalNilai()
     {
-        $this->totalNilai = collect($this->jawabanUjian)->sum('nilai');
+        $total = 0;
+        foreach ($this->selectedUjian->soals as $soal) {
+            if (isset($this->jawabanUjian[$soal->id])) {
+                if ($soal->tipe_soal === 'pg') {
+                    $total += $this->jawabanUjian[$soal->id]['jawaban'] == $soal->kunci_jawaban ? $soal->poin : 0;
+                } else {
+                    $total += isset($this->nilaiEssay[$soal->id]) ? (int)$this->nilaiEssay[$soal->id] : ($this->jawabanUjian[$soal->id]['nilai'] ?? 0);
+                }
+            }
+        }
+
+        $this->totalNilai = $total;
         
         if ($this->hasilUjian) {
             $this->hasilUjian->update([
