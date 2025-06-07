@@ -133,6 +133,13 @@
                                             <i class="bi bi-x-circle"></i> Batalkan Status
                                         </button>
                                     @endif
+                                    @if($registration->status_santri === 'sedang_ujian')
+                                        <button wire:click="cancelExam({{ $registration->id }})"
+                                                wire:confirm="Apakah Anda yakin ingin membatalkan ujian santri ini? Status akan dikembalikan ke wawancara."
+                                                class="btn btn-sm btn-danger me-1">
+                                            <i class="bi bi-x-circle"></i> Batalkan Ujian
+                                        </button>
+                                    @endif
                                 </td>
                             </tr>
                         @empty

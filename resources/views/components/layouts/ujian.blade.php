@@ -5,24 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ $title ?? 'PPDB' }}</title>
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#3b82f6',
-                        'primary-dark': '#2563eb',
-                    }
-                }
-            }
-        }
-    </script>
-
-    <!-- Alpine.js -->
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-
+    <!-- Styles -->
+    @livewireStyles
+    @stack('styles')
+    
     <!-- Custom Styles -->
     <style>
         .gradient-bg {
@@ -39,14 +25,57 @@
             transform: translateY(-2px);
         }
         [x-cloak] { display: none !important; }
+        
+        /* Modal styles */
+        .modal-backdrop {
+            z-index: 900;
+        }
+        .modal-content {
+            z-index: 1000;
+        }
+        .modal-container {
+            z-index: 1000;
+            position: relative;
+        }
     </style>
 
-    @livewireStyles
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com?plugins=forms,typography,aspect-ratio"></script>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        'primary-dark': '#2563eb',
+                    },
+                    zIndex: {
+                        '100': '100',
+                        'modal': '1000',
+                        'modal-backdrop': '900'
+                    }
+                }
+            }
+        }
+    </script>
 </head>
 <body class="antialiased">
     {{ $slot }}
 
+    <!-- Scripts -->
     @livewireScripts
+    
+    <!-- Alpine.js (load after Livewire) -->
+    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.13.3/dist/cdn.min.js"></script>
+    
+    <!-- Initialize Alpine.js -->
+    <script>
+        document.addEventListener('alpine:init', () => {
+            console.log('Alpine initialized');
+        });
+    </script>
+    
     @stack('scripts')
 </body>
-</html> 
+</html>

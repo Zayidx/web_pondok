@@ -67,7 +67,7 @@ class UjianSeeder extends Seeder
                     'pertanyaan' => "Pertanyaan Essay $i untuk ujian $mapel?",
                     'tipe_soal' => 'essay',
                     'opsi' => null,
-                    'kunci_jawaban' => null,
+                    'kunci_jawaban' => "Jawaban untuk pertanyaan essay $i",
                     'poin' => 40
                 ]);
             }

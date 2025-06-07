@@ -16,7 +16,7 @@
                     </div>
                     <div class="bg-red-100 px-4 py-2 rounded-lg">
                         <div class="text-center">
-                            <div x-data="timer({{ $sisaWaktu }})" x-init="startTimer()" class="text-2xl font-bold text-red-600">
+                            <div x-data="timerData({{ $sisaWaktu }})" x-init="startTimer()" class="text-2xl font-bold text-red-600">
                                 <span x-text="hours.toString().padStart(2, '0')">00</span>:
                                 <span x-text="minutes.toString().padStart(2, '0')">00</span>:
                                 <span x-text="seconds.toString().padStart(2, '0')">00</span>
@@ -34,7 +34,9 @@
                     <span class="text-sm text-gray-500">{{ $soalDijawab }} dari {{ $jumlahSoal }} soal</span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2">
-                    <div class="bg-primary h-2 rounded-full transition-all duration-300" style="width: {{ number_format(($soalDijawab / $jumlahSoal) * 100, 0) }}%"></div>
+                    <div class="bg-primary h-2 rounded-full transition-all duration-300" 
+                         style="width: {{ ($soalDijawab / $jumlahSoal) * 100 }}%">
+                    </div>
                 </div>
             </div>
 
@@ -122,7 +124,7 @@
                                             @foreach ($currentSoal->opsi as $key => $opsi)
                                                 <label class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-300 hover:bg-blue-50 cursor-pointer transition duration-200 group">
                                                     <input type="radio"
-                                                        wire:model.live="jawabanSiswa.{{ $currentSoal->id }}"
+                                                        wire:model="jawabanSiswa.{{ $currentSoal->id }}"
                                                         wire:change="simpanJawaban({{ $currentSoal->id }}, {{ $letterToIndex($key) }})"
                                                         name="question_{{ $currentSoal->id }}"
                                                         value="{{ $letterToIndex($key) }}"
@@ -139,7 +141,7 @@
                                     @else
                                         <div class="space-y-3">
                                             <textarea 
-                                                wire:model.live="jawabanSiswa.{{ $currentSoal->id }}"
+                                                wire:model="jawabanSiswa.{{ $currentSoal->id }}"
                                                 wire:change="simpanJawaban({{ $currentSoal->id }}, $event.target.value)"
                                                 class="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-2 focus:ring-blue-200 resize-none transition duration-200" 
                                                 rows="4" 
@@ -147,8 +149,8 @@
                                         </div>
                                     @endif
 
-                                    <!-- Navigation Buttons -->
-                                    <div class="flex justify-between mt-6">
+                                    <!-- Navigation and Submit Button -->
+                                    <div class="flex justify-between items-center mt-6 w-full">
                                         <button wire:click="previousPage" 
                                             @if($currentPage == 1) disabled @endif
                                             class="px-4 py-2 flex items-center gap-2 {{ $currentPage == 1 ? 'bg-gray-100 text-gray-400 cursor-not-allowed' : 'bg-gray-100 text-gray-600 hover:bg-gray-200' }} rounded-lg transition duration-200">
@@ -161,11 +163,14 @@
                                         @if($currentPage == $jumlahSoal)
                                             <button type="button" 
                                                 wire:click="confirmSubmit"
-                                                class="px-4 py-2 flex items-center gap-2 bg-green-600 text-white hover:bg-green-700 rounded-lg transition duration-200">
-                                                Selesai & Kumpulkan
-                                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                                                class="inline-flex items-center px-6 py-3 text-lg font-medium text-white bg-green-600 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 shadow-lg hover:shadow-xl">
+                                                <span>Selesai & Kumpulkan</span>
+                                                <svg class="ml-2 w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                                                 </svg>
+                                                <span class="ml-2 bg-green-700 rounded-full px-2 py-1 text-xs">
+                                                    {{ $soalDijawab }}/{{ $jumlahSoal }}
+                                                </span>
                                             </button>
                                         @else
                                             <button wire:click="nextPage" 
@@ -187,36 +192,63 @@
         </div>
     </div>
 
-    <!-- Warning/Confirmation Modal -->
-    <div x-data="{ isOpen: false }" 
-        x-show="isOpen"
-        x-on:open-modal.window="isOpen = true"
-        x-on:close-modal.window="isOpen = false"
-        class="fixed inset-0 z-50 overflow-y-auto"
-        style="display: none;">
-        <div class="flex items-center justify-center min-h-screen px-4">
+    <!-- Confirmation Modal -->
+    <div x-data="{ 
+        showModal: @entangle('showModal').defer
+    }" 
+    x-show="showModal"
+    x-cloak
+    class="fixed inset-0 z-50 overflow-y-auto"
+    style="display: none;">
+        <div class="flex items-center justify-center min-h-screen p-4">
             <!-- Backdrop -->
-            <div x-show="isOpen" class="fixed inset-0 bg-black opacity-50"></div>
+            <div x-show="showModal"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0"
+                x-transition:enter-end="opacity-100"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100"
+                x-transition:leave-end="opacity-0"
+                class="fixed inset-0 bg-black bg-opacity-50"
+                @click="showModal = false">
+            </div>
 
-            <!-- Modal -->
-            <div x-show="isOpen" 
-                @click.away="isOpen = false"
-                class="relative bg-white rounded-lg max-w-md w-full p-6">
+            <!-- Modal Content -->
+            <div x-show="showModal"
+                x-transition:enter="transition ease-out duration-300"
+                x-transition:enter-start="opacity-0 transform scale-95"
+                x-transition:enter-end="opacity-100 transform scale-100"
+                x-transition:leave="transition ease-in duration-200"
+                x-transition:leave-start="opacity-100 transform scale-100"
+                x-transition:leave-end="opacity-0 transform scale-95"
+                class="relative bg-white rounded-xl shadow-2xl max-w-md w-full p-6">
+                
                 <div class="text-center">
-                    <svg class="mx-auto mb-4 w-16 h-16 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                    </svg>
-                    <h3 class="text-xl font-bold text-gray-900 mb-4">Perhatian</h3>
-                    <p class="text-gray-600 mb-6">{{ $modalMessage }}</p>
+                    <!-- Warning Icon -->
+                    <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-yellow-100 mb-4">
+                        <svg class="h-10 w-10 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+                        </svg>
+                    </div>
+                    
+                    <h3 class="text-xl font-bold text-gray-900 mb-2">Konfirmasi Pengumpulan</h3>
+                    <p class="text-gray-600 mb-6">
+                        {{ $modalMessage }}
+                    </p>
+
                     <div class="flex justify-center gap-4">
-                        <button type="button" 
-                            @click="isOpen = false"
-                            class="px-4 py-2 bg-gray-200 text-gray-800 rounded-lg hover:bg-gray-300 transition duration-200">
+                        <button type="button"
+                            @click="showModal = false"
+                            class="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors duration-200">
                             Kembali
                         </button>
                         <button type="button"
                             wire:click="submitUjian"
-                            class="px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition duration-200">
+                            @click="showModal = false"
+                            class="inline-flex items-center px-6 py-2 text-white bg-green-600 rounded-lg hover:bg-green-700 transition-colors duration-200">
+                            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                            </svg>
                             Ya, Kumpulkan
                         </button>
                     </div>
@@ -227,7 +259,8 @@
 
     @push('scripts')
     <script>
-        function timer(initialSeconds) {
+        // Single instance of timer function
+        window.timerData = function(initialSeconds) {
             return {
                 totalSeconds: initialSeconds,
                 hours: Math.floor(initialSeconds / 3600),
@@ -235,9 +268,12 @@
                 seconds: initialSeconds % 60,
                 timer: null,
                 startTimer() {
+                    if (this.timer) return; // Prevent multiple timers
+                    
                     this.timer = setInterval(() => {
                         if (this.totalSeconds <= 0) {
                             clearInterval(this.timer);
+                            this.timer = null;
                             Livewire.dispatch('waktuHabis');
                             return;
                         }
@@ -252,4 +288,14 @@
         }
     </script>
     @endpush
+
+    @once
+    @push('styles')
+    <style>
+        [x-cloak] {
+            display: none !important;
+        }
+    </style>
+    @endpush
+    @endonce
 </div> 

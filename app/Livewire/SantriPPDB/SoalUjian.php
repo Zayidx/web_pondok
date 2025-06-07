@@ -128,3 +128,128 @@ class SoalUjian extends Component
         return view('livewire.santri-p-p-d-b.soal-ujian');
     }
 } 
+        // Jika jawaban yang dikirim sama dengan jawaban yang sudah ada, berarti user ingin menghapus jawaban
+        if (isset($this->jawaban[$this->currentSoal]) && $this->jawaban[$this->currentSoal] === $jawaban) {
+            unset($this->jawaban[$this->currentSoal]);
+            
+            // Hapus jawaban dari database
+            JawabanUjian::where([
+                'hasil_ujian_id' => $this->hasilUjian->id,
+                'soal_id' => $currentSoalObj->id
+            ])->delete();
+        } else {
+            $this->saveJawaban($currentSoalObj->id, $jawaban);
+        }
+
+        $this->updateBelumDijawab();
+    }
+
+    public function saveJawaban($soalId, $jawaban)
+    {
+        try {
+            JawabanUjian::updateOrCreate(
+                [
+                    'hasil_ujian_id' => $this->hasilUjian->id,
+                    'soal_id' => $soalId,
+                ],
+                ['jawaban' => $jawaban]
+            );
+
+            $this->jawaban[$soalId] = $jawaban;
+            $this->belumDijawab = $this->ujian->soals->count() - count($this->jawaban);
+            
+            session()->flash('success', 'Jawaban berhasil disimpan');
+        } catch (\Exception $e) {
+            session()->flash('error', 'Gagal menyimpan jawaban: ' . $e->getMessage());
+        }
+    }
+
+    public function handleAutoSave()
+    {
+        if (isset($this->jawaban[$this->currentSoal])) {
+            $this->saveJawaban($this->ujian->soals[$this->currentSoal]->id, $this->jawaban[$this->currentSoal]);
+            $this->lastAutoSave = now();
+            $this->dispatch('auto-save');
+        }
+    }
+
+    public function loadJawaban()
+    {
+        $jawabanUjians = JawabanUjian::where('hasil_ujian_id', $this->hasilUjian->id)->get();
+        foreach ($jawabanUjians as $jawaban) {
+            $soalIndex = $this->ujian->soals->search(function($soal) use ($jawaban) {
+                return $soal->id === $jawaban->soal_id;
+            });
+            if ($soalIndex !== false && !empty(trim($jawaban->jawaban))) {
+                $this->jawaban[$soalIndex] = $jawaban->jawaban;
+            }
+        }
+    }
+
+    public function updateBelumDijawab()
+    {
+        $totalSoal = $this->ujian->soals->count();
+        $soalDijawab = 0;
+
+        foreach ($this->ujian->soals as $index => $soal) {
+            if (isset($this->jawaban[$index])) {
+                if ($soal->tipe_soal === 'essay') {
+                    // Untuk soal essay, cek apakah jawabannya tidak kosong
+                    if (!empty(trim($this->jawaban[$index]))) {
+                        $soalDijawab++;
+                    }
+                } else {
+                    // Untuk soal PG, cukup ada jawabannya
+                    $soalDijawab++;
+                }
+            }
+        }
+
+        $this->belumDijawab = $totalSoal - $soalDijawab;
+    }
+
+    public function checkUnfinishedQuestions()
+    {
+        $belumDijawab = $this->ujian->soals->count() - count($this->jawaban);
+        
+        if ($belumDijawab > 0) {
+            session()->flash('warning', "Masih ada {$belumDijawab} soal yang belum dijawab. Yakin ingin menyelesaikan ujian?");
+            return;
+        }
+        
+        $this->submitUjian();
+    }
+
+    public function submitUjian()
+    {
+        try {
+            // Update waktu selesai
+            $this->hasilUjian->update([
+                'waktu_selesai' => now(),
+                'status' => 'selesai'
+            ]);
+
+            // Update status santri
+            if ($this->santri->status_santri === 'sedang_ujian') {
+                $this->santri->update(['status_santri' => 'menunggu']);
+            }
+
+            return redirect()->route('santri.selesai-ujian', ['ujianId' => $this->ujian->id]);
+        } catch (\Exception $e) {
+            session()->flash('error', 'Terjadi kesalahan saat menyelesaikan ujian: ' . $e->getMessage());
+        }
+
+    }
+
+    public function handleTimeUp()
+    {
+        $this->submitUjian();
+    }
+
+    public function render()
+    {
+        return view('livewire.santri-ppdb.soal-ujian', [
+            'soals' => $this->ujian->soals,
+        ]);
+    }
+} 

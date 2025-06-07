@@ -8,7 +8,7 @@
             <p class="mt-2 text-sm text-gray-600">Masuk untuk mengakses ujian PPDB</p>
         </div>
 
-        <form class="space-y-6" method="POST" action="{{ route('login-santri.post') }}">
+        <form class="space-y-6" method="POST" action="{{ route('login-ppdb-santri.post') }}">
             @csrf
             
             @if(session('error'))

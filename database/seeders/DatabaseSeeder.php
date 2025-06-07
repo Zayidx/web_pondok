@@ -39,6 +39,7 @@ class DatabaseSeeder extends Seeder
             PasswordSantriSeeder::class,
             PpdbSantriSeeder::class,
             UjianSeeder::class,
+            SantriUjianSeeder::class,
         ]);
     }
 }

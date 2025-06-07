@@ -130,6 +130,49 @@ class ShowRegistrations extends Component
         }
     }
 
+    public function cancelExam($santriId)
+    {
+        try {
+            $santri = PendaftaranSantri::findOrFail($santriId);
+            
+            if ($santri->status_santri !== 'sedang_ujian') {
+                session()->flash('error', 'Hanya santri dengan status sedang ujian yang dapat dibatalkan ujiannya.');
+                return;
+            }
+
+            DB::beginTransaction();
+
+            // Delete related exam records if any
+            if ($santri->hasilUjians()->exists()) {
+                $santri->hasilUjians()->delete();
+            }
+            if ($santri->jawabanUjians()->exists()) {
+                $santri->jawabanUjians()->delete();
+            }
+
+            // Update status back to wawancara
+            $santri->status_santri = 'wawancara';
+            $santri->save();
+
+            DB::commit();
+
+            Log::info('Exam cancelled successfully', [
+                'santri_id' => $santri->id,
+                'old_status' => 'sedang_ujian',
+                'new_status' => 'wawancara'
+            ]);
+
+            session()->flash('success', 'Ujian berhasil dibatalkan dan status dikembalikan ke tahap wawancara.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to cancel exam', [
+                'santri_id' => $santriId,
+                'error' => $e->getMessage()
+            ]);
+            session()->flash('error', 'Terjadi kesalahan saat membatalkan ujian.');
+        }
+    }
+
     public function openInterviewModal($santriId)
     {
         Log::info('openInterviewModal called with santriId: ' . $santriId);

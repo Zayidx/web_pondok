@@ -4,45 +4,45 @@ namespace App\Livewire\Auth;
 
 use Livewire\Component;
 use App\Models\PSB\PendaftaranSantri;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Layout;
 
 class LoginPsb extends Component
 {
-    public $email = '';
-    public $password = '';
-    public $errorMessage = '';
+    public $email;
+    public $nisn;
+    public $errorMessage;
 
     public function login()
     {
         $this->validate([
             'email' => 'required|email',
-            'password' => 'required|digits:10',
-        ], [
-            'email.required' => 'Email wajib diisi.',
-            'email.email' => 'Format email tidak valid.',
-            'password.required' => 'Password wajib diisi.',
-            'password.digits' => 'Password harus 10 digit (NISN).',
+            'nisn' => 'required'
         ]);
 
-        $santri = PendaftaranSantri::where('email', $this->email)->first();
+        $santri = PendaftaranSantri::where('email', $this->email)
+            ->where('nisn', $this->nisn)
+            ->first();
 
-        if ($santri && $this->password === $santri->nisn) {
-            Log::info('Santri logged in successfully', ['email' => $this->email, 'santri_id' => $santri->id]);
-            
-            // Store santri data in session
-            session(['santri_id' => $santri->id]);
+        if ($santri) {
             Auth::guard('santri')->login($santri);
+            session(['santri_id' => $santri->id]);
+            session(['login_time' => now()]);
 
-            // Redirect based on santri status
+            Log::info('Successful login', [
+                'santri_id' => $santri->id,
+                'email' => $santri->email
+            ]);
+
             if ($santri->status_santri === 'sedang_ujian') {
-                return redirect()->route('santri.dashboard-ujian');
-            } else if ($santri->status_santri === 'diterima') {
-                return redirect()->route('e-ppdb.check-status');
-            } else {
-                return redirect()->route('santri.dashboard');
+                $ujian = $santri->ujian;
+                if ($ujian) {
+                    return redirect()->route('santri.mulai-ujian', ['ujianId' => $ujian->id]);
+                }
             }
+
+            return redirect()->route('santri.dashboard');
         }
 
         Log::warning('Failed login attempt', ['email' => $this->email]);
@@ -52,6 +52,15 @@ class LoginPsb extends Component
     #[Layout('components.layouts.login-santri-ppdb')]
     public function render()
     {
+        // Check if session is expired (3 hours)
+        if (session()->has('login_time')) {
+            $loginTime = session('login_time');
+            if (now()->diffInHours($loginTime) >= 3) {
+                Auth::guard('santri')->logout();
+                session()->forget(['santri_id', 'login_time']);
+            }
+        }
+
         return view('livewire.auth.login-psb');
     }
 }

@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -142,7 +143,22 @@ class PendaftaranSantri extends Authenticatable
      */
     public function hasilUjians(): HasMany
     {
-        return $this->hasMany(\App\Models\HasilUjian::class, 'santri_id');
+        return $this->hasMany(\App\Models\PSB\HasilUjian::class, 'santri_id');
+    }
+
+    /**
+     * Get the jawaban ujian records associated with this pendaftaran santri through hasil ujians.
+     *
+     * @return HasManyThrough
+     */
+    public function jawabanUjians(): HasManyThrough
+    {
+        return $this->hasManyThrough(
+            \App\Models\PSB\JawabanUjian::class,
+            \App\Models\PSB\HasilUjian::class,
+            'santri_id',
+            'hasil_ujian_id'
+        );
     }
 
     public function getAuthPassword()

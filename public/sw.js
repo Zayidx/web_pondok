@@ -54,3 +54,4 @@ self.addEventListener("fetch", function (event) {
         event.waitUntil(addToCache(event.request));
     }
 });
+

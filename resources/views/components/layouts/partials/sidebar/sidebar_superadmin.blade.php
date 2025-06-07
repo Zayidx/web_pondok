@@ -137,7 +137,10 @@
                 <a href="{{ route('admin.master-psb.interview-list') }}" wire:navigate  class="submenu-link {{ Request::routeIs('admin.interview-list') ? 'text-primary fs-6' : '' }}">Wawancara Santri Baru</a>
             </li>
             <li class="submenu-item  ">
-            <a href="{{ route('admin.master-ujian.dashboard') }}" wire:navigate class="submenu-link {{ Request::routeIs('admin.ujian.dashboard') ? 'text-primary fs-6' : '' }}">List Ujian</a>
+                <a href="{{ route('admin.master-ujian.dashboard') }}" wire:navigate class="submenu-link {{ Request::routeIs('admin.ujian.dashboard') ? 'text-primary fs-6' : '' }}">List Ujian</a>
+            </li>
+            <li class="submenu-item">
+                <a href="{{ route('admin.psb.ujian.hasil') }}" wire:navigate class="submenu-link {{ Request::routeIs('admin.psb.ujian.hasil') ? 'text-primary fs-6' : '' }}">Hasil Ujian Santri</a>
             </li>
         </ul>
  

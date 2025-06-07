@@ -52,7 +52,7 @@ Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->grou
 
 // Santri Auth Routes
 Route::middleware('guest:santri')->group(function () {
-    Route::get('/login-ppdb', [SantriAuthController::class, 'showLoginForm'])->name('login-ppdb-santri');
+    Route::get('/login-ppdb', Auth\LoginPsb::class)->name('login-ppdb-santri');
     Route::post('/login-ppdb', [SantriAuthController::class, 'login'])->name('login-ppdb-santri.post');
 });
 

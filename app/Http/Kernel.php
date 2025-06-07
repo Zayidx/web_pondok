@@ -70,6 +70,7 @@ class Kernel extends HttpKernel
         'secure' => SecureAuth::class,
         'route' => SecureRoute::class,
         'check.status' => \App\Http\Middleware\RedirectToCheckStatus::class,
+        'role' => \App\Http\Middleware\CheckRole::class,
     ];
 
     /**
