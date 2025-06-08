@@ -53,10 +53,10 @@ class CheckStatus extends Component
             return redirect()->route('login-ppdb-santri');
         }
 
-        // If santri is in exam phase, redirect directly to exam dashboard
-        if ($this->santri->status_santri === 'sedang_ujian') {
-            return redirect()->route('santri.dashboard-ujian');
-        }
+        // // If santri is in exam phase, redirect directly to exam dashboard
+        // if ($this->santri->status_santri === 'sedang_ujian') {
+        //     return redirect()->route('santri.dashboard-ujian');
+        // }
 
         // Set timeline status
         $this->updateTimelineStatus();

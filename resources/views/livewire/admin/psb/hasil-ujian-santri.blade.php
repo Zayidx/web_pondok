@@ -72,7 +72,7 @@
                                     <td>{{ $tipeOptions[$santri->tipe_pendaftaran] ?? '-' }}</td>
                                     <td>{{ number_format($this->getTotalNilai($santri), 2) }}</td>
                                     <td>
-                                        <span class="badge bg-warning">Sedang Ujian</span>
+                                    <span class="badge bg-primary">Sedang Ujian</span>
                                     </td>
                                     <td class="text-nowrap">
                                         <div class="btn-group" role="group">

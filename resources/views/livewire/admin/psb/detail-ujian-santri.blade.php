@@ -39,7 +39,7 @@
                             </tr>
                             <tr>
                                 <td>Status</td>
-                                <td>: <span class="badge bg-warning">Sedang Ujian</span></td>
+                                <td>:   <span class="badge bg-primary">Sedang Ujian</span></td>
                             </tr>
                         </table>
                     </div>
@@ -83,15 +83,15 @@
                                             {{ str_replace('_', ' ', ucfirst($status)) }}
                                         </span>
                                     </td>
-                                    <td>
-                                        @if($hasilUjian && $hasilUjian->status === 'selesai')
-                                            {{ $hasilUjian->nilai_akhir ?? 'Belum dinilai' }}
+                                    <td class="text-center">
+                                        @if($hasilUjian && $status === 'selesai')
+                                            {{ $totalNilaiPerUjian[$ujian->id] ?? 'Belum dinilai' }}
                                         @else
                                             -
                                         @endif
                                     </td>
                                     <td>
-                                        @if($hasilUjian && $hasilUjian->status === 'selesai')
+                                        @if($hasilUjian && $status === 'selesai')
                                             <button wire:click="viewSoal({{ $ujian->id }})" class="btn btn-primary btn-sm">
                                                 <i class="fas fa-eye"></i> Lihat Soal
                                             </button>
@@ -122,6 +122,12 @@
                 </h6>
             </div>
             <div class="card-body">
+                @if (session()->has('message'))
+                    <div class="alert alert-success alert-dismissible fade show" role="alert">
+                        {{ session('message') }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                @endif
                 @foreach($selectedUjian->soals as $index => $soal)
                     <div class="soal-item mb-4 p-3 border rounded">
                         <div class="d-flex justify-content-between align-items-start">
@@ -136,15 +142,19 @@
                         @if($soal->tipe_soal === 'pg')
                             <div class="pilihan-jawaban mb-3">
                                 <strong>Pilihan Jawaban:</strong><br>
-                                @foreach($soal->opsi as $key => $opsi)
-                                    <div class="form-check">
-                                        <input class="form-check-input" type="radio" disabled
-                                            {{ isset($jawabanUjian[$soal->id]) && $jawabanUjian[$soal->id]['jawaban'] == $key ? 'checked' : '' }}>
-                                        <label class="form-check-label">
-                                            {{ $opsi['teks'] ?? 'Opsi tidak valid' }}
-                                        </label>
-                                    </div>
-                                @endforeach
+                                @if(is_array($soal->opsi) || is_object($soal->opsi))
+                                    @foreach($soal->opsi as $key => $opsi)
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" disabled
+                                                {{ isset($jawabanUjian[$soal->id]) && $jawabanUjian[$soal->id]['jawaban'] == $key ? 'checked' : '' }}>
+                                            <label class="form-check-label">
+                                                {{ $opsi['teks'] ?? 'Opsi tidak valid' }}
+                                            </label>
+                                        </div>
+                                    @endforeach
+                                @else
+                                    <div class="text-danger">Opsi soal tidak valid.</div>
+                                @endif
                             </div>
                             <div class="kunci-jawaban mb-3">
                                 <strong>Kunci Jawaban:</strong> Opsi {{ $soal->kunci_jawaban }}
@@ -170,9 +180,10 @@
                             </div>
                             <div class="penilaian">
                                 <strong>Nilai (Maks. {{ $soal->poin }}):</strong>
-                                <input type="number" class="form-control w-auto d-inline-block ms-2" 
+                                <input type="number" class="form-control w-auto d-inline-block ms-2 mb-2" 
                                     min="0" max="{{ $soal->poin }}"
-                                    wire:model.defer="nilaiEssay.{{ $soal->id }}"
+                                    wire:model="nilaiEssay.{{ $soal->id }}"
+                                    wire:change="hitungTotalNilai({{ $selectedUjian->id }})"
                                     value="{{ isset($jawabanUjian[$soal->id]) ? $jawabanUjian[$soal->id]['nilai'] : 0 }}">
                             </div>
                         @endif
@@ -181,7 +192,7 @@
 
                 <div class="total-nilai mt-4 d-flex align-items-center">
                     <h5 class="me-3">Total Nilai: {{ $totalNilai }}</h5>
-                    <button wire:click="perbaruiSemuaNilai" class="btn btn-primary btn-sm">
+                    <button type="button" wire:click="perbaruiSemuaNilai" class="btn btn-success btn-sm">
                         <i class="fas fa-save"></i> Perbarui Nilai
                     </button>
                 </div>

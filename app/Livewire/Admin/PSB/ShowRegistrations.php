@@ -111,16 +111,16 @@ class ShowRegistrations extends Component
             }
 
             $oldStatus = $santri->status_santri;
-            $santri->status_santri = 'wawancara';
+            $santri->status_santri = 'sedang_ujian';
             $santri->save();
 
             Log::info('Status cancelled successfully', [
                 'santri_id' => $santri->id,
                 'old_status' => $oldStatus,
-                'new_status' => 'wawancara'
+                'new_status' => 'sedang_ujian'
             ]);
 
-            session()->flash('success', 'Status berhasil dibatalkan dan dikembalikan ke tahap wawancara.');
+            session()->flash('success', 'Status berhasil dibatalkan dan dikembalikan ke tahap ujian.');
         } catch (\Exception $e) {
             Log::error('Failed to cancel status', [
                 'santri_id' => $santriId,

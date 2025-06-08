@@ -56,8 +56,8 @@ class SelesaiUjian extends Component
         $this->soalTerjawab = $this->hasilUjian->jawabanUjians()->count();
 
         // Update santri status if needed
-        if ($this->santri->status_santri === 'sedang_ujian') {
-            $this->santri->update(['status_santri' => 'menunggu']);
+        if ($this->santri->status_santri === 'menunggu') {
+            $this->santri->update(['status_santri' => 'sedang_ujian']);
         }
     }
 

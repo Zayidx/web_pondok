@@ -127,7 +127,7 @@
 
             <!-- Action Buttons -->
             <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <a href="{{ route('santri.dashboard') }}" class="px-8 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition duration-300 shadow-lg">
+                <a href="{{ route('santri.dashboard-ujian') }}" class="px-8 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition duration-300 shadow-lg">
                     Kembali ke Dashboard
                 </a>
                 <a href="{{ route('santri.riwayat-ujian') }}" class="px-8 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition duration-300">

@@ -82,12 +82,7 @@ class MulaiUjian extends Component
         // Load existing answers
         $jawabanUjians = JawabanUjian::where('hasil_ujian_id', $this->hasilUjian->id)->get();
         foreach ($jawabanUjians as $jawaban) {
-            // For multiple choice answers, convert numeric index back to letter
-            if ($jawaban->soal->tipe_soal === 'pg' && is_numeric($jawaban->jawaban)) {
-                $this->jawabanSiswa[$jawaban->soal_id] = chr(65 + $jawaban->jawaban); // Convert 0-3 to A-D
-            } else {
-                $this->jawabanSiswa[$jawaban->soal_id] = $jawaban->jawaban;
-            }
+            $this->jawabanSiswa[$jawaban->soal_id] = $jawaban->jawaban; // Store as is (letter for PG, text for essay)
         }
         $this->soalDijawab = count($this->jawabanSiswa);
 
@@ -105,75 +100,103 @@ class MulaiUjian extends Component
         ]);
     }
 
-    public function toggleAnswer($soalId, $jawaban)
+    // public function toggleAnswer($soalId, $jawaban)
+    // {
+    //     if ($this->isFinished) return;
+
+    //     $soal = collect($this->ujian->soals)->firstWhere('id', $soalId);
+    //     $existingJawaban = $this->jawabanSiswa[$soalId] ?? null;
+
+    //     // For multiple choice questions
+    //     if ($soal->tipe_soal === 'pg') {
+    //         // Convert letter to numeric index for storage
+    //         $numericJawaban = is_string($jawaban) ? ord(strtoupper($jawaban)) - ord('A') : $jawaban;
+            
+    //         // If clicking the same answer again, clear it
+    //         if ($existingJawaban === $jawaban) {
+    //             unset($this->jawabanSiswa[$soalId]);
+    //             JawabanUjian::where([
+    //                 'hasil_ujian_id' => $this->hasilUjian->id,
+    //                 'soal_id' => $soalId,
+    //             ])->delete();
+    //         } else {
+    //             $this->jawabanSiswa[$soalId] = $jawaban; // Store letter in component state
+    //             JawabanUjian::updateOrCreate(
+    //                 [
+    //                     'hasil_ujian_id' => $this->hasilUjian->id,
+    //                     'soal_id' => $soalId,
+    //                 ],
+    //                 ['jawaban' => $numericJawaban] // Store numeric in database
+    //             );
+    //         }
+    //     } 
+    //     // For essay questions
+    //     else {
+    //         // Only save if the answer is not empty
+    //         if (trim($jawaban) !== '') {
+    //             $this->jawabanSiswa[$soalId] = $jawaban;
+    //             JawabanUjian::updateOrCreate(
+    //                 [
+    //                     'hasil_ujian_id' => $this->hasilUjian->id,
+    //                     'soal_id' => $soalId,
+    //                 ],
+    //                 ['jawaban' => $jawaban]
+    //             );
+    //         } else {
+    //             unset($this->jawabanSiswa[$soalId]);
+    //             JawabanUjian::where([
+    //                 'hasil_ujian_id' => $this->hasilUjian->id,
+    //                 'soal_id' => $soalId,
+    //             ])->delete();
+    //         }
+    //     }
+
+    //     $this->soalDijawab = count($this->jawabanSiswa);
+    // }
+    public function hapusJawaban($soalId)
     {
         if ($this->isFinished) return;
-
-        $soal = collect($this->ujian->soals)->firstWhere('id', $soalId);
-        $existingJawaban = $this->jawabanSiswa[$soalId] ?? null;
-
-        // For multiple choice questions
-        if ($soal->tipe_soal === 'pg') {
-            // Convert letter to numeric index for storage
-            $numericJawaban = is_string($jawaban) ? ord(strtoupper($jawaban)) - ord('A') : $jawaban;
-            
-            // If clicking the same answer again, clear it
-            if ($existingJawaban === $jawaban) {
-                unset($this->jawabanSiswa[$soalId]);
-                JawabanUjian::where([
-                    'hasil_ujian_id' => $this->hasilUjian->id,
-                    'soal_id' => $soalId,
-                ])->delete();
-            } else {
-                $this->jawabanSiswa[$soalId] = $jawaban; // Store letter in component state
-                JawabanUjian::updateOrCreate(
-                    [
-                        'hasil_ujian_id' => $this->hasilUjian->id,
-                        'soal_id' => $soalId,
-                    ],
-                    ['jawaban' => $numericJawaban] // Store numeric in database
-                );
-            }
-        } 
-        // For essay questions
-        else {
-            // Only save if the answer is not empty
-            if (trim($jawaban) !== '') {
-                $this->jawabanSiswa[$soalId] = $jawaban;
-                JawabanUjian::updateOrCreate(
-                    [
-                        'hasil_ujian_id' => $this->hasilUjian->id,
-                        'soal_id' => $soalId,
-                    ],
-                    ['jawaban' => $jawaban]
-                );
-            } else {
-                unset($this->jawabanSiswa[$soalId]);
-                JawabanUjian::where([
-                    'hasil_ujian_id' => $this->hasilUjian->id,
-                    'soal_id' => $soalId,
-                ])->delete();
-            }
-        }
-
+    
+        // Hapus jawaban dari state lokal
+        unset($this->jawabanSiswa[$soalId]);
         $this->soalDijawab = count($this->jawabanSiswa);
+    
+        // Hapus jawaban dari database
+        JawabanUjian::where([
+            'hasil_ujian_id' => $this->hasilUjian->id,
+            'soal_id' => $soalId,
+        ])->delete();
+    
+        Debugbar::info('Jawaban dihapus', [
+            'soal_id' => $soalId,
+            'jawaban_siswa' => $this->jawabanSiswa,
+            'soal_dijawab' => $this->soalDijawab
+        ]);
     }
-
     public function simpanJawaban($soalId, $jawaban)
     {
         if ($this->isFinished) return;
-
+    
         // Get the current soal to check its type
         $soal = collect($this->ujian->soals)->firstWhere('id', $soalId);
-
+    
+        // For multiple choice, validate jawaban
         if ($soal->tipe_soal === 'pg') {
-            // For multiple choice, convert letter to numeric index
-            if (is_string($jawaban) && strlen($jawaban) === 1) {
-                $jawaban = ord(strtoupper($jawaban)) - ord('A');
+            if (!in_array(strtoupper($jawaban), ['A', 'B', 'C', 'D'])) {
+                Debugbar::warning('Jawaban tidak valid', [
+                    'soal_id' => $soalId,
+                    'jawaban' => $jawaban
+                ]);
+                return;
+            }
+        } elseif ($soal->tipe_soal === 'essay') {
+            // Untuk essay, hapus jawaban jika kosong
+            if (trim($jawaban) === '') {
+                $this->hapusJawaban($soalId);
+                return;
             }
         }
-        // For essay, keep the text answer as is
-
+    
         // Save answer to database
         JawabanUjian::updateOrCreate(
             [
@@ -182,10 +205,17 @@ class MulaiUjian extends Component
             ],
             ['jawaban' => $jawaban]
         );
-
+    
         // Update local state
         $this->jawabanSiswa[$soalId] = $jawaban;
         $this->soalDijawab = count($this->jawabanSiswa);
+    
+        Debugbar::info('Jawaban disimpan', [
+            'soal_id' => $soalId,
+            'jawaban' => $jawaban,
+            'jawaban_siswa' => $this->jawabanSiswa,
+            'soal_dijawab' => $this->soalDijawab
+        ]);
     }
 
     public function checkUnansweredQuestions()
@@ -235,9 +265,11 @@ class MulaiUjian extends Component
             'total_soal' => $this->jumlahSoal,
             'soal_dijawab' => $this->soalDijawab
         ]);
-
+    
         $this->checkUnansweredQuestions();
         $this->showModal = true;
+        
+        $this->dispatch('show-modal');
         
         Debugbar::stopMeasure('confirm_submit');
     }
@@ -246,24 +278,7 @@ class MulaiUjian extends Component
     {
         if ($this->isFinished) return;
         
-        $this->isFinished = true;
-
-        // Save current answer if exists
-        $currentSoal = $this->ujian->soals[$this->currentPage - 1] ?? null;
-        if ($currentSoal && isset($this->jawabanSiswa[$currentSoal->id])) {
-            $this->simpanJawaban($currentSoal->id, $this->jawabanSiswa[$currentSoal->id]);
-        }
-
-        // Update hasil ujian
-        $this->hasilUjian->update([
-            'waktu_selesai' => now(),
-            'status' => 'selesai'
-        ]);
-
-        // Update santri status
-        $this->santri->update(['status_santri' => 'menunggu']);
-
-        return $this->redirectRoute('santri.selesai-ujian', ['ujianId' => $this->ujian->id]);
+        $this->submitUjian();
     }
 
     public function submitUjian()
@@ -362,37 +377,58 @@ class MulaiUjian extends Component
         if ($pageNumber >= 1 && $pageNumber <= $this->jumlahSoal) {
             // Save current answer if exists
             $currentSoal = $this->ujian->soals[$this->currentPage - 1] ?? null;
-            if ($currentSoal && isset($this->jawabanSiswa[$currentSoal->id])) {
+            if ($currentSoal && !empty($this->jawabanSiswa[$currentSoal->id])) {
                 $this->simpanJawaban($currentSoal->id, $this->jawabanSiswa[$currentSoal->id]);
             }
             
             $this->currentPage = $pageNumber;
+            $this->reset(['jawaban']);
+            
+            Debugbar::info('Pindah ke halaman', [
+                'page_number' => $pageNumber,
+                'current_soal_id' => $this->ujian->soals[$pageNumber - 1]->id ?? null,
+                'jawaban_siswa' => $this->jawabanSiswa
+            ]);
         }
     }
-
+    
     public function nextPage()
     {
         if ($this->currentPage < $this->jumlahSoal) {
             // Save current answer if exists
             $currentSoal = $this->ujian->soals[$this->currentPage - 1] ?? null;
-            if ($currentSoal && isset($this->jawabanSiswa[$currentSoal->id])) {
+            if ($currentSoal && !empty($this->jawabanSiswa[$currentSoal->id])) {
                 $this->simpanJawaban($currentSoal->id, $this->jawabanSiswa[$currentSoal->id]);
             }
             
             $this->currentPage++;
+            $this->reset(['jawaban']);
+            
+            Debugbar::info('Pindah ke halaman berikutnya', [
+                'current_page' => $this->currentPage,
+                'current_soal_id' => $this->ujian->soals[$this->currentPage - 1]->id ?? null,
+                'jawaban_siswa' => $this->jawabanSiswa
+            ]);
         }
     }
-
+    
     public function previousPage()
     {
         if ($this->currentPage > 1) {
             // Save current answer if exists
             $currentSoal = $this->ujian->soals[$this->currentPage - 1] ?? null;
-            if ($currentSoal && isset($this->jawabanSiswa[$currentSoal->id])) {
+            if ($currentSoal && !empty($this->jawabanSiswa[$currentSoal->id])) {
                 $this->simpanJawaban($currentSoal->id, $this->jawabanSiswa[$currentSoal->id]);
             }
             
             $this->currentPage--;
+            $this->reset(['jawaban']);
+            
+            Debugbar::info('Pindah ke halaman sebelumnya', [
+                'current_page' => $this->currentPage,
+                'current_soal_id' => $this->ujian->soals[$this->currentPage - 1]->id ?? null,
+                'jawaban_siswa' => $this->jawabanSiswa
+            ]);
         }
     }
 
@@ -401,18 +437,21 @@ class MulaiUjian extends Component
         $soals = $this->ujian->soals()
             ->orderBy('id')
             ->get();
-
+        
         $currentSoal = $soals[$this->currentPage - 1] ?? null;
-
+        
         Debugbar::info('Render halaman ujian', [
             'current_page' => $this->currentPage,
             'soal_dijawab' => $this->soalDijawab,
-            'sisa_waktu' => $this->sisaWaktu
+            'sisa_waktu' => $this->sisaWaktu,
+            'current_soal_id' => $currentSoal ? $currentSoal->id : null,
+            'jawaban_siswa' => $this->jawabanSiswa
         ]);
-
+        
         return view('livewire.santri-p-p-d-b.mulai-ujian', [
             'soals' => $soals,
-            'currentSoal' => $currentSoal
+            'currentSoal' => $currentSoal,
+            'jawabanSiswa' => $this->jawabanSiswa
         ]);
     }
 } 

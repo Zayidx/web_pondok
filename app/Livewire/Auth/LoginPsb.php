@@ -38,11 +38,11 @@ class LoginPsb extends Component
             if ($santri->status_santri === 'sedang_ujian') {
                 $ujian = $santri->ujian;
                 if ($ujian) {
-                    return redirect()->route('santri.mulai-ujian', ['ujianId' => $ujian->id]);
+                    return redirect()->route('check-status');
                 }
             }
 
-            return redirect()->route('santri.dashboard');
+            return redirect()->route('check-status');
         }
 
         Log::warning('Failed login attempt', ['email' => $this->email]);

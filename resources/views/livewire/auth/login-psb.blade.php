@@ -54,7 +54,7 @@
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <i class="fas fa-id-card text-gray-400"></i>
                             </div>
-                            <input type="text" wire:model="password" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-300" placeholder="Masukkan NISN"/>
+                            <input type="text" wire:model="nisn" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-300" placeholder="Masukkan NISN"/>
                             @error('password') <span class="text-danger text-sm">{{ $message }}</span> @enderror
                         </div>
                     </div>
