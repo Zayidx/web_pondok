@@ -47,7 +47,27 @@ class AlterPsbPendaftaranSantriTable extends Migration
                 'mode',
                 'link_online',
                 'lokasi_offline',
-                'reason_rejected'
+                'reason_rejected',
+                'nama_jenjang',
+                'agama',
+                'no_telp_ibu',
+                'nisn',
+                'nama_ayah',
+                'nama_ibu',
+                'pekerjaan_ayah',
+                'pekerjaan_ibu',
+                'alamat_ortu',
+                'status',
+                'email',
+                'jenis_kelamin',
+                'tempat_lahir',
+                'alamat',
+                'no_whatsapp',
+                'status_kesantrian',
+                'no_hp',
+                'no_hp_ortu',
+                'no_whatsapp',
+                
             ];
             foreach ($columns as $column) {
                 if (Schema::hasColumn('psb_pendaftaran_santri', $column)) {

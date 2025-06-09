@@ -5,12 +5,12 @@ namespace App\Livewire\Guest;
 use Livewire\Component;
 use App\Models\PSB\PendaftaranSantri;
 use Illuminate\Support\Facades\Log;
+use Livewire\Attributes\Layout;
 use Livewire\WithoutUrlPagination;
 
 class CheckStatus extends Component
 {
     use WithoutUrlPagination;
-    
     public $santri = null;
     public $timelineStatus = [
         'pendaftaran_online' => [
@@ -107,7 +107,10 @@ class CheckStatus extends Component
                 : null,
         ];
     }
-
+    public function testClick()
+    {
+        Log::info('Test click triggered');
+    }
     public function logout()
     {
         Log::info('Santri logged out', ['santri_id' => session('santri_id')]);
@@ -119,6 +122,10 @@ class CheckStatus extends Component
     {
         return view('livewire.guest.check-status', [
             'title' => 'Cek Status Pendaftaran'
-        ])->extends('components.layouts.check-status');
+        ])
+        ->extends('components.layouts.check-status')
+        ->response(function ($response) {
+            $response->header('Cache-Control', 'no-store, no-cache, must-revalidate, max-age=0');
+        });
     }
 }

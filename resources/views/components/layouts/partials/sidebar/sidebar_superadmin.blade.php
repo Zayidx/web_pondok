@@ -131,6 +131,12 @@
 
         <ul class="submenu ">
             <li class="submenu-item  ">
+                <a href="{{ route('admin.master-periode.dashboard') }}" wire:navigate  class="submenu-link {{ Request::routeIs('admin.master-periode.dashboard') ? 'text-primary fs-6' : '' }}">Periode Ujian</a>
+            </li>
+            <li class="submenu-item  ">
+                <a href="{{ route('admin.master-psb.dashboard') }}" wire:navigate  class="submenu-link {{ Request::routeIs('admin.master-psb.dashboard') ? 'text-primary fs-6' : '' }}">Dashboard PSB</a>
+            </li>
+            <li class="submenu-item  ">
                 <a href="{{ route('admin.master-psb.show-registrations') }}" wire:navigate  class="submenu-link {{ Request::routeIs('admin.show-registrations') ? 'text-primary fs-6' : '' }}">List Santri Baru</a>
             </li>
             <li class="submenu-item  ">

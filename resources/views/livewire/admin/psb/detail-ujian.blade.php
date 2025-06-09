@@ -136,46 +136,48 @@
                         </div>
 
                         @if($soalForm->tipe_soal === 'pg')
-                            <div class="mb-3">
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <label class="form-label mb-0">Opsi Jawaban</label>
-                                    <button type="button" class="btn btn-sm btn-outline-primary" wire:click="addOption">
-                                        Tambah Opsi +
-                                    </button>
-                                </div>
-                                
-                                @foreach($soalForm->opsi as $index => $option)
-                                    <div class="row mb-2">
-                                        <div class="col-1">
-                                            <span class="fw-bold">{{ chr(65 + $index) }}.</span>
-                                        </div>
-                                        <div class="col-8">
-                                            <input type="text" class="form-control" wire:model="soalForm.opsi.{{ $index }}.teks" placeholder="Teks opsi">
-                                            @error("soalForm.opsi.{$index}.teks")
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                        <div class="col-2">
-                                            <input type="number" class="form-control" wire:model="soalForm.opsi.{{ $index }}.bobot" placeholder="Bobot" min="0">
-                                            @error("soalForm.opsi.{$index}.bobot")
-                                                <div class="text-danger">{{ $message }}</div>
-                                            @enderror
-                                        </div>
-                                        <div class="col-1">
-                                            @if(count($soalForm->opsi) > 2)
-                                                <button type="button" class="btn btn-sm btn-danger" wire:click="removeOption({{ $index }})">
-                                                    <i class="bi bi-trash"></i>
-                                                </button>
-                                            @endif
-                                        </div>
-                                    </div>
-                                @endforeach
+    <div class="mb-3">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+            <label class="form-label mb-0">Opsi Jawaban</label>
+            @if(count($soalForm->opsi) < 5)
+                <button type="button" class="btn btn-sm btn-outline-primary" wire:click="addOption">
+                    Tambah Opsi +
+                </button>
+            @endif
+        </div>
+        
+        @foreach($soalForm->opsi as $index => $option)
+            <div class="row mb-2">
+                <div class="col-1">
+                    <span class="fw-bold">{{ chr($index + 65) }}.</span>
+                </div>
+                <div class="col-8">
+                    <input type="text" class="form-control" wire:model="soalForm.opsi.{{ $index }}.teks" placeholder="Teks opsi">
+                    @error("soalForm.opsi.{$index}.teks")
+                        <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="col-2">
+                    <input type="number" class="form-control" wire:model="soalForm.opsi.{{ $index }}.bobot" placeholder="Bobot" min="0">
+                    @error("soalForm.opsi.{$index}.bobot")
+                        <div class="text-danger">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="col-1">
+                    @if(count($soalForm->opsi) > 2)
+                        <button type="button" class="btn btn-sm btn-danger" wire:click="removeOption({{ $index }})">
+                            <i class="bi bi-trash"></i>
+                        </button>
+                    @endif
+                </div>
+            </div>
+        @endforeach
 
-                                @error('soalForm.opsi')
-                                    <div class="text-danger">{{ $message }}</div>
-                            @enderror
-                        </div>
-                        @endif
+        @error('soalForm.opsi')
+            <div class="text-danger">{{ $message }}</div>
+        @enderror
+    </div>
+@endif
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>

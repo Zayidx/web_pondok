@@ -104,21 +104,21 @@
                     </div>
 
                     <!-- Question Navigation -->
-                   <!-- Navigasi Soal -->
-<div class="bg-white rounded-lg card-shadow p-6">
-    <h3 class="text-lg font-semibold text-gray-900 mb-4">Navigasi Soal</h3>
-    <div class="grid grid-cols-5 gap-2" wire:key="navigasi-soal">
-        @for ($i = 1; $i <= $jumlahSoal; $i++)
-            <button wire:click="gotoPage({{ $i }})"
-                    class="w-10 h-10 rounded-lg flex items-center justify-center text-sm font-medium
+                    <!-- Navigasi Soal -->
+                    <div class="bg-white rounded-lg card-shadow p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Navigasi Soal</h3>
+                        <div class="grid grid-cols-5 gap-2" wire:key="navigasi-soal">
+                            @for ($i = 1; $i <= $jumlahSoal; $i++)
+                                <button wire:click="gotoPage({{ $i }})"
+                                class="w-10 h-10 rounded-lg flex items-center justify-center text-sm font-medium
                            {{ $i == $currentPage ? 'bg-blue-600 text-white' : 
                               (!empty($jawabanSiswa[$soals[$i-1]->id]) ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600') }}"
-                    wire:key="nav-soal-{{ $i }}">
-                {{ $i }}
-            </button>
-        @endfor
-    </div>
-</div>
+                                wire:key="nav-soal-{{ $i }}">
+                                {{ $i }}
+                                </button>
+                                @endfor
+                        </div>
+                    </div>
                 </div>
 
                 <!-- Main Content - Question -->
@@ -142,17 +142,24 @@
 
                                     <p class="text-lg text-gray-800 mb-6 leading-relaxed">{{ $currentSoal->pertanyaan }}</p>
 
-                                    @if ($currentSoal->tipe_soal === 'pg')
+                                   <!-- Bagian soal PG dan Essay -->
+@if ($currentSoal->tipe_soal === 'pg')
     <div class="space-y-3" wire:key="soal-{{ $currentSoal->id }}-pg">
         @foreach ($currentSoal->opsi as $key => $opsi)
             <label class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-600 hover:bg-blue-50 cursor-pointer transition duration-200 group" 
                    wire:key="opsi-{{ $currentSoal->id }}-{{ $key }}">
                 <input type="radio"
-                       wire:model.defer="jawabanSiswa.{{ $currentSoal->id }}"
-                       wire:change="simpanJawaban({{ $currentSoal->id }}, '{{ $key }}')"
+                       wire:model="jawabanSiswa.{{ $currentSoal->id }}"
                        name="question_{{ $currentSoal->id }}"
                        value="{{ $key }}"
                        class="w-5 h-5 text-blue-600 border-gray-300 focus:ring-blue-200 focus:ring-2"
+                       x-data="{ soalId: {{ $currentSoal->id }}, key: '{{ $key }}' }"
+                       x-on:click="if ($el.checked && $el.value === @js($jawabanSiswa[$currentSoal->id] ?? '')) { 
+                           $el.checked = false; 
+                           @this.call('hapusJawaban', soalId); 
+                       } else { 
+                           @this.call('simpanJawaban', soalId, key); 
+                       }"
                        {{ !empty($jawabanSiswa[$currentSoal->id]) && $jawabanSiswa[$currentSoal->id] === $key ? 'checked' : '' }}>
                 <div class="ml-4 flex-1">
                     <span class="text-gray-800 group-hover:text-blue-600">
@@ -163,29 +170,16 @@
             </label>
         @endforeach
     </div>
-    <!-- Tombol Hapus Jawaban untuk PG -->
-    <div class="mt-4">
-        <button wire:click="hapusJawaban({{ $currentSoal->id }})"
-                class="px-4 py-2 bg-red-100 text-red-600 hover:bg-red-200 rounded-lg transition duration-200 btn-hapus-jawaban">
-            Hapus Jawaban
-        </button>
+@else
+    <div class="space-y-3" wire:key="soal-{{ $currentSoal->id }}-esai">
+        <textarea wire:model="jawabanSiswa.{{ $currentSoal->id }}"
+                  wire:input="simpanJawaban({{ $currentSoal->id }}, $event.target.value)"
+                  class="w-full p-4 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:ring-blue-200 focus:ring-2 resize-none transition duration-200"
+                  rows="4"
+                  placeholder="Tulis jawaban essay di sini...">{{ !empty($jawabanSiswa[$currentSoal->id]) ? $jawabanSiswa[$currentSoal->id] : '' }}</textarea>
     </div>
-                                    @else
-                                    <div class="space-y-3" wire:key="soal-{{ $currentSoal->id }}-esai">
-                                        <textarea wire:model.defer="jawabanSiswa.{{ $currentSoal->id }}"
-                                            wire:change="simpanJawaban({{ $currentSoal->id }}, $event.target.value)"
-                                            class="w-full p-4 border-2 border-gray-200 rounded-lg focus:ring-blue-200 focus:ring-2 focus:ring-blue-500 resize-none transition duration-200"
-                                            rows="4"
-                                            placeholder="Tulis jawaban esai di sini...">{{ !empty($jawabanSiswa[$currentSoal->id]) ? $jawabanSiswa[$currentSoal->id] : '' }}</textarea>
-                                    </div>
-                                    <!-- Tombol Hapus Jawaban untuk Esai -->
-                                    <div class="mt-4">
-                                        <button wire:click="hapusJawaban({{ $currentSoal->id }})"
-                                            class="px-4 py-4 bg-red-100 text-red-600 hover:bg-red-200 rounded-lg transition duration-200">
-                                            Hapus Jawaban
-                                        </button>
-                                    </div>
-                                    @endif
+@endif
+
 
                                     <!-- Navigation and Submit Button -->
                                     <div class="flex justify-between items-center mt-6 w-full">
@@ -260,48 +254,67 @@
         </div>
     </div>
 
-    @push('scripts')
-    <script>
-        // Function to show the modal
-        function showModal() {
-            console.log('Show modal triggered');
-            const modal = document.getElementById('confirmation-modal');
-            modal.style.display = 'flex';
-            modal.classList.add('modal-visible');
-            console.log('Modal display:', modal.style.display);
-            console.log('Modal classes:', modal.className);
-            console.log('Modal z-index:', window.getComputedStyle(modal).zIndex);
-        }
+   @push('scripts')
+<script>
+    // Function to show the modal
+    function showModal() {
+        console.log('Show modal triggered');
+        const modal = document.getElementById('confirmation-modal');
+        modal.style.display = 'flex';
+        modal.classList.add('modal-visible');
+    }
 
-        // Function to hide the modal
-        function hideModal() {
-            console.log('Hide modal triggered');
-            const modal = document.getElementById('confirmation-modal');
-            modal.style.display = 'none';
-            modal.classList.remove('modal-visible');
-            console.log('Modal display:', modal.style.display);
-            console.log('Modal classes:', modal.className);
-        }
+    // Function to hide the modal
+    function hideModal() {
+        console.log('Hide modal triggered');
+        const modal = document.getElementById('confirmation-modal');
+        modal.style.display = 'none';
+        modal.classList.remove('modal-visible');
+    }
 
-        // HideENDAR modal on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            console.log('DOM loaded');
-            hideModal();
+    // Hide modal on page load
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('DOM loaded');
+        hideModal();
+    });
+
+    // Listen for Livewire's show-modal event
+    window.addEventListener('show-modal', () => {
+        console.log('Livewire show-modal event received');
+        showModal();
+    });
+
+    // Listen for Livewire's hide-modal event
+    window.addEventListener('hide-modal', () => {
+        console.log('Livewire hide-modal event received');
+        hideModal();
+    });
+
+    // Debug jawabanSiswa and listen for events
+    window.addEventListener('livewire:load', () => {
+        Livewire.on('jawaban-updated', ({ soalId }) => {
+            console.log('Jawaban dihapus untuk soal:', soalId);
+            console.log('Jawaban Siswa:', @json($jawabanSiswa ?? []));
+            // Uncheck semua radio button untuk soal ini
+            document.querySelectorAll(`input[name='question_${soalId}']`).forEach(input => {
+                input.checked = false;
+            });
         });
-
-        // Listen for Livewire's show-modal event
-        window.addEventListener('show-modal', () => {
-            console.log('Livewire show-modal event received');
-            showModal();
+        Livewire.on('update-jawaban-siswa', ({ jawabanSiswa }) => {
+            console.log('Jawaban Siswa diperbarui:', jawabanSiswa);
+            // Perbarui radio button berdasarkan jawabanSiswa
+            document.querySelectorAll(`input[name^='question_']`).forEach(input => {
+                const soalId = input.name.replace('question_', '');
+                const key = input.value;
+                input.checked = jawabanSiswa[soalId] === key;
+            });
         });
-
-        // Listen for Livewire's hide-modal event
-        window.addEventListener('hide-modal', () => {
-            console.log('Livewire hide-modal event received');
-            hideModal();
+        Livewire.on('update', () => {
+            console.log('Jawaban Siswa:', @json($jawabanSiswa ?? []));
         });
-    </script>
-    @endpush
+    });
+</script>
+@endpush
 
 
     @once

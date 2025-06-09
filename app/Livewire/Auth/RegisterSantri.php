@@ -32,6 +32,7 @@ class RegisterSantri extends Component
         'tahun_lulus' => '',
         'tipe_pendaftaran' => '',
         'status_kesantrian' => 'aktif',
+        'alamat' => '',
     ];
 
     public $waliForm = [
@@ -45,9 +46,7 @@ class RegisterSantri extends Component
         'no_telp_ibu' => '',
     ];
 
-    public $alamatForm = [
-        'alamat' => '',
-    ];
+
 
     public $pas_foto, $ijazah, $skhun, $akta_kelahiran, $kartu_keluarga;
 
@@ -72,7 +71,7 @@ class RegisterSantri extends Component
         'waliForm.pekerjaan_ibu' => 'required|string|max:255',
         'waliForm.pendidikan_ibu' => 'required|in:SD,SMP,SMA,D3,S1,S2,S3',
         'waliForm.no_telp_ibu' => 'required|regex:/^[0-9]{10,13}$/',
-        'alamatForm.alamat' => 'required|string|max:500',
+        'santriForm.alamat' => 'required|string|max:500',
         'pas_foto' => 'required|file|mimes:jpg,png|max:2048',
         'ijazah' => 'required|file|mimes:pdf,jpg,png|max:2048',
         'skhun' => 'required|file|mimes:pdf,jpg,png|max:2048',
@@ -130,9 +129,9 @@ class RegisterSantri extends Component
         'waliForm.no_telp_ibu.required' => 'Nomor telepon ibu harus diisi.',
         'waliForm.no_telp_ibu.regex' => 'Nomor telepon ibu harus terdiri dari 10 hingga 13 digit angka tanpa spasi atau tanda baca.',
 
-        // Validasi untuk alamatForm
-        'alamatForm.alamat.required' => 'Alamat lengkap harus diisi.',
-        'alamatForm.alamat.max' => 'Alamat lengkap tidak boleh lebih dari 500 karakter.',
+        // Validasi untuk santriForm
+        'santriForm.alamat.required' => 'Alamat lengkap harus diisi.',
+        'santriForm.alamat.max' => 'Alamat lengkap tidak boleh lebih dari 500 karakter.',
 
         // Validasi untuk upload file
         'pas_foto.required' => 'Pas foto harus diunggah.',
@@ -185,10 +184,9 @@ class RegisterSantri extends Component
     {
         $stepRules = array_filter($this->rules, fn($key) => (
             str_starts_with($key, 'santriForm.') && $this->formPage == 1 ||
-            str_starts_with($key, 'waliForm.') && $this->formPage == 2 ||
-            str_starts_with($key, 'alamatForm.') && $this->formPage == 1
+            str_starts_with($key, 'waliForm.') && $this->formPage == 2
         ), ARRAY_FILTER_USE_KEY);
-
+    
         if ($this->formPage == 3) {
             $stepRules = array_merge($stepRules, [
                 'pas_foto' => $this->rules['pas_foto'],
@@ -199,7 +197,7 @@ class RegisterSantri extends Component
                 'terms' => $this->rules['terms'],
             ]);
         }
-
+    
         $this->validate($stepRules, $this->messages);
     }
 
@@ -209,16 +207,16 @@ class RegisterSantri extends Component
             $this->addError('submit', 'Pendaftaran ditutup.');
             return;
         }
-
+    
         $this->validate();
-
+    
         DB::beginTransaction();
         try {
             $periode = \App\Models\PSB\Periode::where('status_periode', 'active')->first();
             if (!$periode) {
                 throw new \Exception('Pendaftaran ditutup. Tidak ada periode aktif saat ini.');
             }
-
+    
             $santri = \App\Models\PSB\PendaftaranSantri::create([
                 'nama_jenjang' => 'SMA',
                 'nama_lengkap' => $this->santriForm['nama_lengkap'],
@@ -235,10 +233,22 @@ class RegisterSantri extends Component
                 'tipe_pendaftaran' => $this->santriForm['tipe_pendaftaran'],
                 'status_kesantrian' => $this->santriForm['status_kesantrian'],
                 'periode_id' => $periode->id,
+                'alamat' => $this->santriForm['alamat'],
+                'nama_ayah' => $this->waliForm['nama_ayah'],
+                'nama_ibu' => $this->waliForm['nama_ibu'],
+                'pekerjaan_ayah' => $this->waliForm['pekerjaan_ayah'],
+                'pekerjaan_ibu' => $this->waliForm['pekerjaan_ibu'],
+                'alamat_ortu' => $this->santriForm['alamat'],
+                'no_telp_ibu' => $this->waliForm['no_telp_ibu'],
             ]);
-
+    
             \App\Models\PSB\WaliSantri::create([
                 'pendaftaran_santri_id' => $santri->id,
+                'nama_wali' => $this->waliForm['nama_ayah'],
+                'hubungan' => 'ayah',
+                'pekerjaan' => $this->waliForm['pekerjaan_ayah'],
+                'no_hp' => $this->waliForm['no_telp_ibu'],
+                'alamat' => $this->santriForm['alamat'],
                 'nama_ayah' => $this->waliForm['nama_ayah'],
                 'pekerjaan_ayah' => $this->waliForm['pekerjaan_ayah'],
                 'pendidikan_ayah' => $this->waliForm['pendidikan_ayah'],
@@ -247,9 +257,8 @@ class RegisterSantri extends Component
                 'pekerjaan_ibu' => $this->waliForm['pekerjaan_ibu'],
                 'pendidikan_ibu' => $this->waliForm['pendidikan_ibu'],
                 'no_telp_ibu' => $this->waliForm['no_telp_ibu'],
-                'alamat' => $this->alamatForm['alamat'],
             ]);
-
+    
             $documents = [
                 ['file' => $this->pas_foto, 'jenis' => 'Pas Foto', 'path' => 'images/santri'],
                 ['file' => $this->ijazah, 'jenis' => 'Ijazah', 'path' => 'documents'],
@@ -257,7 +266,7 @@ class RegisterSantri extends Component
                 ['file' => $this->akta_kelahiran, 'jenis' => 'Akta Kelahiran', 'path' => 'documents'],
                 ['file' => $this->kartu_keluarga, 'jenis' => 'Kartu Keluarga', 'path' => 'documents'],
             ];
-
+    
             foreach ($documents as $doc) {
                 if ($doc['file']) {
                     $path = $doc['file']->store($doc['path'], 'public');
@@ -269,7 +278,7 @@ class RegisterSantri extends Component
                     ]);
                 }
             }
-
+    
             DB::commit();
             $this->registrationNumber = 'PPDB2025' . str_pad($santri->id, 3, '0', STR_PAD_LEFT);
             $this->successMessage = 'Pendaftaran santri berhasil disimpan!';
@@ -278,7 +287,7 @@ class RegisterSantri extends Component
             $this->formPage = 1;
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Submit failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            \Log::error('Submit failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             $this->addError('submit', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
@@ -289,18 +298,17 @@ class RegisterSantri extends Component
     }
 
     public function resetForm()
-    {
-        $this->santriForm = array_merge(array_fill_keys(array_keys($this->santriForm), ''), ['status_kesantrian' => 'aktif']);
-        $this->waliForm = array_fill_keys(array_keys($this->waliForm), '');
-        $this->alamatForm = array_fill_keys(array_keys($this->alamatForm), '');
-        $this->pas_foto = null;
-        $this->ijazah = null;
-        $this->skhun = null;
-        $this->akta_kelahiran = null;
-        $this->kartu_keluarga = null;
-        $this->terms = false;
-        $this->resetErrorBag();
-    }
+{
+    $this->santriForm = array_merge(array_fill_keys(array_keys($this->santriForm), ''), ['status_kesantrian' => 'aktif']);
+    $this->waliForm = array_fill_keys(array_keys($this->waliForm), '');
+    $this->pas_foto = null;
+    $this->ijazah = null;
+    $this->skhun = null;
+    $this->akta_kelahiran = null;
+    $this->kartu_keluarga = null;
+    $this->terms = false;
+    $this->resetErrorBag();
+}
 
     public function render()
     {

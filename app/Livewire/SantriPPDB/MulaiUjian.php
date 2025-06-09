@@ -91,7 +91,7 @@ class MulaiUjian extends Component
         $this->waktuSelesai = $this->waktuMulai->copy()->addMinutes($this->durasi);
 
         // Calculate remaining time
-        $this->sisaWaktu = now()->diffInSeconds($this->waktuSelesai);
+        $this->sisaWaktu = $this->waktuMulai->diffInSeconds($this->waktuSelesai);
 
         Debugbar::info('Hasil Ujian dibuat/diambil', [
             'hasil_ujian_id' => $this->hasilUjian->id,
@@ -154,69 +154,79 @@ class MulaiUjian extends Component
     //     $this->soalDijawab = count($this->jawabanSiswa);
     // }
     public function hapusJawaban($soalId)
-    {
-        if ($this->isFinished) return;
-    
-        // Hapus jawaban dari state lokal
-        unset($this->jawabanSiswa[$soalId]);
-        $this->soalDijawab = count($this->jawabanSiswa);
-    
-        // Hapus jawaban dari database
-        JawabanUjian::where([
+{
+    if ($this->isFinished) return;
+
+    // Hapus jawaban dari state lokal
+    unset($this->jawabanSiswa[$soalId]);
+    $this->jawabanSiswa = array_filter($this->jawabanSiswa, fn($value) => $value !== null && $value !== ''); // Bersihkan nilai kosong
+    $this->soalDijawab = count($this->jawabanSiswa);
+
+    // Hapus jawaban dari database
+    JawabanUjian::where([
+        'hasil_ujian_id' => $this->hasilUjian->id,
+        'soal_id' => $soalId,
+    ])->delete();
+
+    // Dispatch event untuk memaksa update frontend
+    $this->dispatch('jawaban-updated', soalId: $soalId);
+    $this->dispatch('update-jawaban-siswa', jawabanSiswa: $this->jawabanSiswa);
+    $this->dispatch('refresh-navigasi'); // Tambahan untuk memicu refresh navigasi
+
+    Debugbar::info('Jawaban dihapus', [
+        'soal_id' => $soalId,
+        'jawaban_siswa' => $this->jawabanSiswa,
+        'soal_dijawab' => $this->soalDijawab
+    ]);
+}
+public function simpanJawaban($soalId, $jawaban)
+{
+    if ($this->isFinished) return;
+
+    // Get the current soal to check its type
+    $soal = collect($this->ujian->soals)->firstWhere('id', $soalId);
+
+    // For multiple choice, validate jawaban
+    if ($soal->tipe_soal === 'pg') {
+        if (!in_array(strtoupper($jawaban), ['A', 'B', 'C', 'D'])) {
+            Debugbar::warning('Jawaban tidak valid', [
+                'soal_id' => $soalId,
+                'jawaban' => $jawaban
+            ]);
+            return;
+        }
+    } elseif ($soal->tipe_soal === 'essay') {
+        // Untuk essay, hapus jawaban jika kosong
+        if (trim($jawaban) === '') {
+            $this->hapusJawaban($soalId);
+            return;
+        }
+    }
+
+    // Save answer to database
+    JawabanUjian::updateOrCreate(
+        [
             'hasil_ujian_id' => $this->hasilUjian->id,
             'soal_id' => $soalId,
-        ])->delete();
-    
-        Debugbar::info('Jawaban dihapus', [
-            'soal_id' => $soalId,
-            'jawaban_siswa' => $this->jawabanSiswa,
-            'soal_dijawab' => $this->soalDijawab
-        ]);
-    }
-    public function simpanJawaban($soalId, $jawaban)
-    {
-        if ($this->isFinished) return;
-    
-        // Get the current soal to check its type
-        $soal = collect($this->ujian->soals)->firstWhere('id', $soalId);
-    
-        // For multiple choice, validate jawaban
-        if ($soal->tipe_soal === 'pg') {
-            if (!in_array(strtoupper($jawaban), ['A', 'B', 'C', 'D'])) {
-                Debugbar::warning('Jawaban tidak valid', [
-                    'soal_id' => $soalId,
-                    'jawaban' => $jawaban
-                ]);
-                return;
-            }
-        } elseif ($soal->tipe_soal === 'essay') {
-            // Untuk essay, hapus jawaban jika kosong
-            if (trim($jawaban) === '') {
-                $this->hapusJawaban($soalId);
-                return;
-            }
-        }
-    
-        // Save answer to database
-        JawabanUjian::updateOrCreate(
-            [
-                'hasil_ujian_id' => $this->hasilUjian->id,
-                'soal_id' => $soalId,
-            ],
-            ['jawaban' => $jawaban]
-        );
-    
-        // Update local state
-        $this->jawabanSiswa[$soalId] = $jawaban;
-        $this->soalDijawab = count($this->jawabanSiswa);
-    
-        Debugbar::info('Jawaban disimpan', [
-            'soal_id' => $soalId,
-            'jawaban' => $jawaban,
-            'jawaban_siswa' => $this->jawabanSiswa,
-            'soal_dijawab' => $this->soalDijawab
-        ]);
-    }
+        ],
+        ['jawaban' => $jawaban]
+    );
+
+    // Update local state
+    $this->jawabanSiswa[$soalId] = $jawaban;
+    $this->soalDijawab = count($this->jawabanSiswa);
+
+    // Dispatch event untuk memaksa update frontend
+    $this->dispatch('update-jawaban-siswa', jawabanSiswa: $this->jawabanSiswa);
+    $this->dispatch('refresh-navigasi'); // Tambahan untuk memicu refresh navigasi
+
+    Debugbar::info('Jawaban disimpan', [
+        'soal_id' => $soalId,
+        'jawaban' => $jawaban,
+        'jawaban_siswa' => $this->jawabanSiswa,
+        'soal_dijawab' => $this->soalDijawab
+    ]);
+}
 
     public function checkUnansweredQuestions()
     {

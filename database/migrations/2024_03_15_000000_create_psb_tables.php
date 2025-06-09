@@ -8,70 +8,78 @@ return new class extends Migration
 {
     public function up()
     {
-        // 1. Create psb_periodes table
-        Schema::create('psb_periodes', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama_periode');
-            $table->date('periode_mulai');
-            $table->date('periode_selesai');
-            $table->enum('status_periode', ['active', 'inactive'])->default('inactive');
-            $table->string('tahun_ajaran');
-            $table->timestamps();
-        });
+      // 1. Create psb_periodes table
+      Schema::create('psb_periodes', function (Blueprint $table) {
+        $table->engine = 'InnoDB';
+        $table->id();
+        $table->string('nama_periode');
+        $table->date('periode_mulai');
+        $table->date('periode_selesai');
+        $table->enum('status_periode', ['active', 'inactive'])->default('inactive');
+        $table->string('tahun_ajaran');
+        $table->timestamps();
+    });
 
-        // 2. Create psb_pendaftaran_santri table
-        Schema::create('psb_pendaftaran_santri', function (Blueprint $table) {
-            $table->id();
-            $table->string('nama_lengkap');
-            $table->string('nisn')->unique();
-            $table->string('tempat_lahir');
-            $table->date('tanggal_lahir');
-            $table->enum('jenis_kelamin', ['L', 'P']);
-            $table->string('alamat');
-            $table->string('no_hp');
-            $table->string('email')->unique();
-            $table->string('asal_sekolah');
-            $table->string('tahun_lulus')->nullable();
-            $table->enum('tipe_pendaftaran', ['reguler', 'olimpiade', 'internasional'])->nullable();
-            $table->string('nama_ayah');
-            $table->string('nama_ibu');
-            $table->string('pekerjaan_ayah');
-            $table->string('pekerjaan_ibu');
-            $table->string('no_hp_ortu');
-            $table->string('alamat_ortu');
-            $table->enum('status', ['daftar', 'verifikasi', 'ujian', 'wawancara', 'diterima', 'ditolak'])->default('daftar');
-            $table->enum('status_santri', ['menunggu', 'wawancara', 'sedang_ujian', 'lulus', 'diterima', 'ditolak'])->default('menunggu');
-            $table->text('reason_rejected')->nullable();
-            
-            // Wawancara fields
-            $table->dateTime('tanggal_wawancara')->nullable();
-            $table->enum('mode', ['online', 'offline'])->nullable();
-            $table->string('link_online')->nullable();
-            $table->string('lokasi_offline')->nullable();
-            $table->text('hasil_wawancara')->nullable();
-            $table->enum('status_wawancara', ['belum', 'selesai', 'tidak_hadir'])->default('belum');
-            
-            $table->rememberToken();
-            $table->string('password')->nullable();
-            $table->timestamps();
-        });
+    // 2. Create psb_pendaftaran_santri table
+    Schema::create('psb_pendaftaran_santri', function (Blueprint $table) {
+        $table->engine = 'InnoDB';
+        $table->id();
+        $table->string('nama_lengkap');
+        $table->string('alamat')->nullable();
+        $table->string('nisn')->unique();
+        $table->string('tempat_lahir');
+        $table->date('tanggal_lahir');
+        $table->enum('jenis_kelamin', ['L', 'P']);
+        $table->string('no_whatsapp')->nullable();
+        $table->string('email')->unique();
+        $table->string('asal_sekolah');
+        $table->string('tahun_lulus')->nullable();
+        $table->enum('tipe_pendaftaran', ['reguler', 'olimpiade', 'internasional'])->nullable();
+        $table->string('nama_ayah');
+        $table->string('nama_ibu');
+        $table->string('pekerjaan_ayah');
+        $table->string('pekerjaan_ibu');
+        $table->string('no_telp_ibu')->nullable();
+        $table->string('alamat_ortu');
+        $table->enum('status', ['daftar', 'verifikasi', 'ujian', 'wawancara', 'diterima', 'ditolak'])->default('daftar');
+        $table->enum('status_santri', ['menunggu', 'wawancara', 'sedang_ujian', 'lulus', 'diterima', 'ditolak'])->default('menunggu');
+        $table->text('reason_rejected')->nullable();
+        $table->string('nama_jenjang')->nullable();
+        $table->string('agama')->nullable();
+        $table->string('status_kesantrian')->nullable();
+        $table->unsignedBigInteger('periode_id')->nullable();
+        $table->foreign('periode_id')->references('id')->on('psb_periodes')->onDelete('set null');
+        $table->string('no_hp')->nullable();
+        $table->string('no_hp_ortu')->nullable();
+        $table->dateTime('tanggal_wawancara')->nullable();
+        $table->enum('mode', ['online', 'offline'])->nullable();
+        $table->string('link_online')->nullable();
+        $table->string('lokasi_offline')->nullable();
+        $table->text('hasil_wawancara')->nullable();
+        $table->enum('status_wawancara', ['belum', 'selesai', 'tidak_hadir'])->default('belum');
+        $table->rememberToken();
+        $table->string('password')->nullable();
+        $table->timestamps();
+    });
 
-        // Create psb_wali_santri table
-        Schema::create('psb_wali_santri', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('pendaftaran_santri_id')->constrained('psb_pendaftaran_santri')->onDelete('cascade');
-            $table->string('nama_wali');
-            $table->enum('hubungan', ['ayah', 'ibu', 'wali'])->default('wali');
-            $table->string('pekerjaan');
-            $table->string('no_hp');
-            $table->string('alamat');
-            $table->timestamps();
-        });
+    // Create psb_wali_santri table
+    Schema::create('psb_wali_santri', function (Blueprint $table) {
+        $table->engine = 'InnoDB';
+        $table->id();
+        $table->foreignId('pendaftaran_santri_id')->constrained('psb_pendaftaran_santri')->onDelete('cascade');
+        $table->string('nama_wali');
+        $table->enum('hubungan', ['ayah', 'ibu', 'wali'])->default('wali');
+        $table->string('pekerjaan');
+        $table->string('no_hp');
+        $table->string('alamat');
+        $table->timestamps();
+    });
 
-        // Create psb_dokumen table
-        Schema::create('psb_dokumen', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('santri_id')->constrained('psb_pendaftaran_santri')->onDelete('cascade');
+    // Create psb_dokumen table
+    Schema::create('psb_dokumen', function (Blueprint $table) {
+        $table->engine = 'InnoDB';
+        $table->id();
+        $table->foreignId('santri_id')->constrained('psb_pendaftaran_santri')->onDelete('cascade');
             $table->string('jenis_berkas');
             $table->string('nama_berkas');
             $table->string('file_path');
@@ -102,7 +110,7 @@ return new class extends Migration
             $table->text('pertanyaan');
             $table->enum('tipe_soal', ['pg', 'essay'])->default('pg');
             $table->json('opsi')->nullable();
-            $table->text('kunci_jawaban');
+            $table->text('kunci_jawaban')->nullable();
             $table->integer('bobot_nilai')->default(1);
             $table->integer('poin')->default(1);
             $table->timestamps();

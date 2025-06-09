@@ -46,6 +46,7 @@ class DetailUjianSantri extends Component
                 ? ($hasilUjian->nilai_akhir ?? 0) 
                 : 0;
         }
+        
     }
 
     public function viewSoal($ujianId)

@@ -145,10 +145,10 @@
                             </div>
                         </div>
                         <div class="mt-6">
-                            <label class="block text-sm font-medium text-gray-700 mb-2">Alamat Lengkap *</label>
-                            <textarea wire:model="alamatForm.alamat" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg"></textarea>
-                            @error('alamatForm.alamat') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
-                        </div>
+    <label class="block text-sm font-medium text-gray-700 mb-2">Alamat Lengkap *</label>
+    <textarea wire:model="santriForm.alamat" rows="3" class="w-full px-4 py-3 border border-gray-300 rounded-lg"></textarea>
+    @error('santriForm.alamat') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
+</div>
                         <div class="grid md:grid-cols-2 gap-6 mt-6">
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">Asal Sekolah *</label>

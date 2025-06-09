@@ -60,6 +60,8 @@ class Login extends Component
                 return redirect()->route('e-santri-guru-diniyyah.dashboard');
             } else if ($result->nama === 'Guru Umum') {
                 return redirect()->route('e-santri-guru-umum.dashboard');
+            } else if ($result->nama === 'Pendaftaran Santri') {
+                return redirect()->route('e-ppdb.dashboard');
             } else {
                 return redirect()->route('santri.dashboard');
             }

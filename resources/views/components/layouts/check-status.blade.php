@@ -9,6 +9,7 @@
       href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
       rel="stylesheet"
     />
+    @livewireStyles
     <script>
       tailwind.config = {
         theme: {
@@ -24,16 +25,22 @@
     </script>
   </head>
   <body class="bg-gray-50 text-gray-800">
-   @yield('content')
+    @yield('content')
 
+    @livewireScripts
     <script>
       // Mobile Menu Toggle
-      document
-        .getElementById("mobile-menu-button")
-        .addEventListener("click", function () {
-          const mobileMenu = document.getElementById("mobile-menu");
-          mobileMenu.classList.toggle("hidden");
-        });
+      document.addEventListener('DOMContentLoaded', function () {
+        const mobileMenuButton = document.getElementById("mobile-menu-button");
+        if (mobileMenuButton) {
+          mobileMenuButton.addEventListener("click", function () {
+            const mobileMenu = document.getElementById("mobile-menu");
+            if (mobileMenu) {
+              mobileMenu.classList.toggle("hidden");
+            }
+          });
+        }
+      });
 
       // Auto refresh status (simulasi)
       setInterval(function() {

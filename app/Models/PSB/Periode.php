@@ -32,6 +32,7 @@ class Periode extends Model
      * @var array
      */
     protected $fillable = [
+        'id',
         'nama_periode',
         'periode_mulai',
         'periode_selesai',

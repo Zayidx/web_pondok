@@ -34,7 +34,7 @@
                     {{-- Individual Option Input Group --}}
                     <div class="flex items-center space-x-4">
                         {{-- Option Letter Label --}}
-                        <span class="text-sm font-medium">{{ chr(65 + $index) }}.</span>
+                        <span class="text-sm font-medium">{{ chr($index + 65) }}.</span>
                         
                         {{-- Option Text Input --}}
                         <div class="flex-1">

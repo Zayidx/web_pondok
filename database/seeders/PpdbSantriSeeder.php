@@ -20,6 +20,7 @@ class PpdbSantriSeeder extends Seeder
 
         // Create periode
         $periode = Periode::create([
+            'id'=> 0,
             'nama_periode' => 'Penerimaan Santri 2025/2026',
             'periode_mulai' => $now->copy()->subMonth(),
             'periode_selesai' => $now->copy()->addMonth(),

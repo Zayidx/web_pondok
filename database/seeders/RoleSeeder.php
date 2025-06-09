@@ -38,6 +38,9 @@ class RoleSeeder extends Seeder
             [
                 'nama' => 'Guru Umum'
             ],
+            [
+                'nama'=> 'Pendaftaran Santri'
+            ]
         ];
 
         foreach ($roles as $role) {
