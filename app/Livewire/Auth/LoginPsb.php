@@ -14,39 +14,60 @@ class LoginPsb extends Component
     public $nisn;
     public $errorMessage;
 
+    protected $rules = [
+        'email' => 'required|email',
+        'nisn' => 'required|numeric|digits:10'
+    ];
+
+    protected $messages = [
+        'email.required' => 'Email harus diisi',
+        'email.email' => 'Format email tidak valid',
+        'nisn.required' => 'NISN harus diisi',
+        'nisn.numeric' => 'NISN harus berupa angka',
+        'nisn.digits' => 'NISN harus 10 digit'
+    ];
+
+    public function resetError($field)
+    {
+        $this->resetValidation($field);
+        $this->errorMessage = null;
+    }
+
     public function login()
     {
-        $this->validate([
-            'email' => 'required|email',
-            'nisn' => 'required'
-        ]);
+        try {
+            $this->validate();
 
-        $santri = PendaftaranSantri::where('email', $this->email)
-            ->where('nisn', $this->nisn)
-            ->first();
+            $santri = PendaftaranSantri::where('email', $this->email)
+                ->where('nisn', $this->nisn)
+                ->first();
 
-        if ($santri) {
-            Auth::guard('santri')->login($santri);
-            session(['santri_id' => $santri->id]);
-            session(['login_time' => now()]);
+            if ($santri) {
+                Auth::guard('pendaftaran_santri')->login($santri);
+                session(['santri_id' => $santri->id]);
+                session(['login_time' => now()]);
 
-            Log::info('Successful login', [
-                'santri_id' => $santri->id,
-                'email' => $santri->email
-            ]);
+                Log::info('Successful login', [
+                    'santri_id' => $santri->id,
+                    'email' => $santri->email
+                ]);
 
-            if ($santri->status_santri === 'sedang_ujian') {
-                $ujian = $santri->ujian;
-                if ($ujian) {
-                    return redirect()->route('check-status');
+                if ($santri->status_santri === 'sedang_ujian') {
+                    $ujian = $santri->ujian;
+                    if ($ujian) {
+                        return redirect()->route('check-status');
+                    }
                 }
+
+                return redirect()->route('check-status');
             }
 
-            return redirect()->route('check-status');
+            $this->errorMessage = 'Email atau NISN tidak sesuai. Silakan coba lagi.';
+            Log::warning('Failed login attempt', ['email' => $this->email]);
+        } catch (\Exception $e) {
+            Log::error('Login error', ['error' => $e->getMessage()]);
+            $this->errorMessage = 'Terjadi kesalahan. Silakan coba lagi.';
         }
-
-        Log::warning('Failed login attempt', ['email' => $this->email]);
-        $this->errorMessage = 'Email atau NISN salah.';
     }
 
     #[Layout('components.layouts.login-santri-ppdb')]
@@ -56,7 +77,7 @@ class LoginPsb extends Component
         if (session()->has('login_time')) {
             $loginTime = session('login_time');
             if (now()->diffInHours($loginTime) >= 3) {
-                Auth::guard('santri')->logout();
+                Auth::guard('pendaftaran_santri')->logout();
                 session()->forget(['santri_id', 'login_time']);
             }
         }

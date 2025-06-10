@@ -19,6 +19,7 @@ class PeriksaUjian extends Component
     public $soals;
     public $nilaiSoal = [];
     public $komentar = [];
+    public $selectedSoal = null;
     public $totalNilai = 0;
     public $rataRata = 0;
     
@@ -49,26 +50,21 @@ class PeriksaUjian extends Component
             
         $this->soals = $this->ujian->soals;
         
-        // Initialize all soals with default values
+        // Load existing scores and comments
         foreach ($this->soals as $soal) {
-            // For PG questions, use their pre-set points, otherwise use 0
-            $this->nilaiSoal[$soal->id] = $soal->tipe_soal === 'pg' ? $soal->poin : 0;
+            $jawaban = $this->jawabanUjian->get($soal->id);
+            if ($jawaban) {
+                $this->nilaiSoal[$soal->id] = $jawaban->nilai;
+                $this->komentar[$soal->id] = $jawaban->komentar;
+            }
         }
         
-        // Load existing nilai and komentar if any
-        foreach ($this->jawabanUjian as $jawaban) {
-            if (isset($jawaban->nilai)) {
-                $this->nilaiSoal[$jawaban->soal_id] = $jawaban->nilai;
-            }
-            $this->komentar[$jawaban->soal_id] = $jawaban->komentar;
-        }
-
-        $this->calculateTotalNilai();
+        $this->hitungTotalNilai();
     }
 
     public function updatedNilaiSoal($value, $key)
     {
-        $this->calculateTotalNilai();
+        $this->hitungTotalNilai();
     }
 
     public function getPilihanJawaban($soal)
@@ -85,53 +81,78 @@ class PeriksaUjian extends Component
         }
     }
 
-    public function calculateTotalNilai()
+    public function showEssayModal($soalId)
     {
-        $this->totalNilai = 0;
-        $jumlahSoal = 0;
-        
+        $this->selectedSoal = $this->soals->firstWhere('id', $soalId);
+        $this->dispatch('showEssayModal');
+    }
+
+    public function simpanNilaiEssay()
+    {
+        $this->validate([
+            'nilaiSoal.' . $this->selectedSoal->id => 'required|numeric|min:0|max:100'
+        ]);
+
+        $jawaban = $this->jawabanUjian->get($this->selectedSoal->id);
+        if ($jawaban) {
+            $jawaban->update([
+                'nilai' => $this->nilaiSoal[$this->selectedSoal->id],
+                'komentar' => $this->komentar[$this->selectedSoal->id] ?? null
+            ]);
+        }
+
+        $this->hitungTotalNilai();
+        $this->dispatch('hideEssayModal');
+        $this->dispatch('notify', [
+            'type' => 'success',
+            'message' => 'Nilai essay berhasil disimpan'
+        ]);
+    }
+
+    public function simpanNilai()
+    {
+        $this->validate([
+            'nilaiSoal.*' => 'required|numeric|min:0|max:100'
+        ]);
+
         foreach ($this->nilaiSoal as $soalId => $nilai) {
-            if (is_numeric($nilai)) {
-                $this->totalNilai += $nilai;
+            $jawaban = $this->jawabanUjian->get($soalId);
+            if ($jawaban) {
+                $jawaban->update([
+                    'nilai' => $nilai,
+                    'komentar' => $this->komentar[$soalId] ?? null
+                ]);
+            }
+        }
+
+        $this->hasilUjian->update([
+            'status' => 'dinilai',
+            'total_nilai' => $this->totalNilai,
+            'rata_rata' => $this->rataRata
+        ]);
+
+        $this->dispatch('notify', [
+            'type' => 'success',
+            'message' => 'Semua nilai berhasil disimpan'
+        ]);
+
+        return redirect()->route('admin.master-ujian.hasil-ujian');
+    }
+
+    protected function hitungTotalNilai()
+    {
+        $totalNilai = 0;
+        $jumlahSoal = 0;
+
+        foreach ($this->nilaiSoal as $nilai) {
+            if ($nilai !== null) {
+                $totalNilai += $nilai;
                 $jumlahSoal++;
             }
         }
-        
-        $this->rataRata = $jumlahSoal > 0 ? round($this->totalNilai / $jumlahSoal, 2) : 0;
-    }
-    
-    public function simpanNilai()
-    {
-        $this->validate();
-        
-        try {
-            DB::beginTransaction();
-            
-            foreach ($this->nilaiSoal as $soalId => $nilai) {
-                if (isset($this->jawabanUjian[$soalId])) {
-                    $this->jawabanUjian[$soalId]->update([
-                        'nilai' => $nilai,
-                        'komentar' => $this->komentar[$soalId] ?? null
-                    ]);
-                }
-            }
-            
-            $this->calculateTotalNilai();
-            
-            $this->hasilUjian->update([
-                'nilai' => $this->rataRata,
-                'status' => 'dinilai'
-            ]);
-            
-            DB::commit();
-            
-            session()->flash('message', 'Nilai berhasil disimpan.');
-            return redirect()->route('admin.master-ujian.hasil-ujian');
-            
-        } catch (\Exception $e) {
-            DB::rollBack();
-            session()->flash('error', 'Terjadi kesalahan saat menyimpan nilai.');
-        }
+
+        $this->totalNilai = $totalNilai;
+        $this->rataRata = $jumlahSoal > 0 ? round($totalNilai / $jumlahSoal, 2) : 0;
     }
 
     public function getJawabanPG($soal, $jawaban)

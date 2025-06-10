@@ -38,6 +38,7 @@ class WaliSantri extends Model
      */
     protected $fillable = [
         'pendaftaran_santri_id',
+        'nama_wali',
         'nama_ayah',
         'pekerjaan_ayah',
         'pendidikan_ayah',
@@ -47,6 +48,9 @@ class WaliSantri extends Model
         'pendidikan_ibu',
         'no_telp_ibu',
         'alamat',
+        'hubungan',
+        'pekerjaan',
+        'no_hp',
     ];
 
     /**

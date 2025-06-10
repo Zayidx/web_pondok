@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Title;
 use Carbon\Carbon;
 use Livewire\Attributes\Computed;
+use Illuminate\Support\Facades\Storage;
 
 class ShowRegistrations extends Component
 {
@@ -111,16 +112,16 @@ class ShowRegistrations extends Component
             }
 
             $oldStatus = $santri->status_santri;
-            $santri->status_santri = 'sedang_ujian';
+            $santri->status_santri = 'daftar_ulang';
             $santri->save();
 
             Log::info('Status cancelled successfully', [
                 'santri_id' => $santri->id,
                 'old_status' => $oldStatus,
-                'new_status' => 'sedang_ujian'
+                'new_status' => 'daftar_ulang'
             ]);
 
-            session()->flash('success', 'Status berhasil dibatalkan dan dikembalikan ke tahap ujian.');
+            session()->flash('success', 'Status berhasil dibatalkan dan dikembalikan ke tahap daftar ulang.');
         } catch (\Exception $e) {
             Log::error('Failed to cancel status', [
                 'santri_id' => $santriId,
@@ -170,6 +171,55 @@ class ShowRegistrations extends Component
                 'error' => $e->getMessage()
             ]);
             session()->flash('error', 'Terjadi kesalahan saat membatalkan ujian.');
+        }
+    }
+
+    public function cancelDaftarUlang($santriId)
+    {
+        try {
+            $santri = PendaftaranSantri::findOrFail($santriId);
+            
+            if ($santri->status_santri !== 'daftar_ulang') {
+                session()->flash('error', 'Hanya santri dengan status Daftar Ulang yang dapat dibatalkan.');
+                return;
+            }
+
+            DB::beginTransaction();
+
+            // Delete bukti pembayaran file if exists
+            if ($santri->bukti_pembayaran && Storage::disk('public')->exists($santri->bukti_pembayaran)) {
+                Storage::disk('public')->delete($santri->bukti_pembayaran);
+            }
+
+            // Reset status pembayaran jika ada
+            $santri->status_pembayaran = null;
+            $santri->nominal_pembayaran = null;
+            $santri->tanggal_pembayaran = null;
+            $santri->bank_pengirim = null;
+            $santri->nama_pengirim = null;
+            $santri->bukti_pembayaran = null;
+            $santri->catatan_verifikasi = null;
+
+            // Update status back to diterima
+            $santri->status_santri = 'diterima';
+            $santri->save();
+
+            DB::commit();
+
+            Log::info('Daftar ulang cancelled successfully', [
+                'santri_id' => $santri->id,
+                'old_status' => 'daftar_ulang',
+                'new_status' => 'diterima'
+            ]);
+
+            session()->flash('success', 'Daftar ulang berhasil dibatalkan dan status dikembalikan ke tahap diterima.');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Failed to cancel daftar ulang', [
+                'santri_id' => $santriId,
+                'error' => $e->getMessage()
+            ]);
+            session()->flash('error', 'Terjadi kesalahan saat membatalkan daftar ulang.');
         }
     }
 

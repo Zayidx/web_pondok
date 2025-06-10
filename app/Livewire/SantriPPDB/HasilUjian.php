@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
+use App\Models\PSB\SoalUjian;
+use App\Models\PSB\JawabanSantri;
+use App\Models\PSB\Siswa;
 
 class HasilUjian extends Component
 {
@@ -32,6 +35,7 @@ class HasilUjian extends Component
     public $maxNilaiPG;
     public $maxNilaiEssay;
     public $jumlahBenarPG;
+    public $totalNilai = 0;
 
     public function mount($ujianId)
     {
@@ -92,6 +96,33 @@ class HasilUjian extends Component
             
             $this->nilaiEssay = $essayJawaban->sum('nilai') * 40;
         }
+
+        $this->calculateTotalNilai();
+    }
+
+    public function calculateTotalNilai()
+    {
+        $soalUjian = SoalUjian::where('ujian_id', $this->ujian->id)->get();
+        $jawabanSantri = JawabanSantri::where('ujian_id', $this->ujian->id)
+            ->where('santri_id', $this->santri->id)
+            ->get()
+            ->keyBy('soal_id');
+
+        $this->totalNilai = 0;
+
+        foreach ($soalUjian as $soal) {
+            $jawaban = $jawabanSantri->get($soal->id);
+            
+            if ($soal->jenis_soal === 'PG') {
+                // Calculate PG points automatically
+                if ($jawaban && $jawaban->jawaban === $soal->kunci_jawaban) {
+                    $this->totalNilai += $soal->bobot_poin;
+                }
+            } else {
+                // Add essay points from manual input
+                $this->totalNilai += $jawaban ? ($jawaban->poin ?? 0) : 0;
+            }
+        }
     }
 
     public function getNilaiGrade($nilai)
@@ -101,6 +132,27 @@ class HasilUjian extends Component
         if ($nilai >= 70) return 'C';
         if ($nilai >= 60) return 'D';
         return 'E';
+    }
+
+    public function terimaSantri($siswaId)
+    {
+        try {
+            $siswa = Siswa::findOrFail($siswaId);
+            $siswa->update([
+                'status' => 'daftar_ulang'
+            ]);
+
+            $this->dispatch('showToast', [
+                'type' => 'success',
+                'message' => 'Status santri berhasil diperbarui'
+            ]);
+
+        } catch (\Exception $e) {
+            $this->dispatch('showToast', [
+                'type' => 'error',
+                'message' => 'Gagal memperbarui status santri'
+            ]);
+        }
     }
 
     public function render()

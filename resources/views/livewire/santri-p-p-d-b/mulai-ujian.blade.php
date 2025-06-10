@@ -104,19 +104,18 @@
                     </div>
 
                     <!-- Question Navigation -->
-                    <!-- Navigasi Soal -->
                     <div class="bg-white rounded-lg card-shadow p-6">
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Navigasi Soal</h3>
                         <div class="grid grid-cols-5 gap-2" wire:key="navigasi-soal">
                             @for ($i = 1; $i <= $jumlahSoal; $i++)
                                 <button wire:click="gotoPage({{ $i }})"
-                                class="w-10 h-10 rounded-lg flex items-center justify-center text-sm font-medium
-                           {{ $i == $currentPage ? 'bg-blue-600 text-white' : 
-                              (!empty($jawabanSiswa[$soals[$i-1]->id]) ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600') }}"
-                                wire:key="nav-soal-{{ $i }}">
-                                {{ $i }}
+                                    class="w-10 h-10 rounded-lg flex items-center justify-center text-sm font-medium
+                                    {{ $i == $currentPage ? 'bg-blue-600 text-white' :
+                                       (isset($jawabanSiswa[$soals[$i-1]->id]) && !empty($jawabanSiswa[$soals[$i-1]->id]) ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600') }}"
+                                    wire:key="nav-soal-{{ $i }}">
+                                    {{ $i }}
                                 </button>
-                                @endfor
+                            @endfor
                         </div>
                     </div>
                 </div>
@@ -217,6 +216,10 @@
                             {{ $soalDijawab }}/{{ $jumlahSoal }}
                         </span>
                     </button>
+                    @else
+                    <div class="bg-white rounded-xl card-shadow p-6">
+                        <p class="text-gray-600">Tidak ada soal yang tersedia.</p>
+                    </div>
                     @endif
                 </div>
             </div>

@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Jenssegers\Agent\Agent;
 
 class Dashboard extends Component
 {
@@ -24,38 +25,76 @@ class Dashboard extends Component
 
     public function mount()
     {
-        Carbon::setLocale('id');
+        try {
+            Carbon::setLocale('id');
 
-        $this->profile = Santri::with('kamar', 'kelas', 'semester', 'angkatan')->where('nama', Auth::guard('santri')->user()->nama)->first();
-        $this->timeline_spp = PembayaranTimeline::all();
+            // Get authenticated user
+            $user = Auth::guard('santri')->user();
+            if (!$user) {
+                throw new \Exception('User tidak ditemukan');
+            }
 
-        $this->setStatusSpp = Carbon::now()->translatedFormat('F');
+            // Get santri profile
+            $this->profile = Santri::with(['kamar', 'kelas', 'semester', 'angkatan'])
+                ->where('nama', $user->nama)
+                ->first();
 
-        $this->jadwalHari = Carbon::now()->translatedFormat('l');
+            if (!$this->profile) {
+                throw new \Exception('Data santri tidak ditemukan');
+            }
 
-        $mobile = new MobileDetect();
-        $this->isMobile = $mobile->isMobile();
+            // Get timeline SPP
+            $this->timeline_spp = PembayaranTimeline::all();
 
-        $this->updatedSetStatusSpp($this->setStatusSpp);
+            // Set current month
+            $this->setStatusSpp = Carbon::now()->translatedFormat('F');
+
+            // Set current day
+            $this->jadwalHari = Carbon::now()->translatedFormat('l');
+
+            // Check if mobile
+            $agent = new Agent();
+            $this->isMobile = $agent->isMobile();
+
+            // Update SPP status
+            $this->updatedSetStatusSpp($this->setStatusSpp);
+
+        } catch (\Exception $e) {
+            session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
+            return redirect()->route('login-ppdb-santri');
+        }
     }
 
     #[Computed]
     public function getMataPelajaran()
     {
-        return $this->jadwalPelajaran = $this->profile->kelas->jenjang->jadwalPelajaran()
-            ->when($this->jadwalHari)->where('hari', 'LIKE', "%{$this->jadwalHari}%")
-            ->get();
+        try {
+            if (!$this->profile || !$this->profile->kelas) {
+                return collect();
+            }
+
+            return $this->profile->kelas->jadwalPelajaran()
+                ->where('hari', $this->jadwalHari)
+                ->get();
+        } catch (\Exception $e) {
+            return collect();
+        }
     }
 
     public function updatedSetStatusSpp($value)
     {
-        $this->pembayaran = Pembayaran::with('pembayaranTimeline', 'santri')
-            ->whereHas('santri', function ($query) {
-                return $query->where('nama', Auth::guard('santri')->user()->nama);
-            })
-            ->whereHas('pembayaranTimeline', function ($query) use ($value) {
-                return $query->where('nama_bulan', $value);
-            })->first();
+        try {
+            if (!$this->profile) {
+                return;
+            }
+
+            $this->pembayaran = $this->profile->pembayaran()
+                ->whereMonth('tanggal', Carbon::parse($value)->month)
+                ->whereYear('tanggal', Carbon::parse($value)->year)
+                ->get();
+        } catch (\Exception $e) {
+            $this->pembayaran = collect();
+        }
     }
 
     #[Computed]

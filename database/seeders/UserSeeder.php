@@ -72,6 +72,12 @@ class UserSeeder extends Seeder
             ],
         ];
 
-        DB::table('users')->insert($data);
+        foreach ($data as $userData) {
+            $user = \App\Models\User::create($userData);
+            \App\Models\admin\Admin::create([
+                'user_id' => $user->id,
+                'roles_id' => $userData['roles_id'],
+            ]);
+        }
     }
 }

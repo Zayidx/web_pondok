@@ -78,6 +78,13 @@ class PendaftaranSantri extends Authenticatable
         'reason_rejected',
         'periode_id',
         'password',
+        'nominal_pembayaran',
+        'tanggal_pembayaran',
+        'bank_pengirim',
+        'nama_pengirim',
+        'bukti_pembayaran',
+        'status_pembayaran',
+        'catatan_verifikasi',
     ];
 
     /**
@@ -88,12 +95,14 @@ class PendaftaranSantri extends Authenticatable
     protected $casts = [
         'tanggal_lahir' => 'date',
         'tanggal_wawancara' => 'date',
+        'tanggal_pembayaran' => 'date',
         'jenis_kelamin' => 'string',
         'agama' => 'string',
         'status_santri' => 'string',
         'status_kesantrian' => 'string',
         'tipe_pendaftaran' => 'string',
         'mode' => 'string',
+        'nominal_pembayaran' => 'decimal:2',
     ];
 
     /**

@@ -40,6 +40,11 @@
             }
           });
         }
+
+        // Listen for redirect event
+        Livewire.on('redirect', (data) => {
+          window.location.href = data.url;
+        });
       });
 
       // Auto refresh status (simulasi)

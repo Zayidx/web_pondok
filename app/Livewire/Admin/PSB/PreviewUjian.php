@@ -34,10 +34,13 @@ class PreviewUjian extends Component
 
     protected function loadQuestions()
     {
-        $this->questions = $this->ujian->soals()
-            ->orderByRaw("CASE WHEN tipe_soal = 'pg' THEN 0 ELSE 1 END")
-            ->orderBy('created_at', 'asc')
-            ->get();
+        // Cache the questions for 5 minutes to improve performance
+        $this->questions = cache()->remember("ujian_{$this->ujianId}_questions", 300, function () {
+            return $this->ujian->soals()
+                ->orderByRaw("CASE WHEN tipe_soal = 'pg' THEN 0 ELSE 1 END")
+                ->orderBy('created_at', 'asc')
+                ->get();
+        });
     }
 
     #[Computed]
@@ -63,6 +66,7 @@ class PreviewUjian extends Component
     {
         if ($this->currentQuestionIndex < $this->totalQuestions() - 1) {
             $this->currentQuestionIndex++;
+            $this->dispatchBrowserEvent('question-changed');
         }
     }
 
@@ -70,6 +74,7 @@ class PreviewUjian extends Component
     {
         if ($this->currentQuestionIndex > 0) {
             $this->currentQuestionIndex--;
+            $this->dispatchBrowserEvent('question-changed');
         }
     }
 
@@ -77,6 +82,7 @@ class PreviewUjian extends Component
     {
         if ($index >= 0 && $index < $this->totalQuestions()) {
             $this->currentQuestionIndex = $index;
+            $this->dispatchBrowserEvent('question-changed');
         }
     }
 

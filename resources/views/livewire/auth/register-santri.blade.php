@@ -140,7 +140,10 @@
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 mb-2">No. HP/WhatsApp *</label>
-                                <input type="tel" wire:model="santriForm.no_whatsapp" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="08xxxxxxxxxx" />
+                                <div class="relative">
+                                    <input type="tel" wire:model="santriForm.no_whatsapp" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="62812xxxxxxxx" />
+                                    <div class="mt-1 text-sm text-gray-500">Format: Diawali dengan 62 (contoh: 628123456789)</div>
+                                </div>
                                 @error('santriForm.no_whatsapp') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
                             </div>
                         </div>

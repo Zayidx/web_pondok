@@ -42,7 +42,11 @@ return [
         ],
         'santri' => [
             'driver' => 'session',
-            'provider' => 'santri',
+            'provider' => 'pendaftaran_santri',
+        ],
+        'pendaftaran_santri' => [
+            'driver' => 'session',
+            'provider' => 'pendaftaran_santri',
         ],
     ],
 
@@ -68,7 +72,13 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
         ],
-        'santri' => [
+        
+        'santris' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\PSB\PendaftaranSantri::class,
+        ],
+
+        'pendaftaran_santri' => [
             'driver' => 'eloquent',
             'model' => App\Models\PSB\PendaftaranSantri::class,
         ],
@@ -101,12 +111,6 @@ return [
     'passwords' => [
         'users' => [
             'provider' => 'users',
-            'table' => 'password_reset_tokens',
-            'expire' => 60,
-            'throttle' => 60,
-        ],
-        'santri' => [
-            'provider' => 'santri',
             'table' => 'password_reset_tokens',
             'expire' => 60,
             'throttle' => 60,

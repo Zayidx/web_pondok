@@ -14,6 +14,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
  * @property \Illuminate\Support\Carbon $periode_selesai
  * @property string $status_periode
  * @property string $tahun_ajaran
+ * @property string $tipe_periode
  * @property \Illuminate\Support\Carbon $created_at
  * @property \Illuminate\Support\Carbon $updated_at
  */
@@ -38,6 +39,7 @@ class Periode extends Model
         'periode_selesai',
         'status_periode',
         'tahun_ajaran',
+        'tipe_periode',
     ];
 
     /**
@@ -49,6 +51,7 @@ class Periode extends Model
         'periode_mulai' => 'date',
         'periode_selesai' => 'date',
         'status_periode' => 'string',
+        'tipe_periode' => 'string',
     ];
 
     /**

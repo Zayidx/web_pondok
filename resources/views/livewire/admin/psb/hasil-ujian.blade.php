@@ -53,7 +53,8 @@
                                 <th>Nama Santri</th>
                                 <th>NISN</th>
                                 <th>Mata Pelajaran</th>
-                                <th>Nilai</th>
+                                <th>Total Nilai</th>
+                                <th>Rata-rata</th>
                                 <th>Status</th>
                                 <th>Aksi</th>
                             </tr>
@@ -65,7 +66,20 @@
                                     <td>{{ $hasil->santri->nama_lengkap }}</td>
                                     <td>{{ $hasil->santri->nisn }}</td>
                                     <td>{{ $hasil->ujian->mata_pelajaran }}</td>
-                                    <td>{{ $hasil->nilai ?? '-' }}</td>
+                                    <td>
+                                        @if($hasil->total_nilai)
+                                            <span class="badge bg-primary">{{ $hasil->total_nilai }}</span>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($hasil->rata_rata)
+                                            <span class="badge bg-info">{{ $hasil->rata_rata }}</span>
+                                        @else
+                                            <span class="text-muted">-</span>
+                                        @endif
+                                    </td>
                                     <td>
                                         @if($hasil->status === 'belum_dinilai')
                                             <span class="badge bg-warning">Belum Dinilai</span>

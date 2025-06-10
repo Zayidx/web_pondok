@@ -1,8 +1,8 @@
 <ul class="menu">
     <li class="sidebar-title">Menu</li>
 
-    <li wire:click='$refresh' class="sidebar-item {{ Request::routeIs('admin.dashboard') ? 'active' : '' }}">
-        <a href="{{ route('admin.dashboard') }}" class='sidebar-link'>
+    <li class="sidebar-item {{ Request::routeIs('e-ppdb.dashboard') ? 'active' : '' }}">
+        <a href="{{ route('e-ppdb.dashboard') }}" class='sidebar-link'>
             <i class="bi bi-grid-fill"></i>
             <span>Dashboard</span>
         </a>
@@ -10,7 +10,6 @@
 
     {{-- Data Pendaftaran Santri --}}
     <li class="sidebar-title">Data Pendaftaran Santri</li>
-       
 
     {{-- Master Pendaftaran Santri Baru --}}
     <li class="sidebar-item has-sub {{ Request::routeIs('admin.master-psb*') ? 'active' : '' }}">
@@ -19,24 +18,28 @@
             <span>Master PSB</span>
         </a>
 
-        <ul class="submenu ">
-            <li class="submenu-item  ">
-                <a href="{{ route('admin.master-periode.dashboard') }}" wire:navigate  class="submenu-link {{ Request::routeIs('admin.master-periode.dashboard') ? 'text-primary fs-6' : '' }}">Periode Ujian</a>
+        <ul class="submenu">
+            <li class="submenu-item">
+                <a href="{{ route('admin.master-periode.dashboard') }}" wire:navigate class="submenu-link {{ Request::routeIs('admin.master-periode.dashboard') ? 'text-primary fs-6' : '' }}">Periode Ujian</a>
             </li>
-            <li class="submenu-item  ">
-                <a href="{{ route('admin.master-psb.show-registrations') }}" wire:navigate  class="submenu-link {{ Request::routeIs('admin.show-registrations') ? 'text-primary fs-6' : '' }}">List Santri Baru</a>
+            <li class="submenu-item">
+                <a href="{{ route('admin.master-psb.dashboard') }}" wire:navigate class="submenu-link {{ Request::routeIs('admin.master-psb.dashboard') ? 'text-primary fs-6' : '' }}">Dashboard PSB</a>
             </li>
-            <li class="submenu-item  ">
-                <a href="{{ route('admin.master-psb.interview-list') }}" wire:navigate  class="submenu-link {{ Request::routeIs('admin.interview-list') ? 'text-primary fs-6' : '' }}">Wawancara Santri Baru</a>
+            <li class="submenu-item">
+                <a href="{{ route('admin.master-psb.show-registrations') }}" wire:navigate class="submenu-link {{ Request::routeIs('admin.master-psb.show-registrations') ? 'text-primary fs-6' : '' }}">List Santri Baru</a>
             </li>
-            <li class="submenu-item  ">
-                <a href="{{ route('admin.master-ujian.dashboard') }}" wire:navigate class="submenu-link {{ Request::routeIs('admin.ujian.dashboard') ? 'text-primary fs-6' : '' }}">List Ujian</a>
+            <li class="submenu-item">
+                <a href="{{ route('admin.master-psb.interview-list') }}" wire:navigate class="submenu-link {{ Request::routeIs('admin.master-psb.interview-list') ? 'text-primary fs-6' : '' }}">Wawancara Santri Baru</a>
+            </li>
+            <li class="submenu-item">
+                <a href="{{ route('admin.master-ujian.dashboard') }}" wire:navigate class="submenu-link {{ Request::routeIs('admin.master-ujian.dashboard') ? 'text-primary fs-6' : '' }}">List Ujian</a>
             </li>
             <li class="submenu-item">
                 <a href="{{ route('admin.psb.ujian.hasil') }}" wire:navigate class="submenu-link {{ Request::routeIs('admin.psb.ujian.hasil') ? 'text-primary fs-6' : '' }}">Hasil Ujian Santri</a>
             </li>
+            <li class="submenu-item">
+                <a href="{{ route('ppdb.dashboard-daftar-ulang') }}" wire:navigate class="submenu-link {{ Request::routeIs('ppdb.dashboard-daftar-ulang') ? 'text-primary fs-6' : '' }}">Dashboard Daftar Ulang</a>
+            </li>
         </ul>
- 
     </li>
-
 </ul>

@@ -14,7 +14,7 @@
                     <a href="{{ route('psb-page') }}" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition duration-300">
                         <i class="fas fa-home mr-2"></i>Beranda
                     </a>
-                    <a href="register.html" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition duration-300">
+                    <a href="{{ route('register-santri') }}" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition duration-300">
                         Daftar Sekarang
                     </a>
                 </div>
@@ -34,7 +34,18 @@
 
             <div class="bg-white rounded-lg shadow-lg p-8">
                 @if($errorMessage)
-                    <div class="alert alert-danger mb-4">{{ $errorMessage }}</div>
+                    <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                                    <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm text-red-700">{{ $errorMessage }}</p>
+                            </div>
+                        </div>
+                    </div>
                 @endif
                 <form wire:submit.prevent="login" class="space-y-6">
                     <div>
@@ -43,9 +54,15 @@
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <i class="fas fa-envelope text-gray-400"></i>
                             </div>
-                            <input type="email" wire:model="email" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-300" placeholder="Masukkan email (Gmail)"/>
-                            @error('email') <span class="text-danger text-sm">{{ $message }}</span> @enderror
+                            <input type="email" 
+                                   wire:model.live="email" 
+                                   wire:keydown="resetError('email')"
+                                   class="w-full pl-10 pr-4 py-3 border @error('email') border-red-500 @else border-gray-300 @enderror rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-300" 
+                                   placeholder="Masukkan email (Gmail)"/>
                         </div>
+                        @error('email') 
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
 
                     <div>
@@ -54,13 +71,26 @@
                             <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                 <i class="fas fa-id-card text-gray-400"></i>
                             </div>
-                            <input type="text" wire:model="nisn" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-300" placeholder="Masukkan NISN"/>
-                            @error('password') <span class="text-danger text-sm">{{ $message }}</span> @enderror
+                            <input type="text" 
+                                   wire:model.live="nisn" 
+                                   wire:keydown="resetError('nisn')"
+                                   class="w-full pl-10 pr-4 py-3 border @error('nisn') border-red-500 @else border-gray-300 @enderror rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition duration-300" 
+                                   placeholder="Masukkan NISN"/>
                         </div>
+                        @error('nisn') 
+                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                        @enderror
                     </div>
 
-                    <button type="submit" class="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 flex items-center justify-center">
-                        <i class="fas fa-sign-in-alt mr-2"></i> Masuk
+                    <button type="submit" 
+                            class="w-full bg-primary text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-300 flex items-center justify-center"
+                            wire:loading.attr="disabled">
+                        <span wire:loading.remove wire:target="login">
+                            <i class="fas fa-sign-in-alt mr-2"></i> Masuk
+                        </span>
+                        <span wire:loading wire:target="login">
+                            <i class="fas fa-spinner fa-spin mr-2"></i> Memproses...
+                        </span>
                     </button>
                 </form>
 

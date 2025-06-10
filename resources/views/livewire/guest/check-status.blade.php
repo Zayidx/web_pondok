@@ -20,7 +20,11 @@
                         <a href="{{ route('santri.dashboard-ujian') }}" class="text-primary px-3 py-2 rounded-md text-sm font-medium bg-blue-50">Dashboard Ujian</a>
                         <a href="#" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition duration-300">Profil</a>
                         <a href="#" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition duration-300">Bantuan</a>
-                        <a  wire:click="logout" class="bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-600 transition duration-300">Keluar</a>
+                        <button type="button" wire:click="logout" wire:loading.attr="disabled" class="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-600 transition duration-300">
+                            <i class="fas fa-sign-out-alt"></i>
+                            <span wire:loading.remove>Keluar</span>
+                            <span wire:loading>Memproses...</span>
+                        </button>
                     </div>
                 </div>
                 <div class="md:hidden">
@@ -36,7 +40,11 @@
                 <a href="#" class="text-primary block px-3 py-2 rounded-md text-base font-medium bg-blue-50">Dashboard</a>
                 <a href="#" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Profil</a>
                 <a href="#" class="text-gray-700 hover:text-primary block px-3 py-2 rounded-md text-base font-medium">Bantuan</a>
-                <a href="#" wire:click="logout" class="bg-red-500 text-white block px-3 py-2 rounded-md text-base font-medium">Keluar</a>
+                <button type="button" wire:click="logout" wire:loading.attr="disabled" class="w-full flex items-center gap-2 bg-red-500 text-white px-3 py-2 rounded-md text-base font-medium hover:bg-red-600 transition duration-300">
+                    <i class="fas fa-sign-out-alt"></i>
+                    <span wire:loading.remove>Keluar</span>
+                    <span wire:loading>Memproses...</span>
+                </button>
             </div>
         </div>
     </nav>
@@ -154,16 +162,27 @@
 
                         <!-- Step 2 - Wawancara -->
                         <div class="relative flex items-center">
-                            <div class="{{ $timelineStatus['wawancara']['completed'] ? 'bg-green-500' : ($timelineStatus['wawancara']['current'] ? 'bg-yellow-500 animate-pulse' : 'bg-gray-300') }} p-6 rounded-full text-white z-10">
-                                <i class="fas {{ $timelineStatus['wawancara']['completed'] ? 'fa-check' : 'fa-comments' }} text-lg"></i>
+                            @php
+                                $showAsCompleted = $santri->status_santri === 'daftar_ulang' || $timelineStatus['wawancara']['completed'];
+                            @endphp
+                            <div class="{{ $showAsCompleted ? 'bg-green-500' : ($timelineStatus['wawancara']['current'] ? 'bg-yellow-500 animate-pulse' : 'bg-gray-300') }} p-6 rounded-full text-white z-10">
+                                <i class="fas {{ $showAsCompleted ? 'fa-check' : 'fa-comments' }} text-lg"></i>
                             </div>
                             <div class="ml-6">
-                                <h3 class="text-lg font-semibold {{ $timelineStatus['wawancara']['completed'] ? 'text-gray-900' : ($timelineStatus['wawancara']['current'] ? 'text-gray-900' : 'text-gray-500') }}">Wawancara</h3>
-                                @if($timelineStatus['wawancara']['date'])
+                                <h3 class="text-lg font-semibold {{ $showAsCompleted ? 'text-gray-900' : ($timelineStatus['wawancara']['current'] ? 'text-gray-900' : 'text-gray-500') }}">Wawancara</h3>
+                                @if($showAsCompleted)
+                                    <p class="text-green-600">✓ Wawancara telah selesai</p>
+                                    @if($timelineStatus['wawancara']['date'])
+                                        <p class="text-sm text-gray-600 font-medium">
+                                            <i class="fas fa-calendar-alt mr-1"></i>
+                                            {{ $timelineStatus['wawancara']['date'] }}
+                                        </p>
+                                    @endif
+                                @elseif($timelineStatus['wawancara']['date'])
                                     <p class="text-gray-600">
                                         {{ $timelineStatus['wawancara']['mode'] == 'online' ? 'Wawancara Online' : 'Wawancara Tatap Muka' }}
                                     </p>
-                                    <p class="text-sm {{ $timelineStatus['wawancara']['completed'] ? 'text-green-600' : 'text-blue-600' }} font-medium">
+                                    <p class="text-sm text-blue-600 font-medium">
                                         <i class="fas fa-calendar-alt mr-1"></i>
                                         {{ $timelineStatus['wawancara']['date'] }} {{ $timelineStatus['wawancara']['time'] }}
                                     </p>
@@ -179,30 +198,81 @@
 
                         <!-- Step 3 - Ujian Online -->
                         <div class="relative flex items-center">
-                            <div class="{{ $timelineStatus['ujian']['completed'] ? 'bg-green-500' : ($timelineStatus['ujian']['current'] ? 'bg-yellow-500 animate-pulse' : 'bg-gray-300') }} p-6 rounded-full text-white z-10">
-                                <i class="fas {{ $timelineStatus['ujian']['completed'] ? 'fa-check' : 'fa-edit' }} text-lg"></i>
+                            @php
+                                $showAsCompleted = $santri->status_santri === 'daftar_ulang' || $timelineStatus['ujian']['completed'];
+                            @endphp
+                            <div class="{{ $showAsCompleted ? 'bg-green-500' : ($timelineStatus['ujian']['current'] ? 'bg-yellow-500 animate-pulse' : 'bg-gray-300') }} p-6 rounded-full text-white z-10">
+                                <i class="fas {{ $showAsCompleted ? 'fa-check' : 'fa-edit' }} text-lg"></i>
                             </div>
                             <div class="ml-6">
-                                <h3 class="text-lg font-semibold {{ $timelineStatus['ujian']['completed'] ? 'text-gray-900' : ($timelineStatus['ujian']['current'] ? 'text-gray-900' : 'text-gray-500') }}">Ujian Online</h3>
-                                @if($timelineStatus['ujian']['current'])
+                                <h3 class="text-lg font-semibold {{ $showAsCompleted ? 'text-gray-900' : ($timelineStatus['ujian']['current'] ? 'text-gray-900' : 'text-gray-500') }}">Ujian Online</h3>
+                                @if($showAsCompleted)
+                                    <p class="text-green-600">✓ Ujian telah selesai</p>
+                                    @if($timelineStatus['ujian']['date'])
+                                        <p class="text-sm text-gray-600 font-medium">
+                                            <i class="fas fa-calendar-alt mr-1"></i>
+                                            {{ $timelineStatus['ujian']['date'] }}
+                                        </p>
+                                    @endif
+                                @elseif($timelineStatus['ujian']['current'])
                                     <p class="text-gray-600">Silahkan mengikuti ujian online</p>
                                     <a href="{{ route('santri.dashboard-ujian') }}" class="inline-block mt-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition duration-300">
                                         <i class="fas fa-external-link-alt mr-2"></i>
                                         Menuju Dashboard Ujian
                                     </a>
-                                @elseif($timelineStatus['ujian']['completed'])
-                                    <p class="text-green-600">Ujian telah selesai</p>
-                                    <p class="text-sm text-gray-600 font-medium">
-                                        <i class="fas fa-calendar-alt mr-1"></i>
-                                        {{ $timelineStatus['ujian']['date'] }}
-                                    </p>
                                 @else
-                                    <p class="text-gray-500">Menunggu tahap ujian</p>
+                                    <p class="text-gray-600">Menunggu jadwal ujian</p>
                                 @endif
                             </div>
                         </div>
 
-                        <!-- Step 4 - Pengumuman Hasil -->
+                        <!-- Step 4 - Daftar Ulang -->
+                        <div class="relative flex items-center mt-8">
+                            <div class="{{ $timelineStatus['daftar_ulang']['completed'] ? 'bg-green-500' : ($timelineStatus['daftar_ulang']['current'] ? 'bg-yellow-500 animate-pulse' : 'bg-gray-300') }} p-6 rounded-full text-white z-10">
+                                <i class="fas {{ $timelineStatus['daftar_ulang']['completed'] ? 'fa-check' : 'fa-clipboard-list' }} text-lg"></i>
+                            </div>
+                            <div class="ml-6">
+                                <h3 class="text-lg font-semibold {{ $timelineStatus['daftar_ulang']['completed'] ? 'text-gray-900' : ($timelineStatus['daftar_ulang']['current'] ? 'text-gray-900' : 'text-gray-500') }}">Daftar Ulang</h3>
+                                @if($timelineStatus['daftar_ulang']['current'])
+                                    @if($santri->status_pembayaran === 'rejected')
+                                        <p class="text-red-600">Verifikasi pembayaran ditolak</p>
+                                        @if($santri->catatan_verifikasi)
+                                            <p class="text-sm text-gray-600 mb-2">
+                                                <i class="fas fa-info-circle mr-1"></i>
+                                                Catatan: {{ $santri->catatan_verifikasi }}
+                                            </p>
+                                        @endif
+                                        <p class="text-gray-600">Silakan melakukan pendaftaran ulang kembali</p>
+                                        <a href="{{ route('santri.daftar-ulang') }}" class="inline-block mt-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition duration-300">
+                                            <i class="fas fa-redo mr-2"></i>
+                                            Upload Ulang Bukti Pembayaran
+                                        </a>
+                                    @elseif($santri->status_pembayaran === 'pending')
+                                        <p class="text-yellow-600">Menunggu verifikasi pembayaran</p>
+                                        <p class="text-sm text-gray-600 font-medium">
+                                            <i class="fas fa-calendar-alt mr-1"></i>
+                                            Tanggal Upload: {{ \Carbon\Carbon::parse($santri->tanggal_pembayaran)->format('d F Y') }}
+                                        </p>
+                                    @else
+                                        <p class="text-gray-600">Silakan melakukan pendaftaran ulang</p>
+                                        <a href="{{ route('santri.daftar-ulang') }}" class="inline-block mt-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition duration-300">
+                                            <i class="fas fa-clipboard-check mr-2"></i>
+                                            Menuju Halaman Daftar Ulang
+                                        </a>
+                                    @endif
+                                @elseif($timelineStatus['daftar_ulang']['completed'])
+                                    <p class="text-green-600">Pendaftaran ulang telah diverifikasi</p>
+                                    <p class="text-sm text-gray-600 font-medium">
+                                        <i class="fas fa-calendar-alt mr-1"></i>
+                                        {{ $timelineStatus['daftar_ulang']['date'] }}
+                                    </p>
+                                @else
+                                    <p class="text-gray-600">Menunggu tahap daftar ulang</p>
+                                @endif
+                            </div>
+                        </div>
+
+                        <!-- Step 5 - Pengumuman Hasil -->
                         <div class="relative flex items-center">
                             <div class="{{ isset($timelineStatus['pengumuman_hasil']) && $timelineStatus['pengumuman_hasil']['completed'] ? 'bg-green-500' : 'bg-gray-300' }} p-6 rounded-full text-white z-10">
                                 <i class="fas {{ isset($timelineStatus['pengumuman_hasil']) && $timelineStatus['pengumuman_hasil']['completed'] ? 'fa-check' : 'fa-bullhorn' }} text-lg"></i>
@@ -344,6 +414,51 @@
                             Tetap semangat untuk masa depan yang cerah!
                         </p>
                     </div>
+                @elseif($santri->status_santri == 'daftar_ulang')
+                    <div class="flex items-center justify-between mb-4">
+                        @if($santri->status_pembayaran === 'rejected')
+                            <div class="bg-red-100 p-3 rounded-full">
+                                <i class="fas fa-times text-red-600 text-2xl"></i>
+                            </div>
+                            <span class="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium">Ditolak</span>
+                        @elseif($santri->status_pembayaran === 'pending')
+                            <div class="bg-yellow-100 p-3 rounded-full">
+                                <i class="fas fa-clock text-yellow-600 text-2xl"></i>
+                            </div>
+                            <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">Menunggu Verifikasi</span>
+                        @else
+                            <div class="bg-blue-100 p-3 rounded-full">
+                                <i class="fas fa-clipboard-list text-blue-600 text-2xl"></i>
+                            </div>
+                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">Daftar Ulang</span>
+                        @endif
+                    </div>
+                    
+                    @if($santri->status_pembayaran === 'rejected')
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Verifikasi Pembayaran Ditolak</h3>
+                        <p class="text-gray-600 mb-4">Mohon maaf, pembayaran Anda tidak dapat diverifikasi. Silakan lakukan upload ulang bukti pembayaran.</p>
+                        @if($santri->catatan_verifikasi)
+                            <div class="bg-red-50 p-4 rounded-lg mb-4">
+                                <p class="text-sm text-red-800 font-medium">
+                                    <i class="fas fa-info-circle mr-2"></i>
+                                    Catatan: {{ $santri->catatan_verifikasi }}
+                                </p>
+                            </div>
+                        @endif
+                        <a href="{{ route('santri.daftar-ulang') }}" class="inline-block px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition duration-300">
+                            <i class="fas fa-redo mr-2"></i>
+                            Upload Ulang Bukti Pembayaran
+                        </a>
+                    @elseif($santri->status_pembayaran === 'pending')
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Menunggu Verifikasi</h3>
+                        <p class="text-gray-600 mb-4">Bukti pembayaran Anda sedang dalam proses verifikasi. Mohon tunggu informasi selanjutnya.</p>
+                        <div class="bg-yellow-50 p-4 rounded-lg">
+                            <p class="text-sm text-yellow-800 font-medium">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                Kami akan menginformasikan hasil verifikasi melalui email dan WhatsApp.
+                            </p>
+                        </div>
+                    @endif
                 @endif
             </div>
         </div>

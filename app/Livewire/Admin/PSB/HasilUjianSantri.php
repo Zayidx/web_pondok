@@ -140,9 +140,9 @@ class HasilUjianSantri extends Component
         $santri = PendaftaranSantri::findOrFail($id);
         $santri->update([
             'status' => 'diterima',
-            'status_santri' => 'diterima'
+            'status_santri' => 'daftar_ulang'
         ]);
-        session()->flash('success', 'Santri berhasil diterima');
+        session()->flash('success', 'Santri berhasil diterima dan akan melakukan pendaftaran ulang');
     }
 
     public function tolakSantri($id)

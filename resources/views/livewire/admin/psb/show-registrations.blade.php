@@ -97,6 +97,8 @@
                                         @endif
                                     @elseif($registration->status_santri === 'sedang_ujian')
                                         <span class="badge bg-primary">Sedang Ujian</span>
+                                        @elseif($registration->status_santri === 'daftar_ulang')
+                                        <span class="badge bg-warning">Sedang Daftar Ulang</span>
                                     @elseif($registration->status_santri === 'diterima')
                                         <span class="badge bg-success">Diterima</span>
                                     @elseif($registration->status_santri === 'ditolak')
@@ -124,6 +126,13 @@
                                                 wire:confirm="Apakah Anda yakin ingin membatalkan jadwal wawancara santri ini?"
                                                 class="btn btn-sm btn-danger me-1">
                                             <i class="bi bi-calendar-x"></i> Batalkan Wawancara
+                                        </button>
+                                 
+                                    @elseif($registration->status_santri === 'daftar_ulang')
+                                        <button wire:click="cancelDaftarUlang({{ $registration->id }})"
+                                                wire:confirm="Apakah Anda yakin ingin membatalkan daftar ulang santri ini? Status akan dikembalikan ke tahap diterima."
+                                                class="btn btn-sm btn-danger me-1">
+                                            <i class="bi bi-calendar-x"></i> Batalkan Daftar Ulang
                                         </button>
                                     @endif
                                     @if(in_array($registration->status_santri, ['diterima', 'ditolak']))

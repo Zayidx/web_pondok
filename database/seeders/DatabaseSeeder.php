@@ -37,6 +37,7 @@ class DatabaseSeeder extends Seeder
             PengumumanSeeder::class,
             KegiatanSeeder::class,
             PasswordSantriSeeder::class,
+            PeriodeSeeder::class,
             PpdbSantriSeeder::class,
             UjianSeeder::class,
             SantriUjianSeeder::class,

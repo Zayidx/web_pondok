@@ -55,6 +55,6 @@ class SantriAuthController extends Controller
         $request->session()->invalidate();
         $request->session()->regenerateToken();
         
-        return redirect()->route('login-santri');
+        return redirect()->route('login-ppdb-santri');
     }
 } 

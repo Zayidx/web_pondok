@@ -6,11 +6,13 @@ use App\Models\HasilUjian;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
+use Livewire\Attributes\Layout;
 
 class SantriDashboard extends Component
 {
     use WithPagination;
     #[Title('Dashboard Santri')]
+    #[Layout('components.layouts.pendaftaran-santri-app')]
 
     #[Computed]
     public function listHasilUjian()

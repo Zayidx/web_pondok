@@ -58,7 +58,7 @@ class RegisterSantri extends Component
         'santriForm.jenis_kelamin' => 'required|in:L,P',
         'santriForm.agama' => 'required|in:Islam,Kristen,Katolik,Hindu,Buddha,Konghucu',
         'santriForm.email' => 'required|email|max:255|unique:psb_pendaftaran_santri,email',
-        'santriForm.no_whatsapp' => 'required|regex:/^[0-9]{10,13}$/',
+        'santriForm.no_whatsapp' => 'required|regex:/^62[0-9]{9,12}$/',
         'santriForm.asal_sekolah' => 'required|string|max:255',
         'santriForm.tahun_lulus' => 'required|in:2024,2025',
         'santriForm.tipe_pendaftaran' => 'required|in:reguler,olimpiade,internasional',
@@ -101,7 +101,7 @@ class RegisterSantri extends Component
         'santriForm.email.max' => 'Email tidak boleh lebih dari 255 karakter.',
         'santriForm.email.unique' => 'Email sudah terdaftar. Silakan gunakan email lain.',
         'santriForm.no_whatsapp.required' => 'Nomor WhatsApp harus diisi.',
-        'santriForm.no_whatsapp.regex' => 'Nomor WhatsApp harus terdiri dari 10 hingga 13 digit angka tanpa spasi atau tanda baca.',
+        'santriForm.no_whatsapp.regex' => 'Nomor WhatsApp harus diawali dengan 62 dan terdiri dari 11-14 digit angka tanpa spasi atau tanda baca.',
         'santriForm.asal_sekolah.required' => 'Asal sekolah harus diisi.',
         'santriForm.asal_sekolah.max' => 'Asal sekolah tidak boleh lebih dari 255 karakter.',
         'santriForm.tahun_lulus.required' => 'Tahun lulus harus dipilih.',
@@ -218,7 +218,6 @@ class RegisterSantri extends Component
             }
     
             $santri = \App\Models\PSB\PendaftaranSantri::create([
-                'nama_jenjang' => 'SMA',
                 'nama_lengkap' => $this->santriForm['nama_lengkap'],
                 'nisn' => $this->santriForm['nisn'],
                 'tempat_lahir' => $this->santriForm['tempat_lahir'],
@@ -229,24 +228,17 @@ class RegisterSantri extends Component
                 'no_whatsapp' => $this->santriForm['no_whatsapp'],
                 'asal_sekolah' => $this->santriForm['asal_sekolah'],
                 'tahun_lulus' => $this->santriForm['tahun_lulus'],
-                'status_santri' => 'menunggu',
                 'tipe_pendaftaran' => $this->santriForm['tipe_pendaftaran'],
-                'status_kesantrian' => $this->santriForm['status_kesantrian'],
-                'periode_id' => $periode->id,
+                'status_santri' => 'menunggu',
                 'alamat' => $this->santriForm['alamat'],
-                'nama_ayah' => $this->waliForm['nama_ayah'],
-                'nama_ibu' => $this->waliForm['nama_ibu'],
-                'pekerjaan_ayah' => $this->waliForm['pekerjaan_ayah'],
-                'pekerjaan_ibu' => $this->waliForm['pekerjaan_ibu'],
-                'alamat_ortu' => $this->santriForm['alamat'],
-                'no_telp_ibu' => $this->waliForm['no_telp_ibu'],
+                'periode_id' => $periode->id,
             ]);
     
             \App\Models\PSB\WaliSantri::create([
                 'pendaftaran_santri_id' => $santri->id,
-                'nama_wali' => $this->waliForm['nama_ayah'],
-                'hubungan' => 'ayah',
-                'pekerjaan' => $this->waliForm['pekerjaan_ayah'],
+                'nama_wali' => $this->waliForm['nama_ayah'] ?: $this->waliForm['nama_ibu'],
+                'hubungan' => $this->waliForm['nama_ayah'] ? 'ayah' : 'ibu',
+                'pekerjaan' => $this->waliForm['pekerjaan_ayah'] ?: $this->waliForm['pekerjaan_ibu'],
                 'no_hp' => $this->waliForm['no_telp_ibu'],
                 'alamat' => $this->santriForm['alamat'],
                 'nama_ayah' => $this->waliForm['nama_ayah'],
@@ -273,8 +265,12 @@ class RegisterSantri extends Component
                     \App\Models\PSB\Dokumen::create([
                         'santri_id' => $santri->id,
                         'jenis_berkas' => $doc['jenis'],
+                        'nama_berkas' => $doc['file']->getClientOriginalName(),
                         'file_path' => $path,
-                        'tanggal' => now(),
+                        'file_type' => $doc['file']->getClientOriginalExtension(),
+                        'file_size' => $doc['file']->getSize(),
+                        'is_verified' => false,
+                        'keterangan' => 'Dokumen pendaftaran santri'
                     ]);
                 }
             }
@@ -298,17 +294,17 @@ class RegisterSantri extends Component
     }
 
     public function resetForm()
-{
-    $this->santriForm = array_merge(array_fill_keys(array_keys($this->santriForm), ''), ['status_kesantrian' => 'aktif']);
-    $this->waliForm = array_fill_keys(array_keys($this->waliForm), '');
-    $this->pas_foto = null;
-    $this->ijazah = null;
-    $this->skhun = null;
-    $this->akta_kelahiran = null;
-    $this->kartu_keluarga = null;
-    $this->terms = false;
-    $this->resetErrorBag();
-}
+    {
+        $this->santriForm = array_merge(array_fill_keys(array_keys($this->santriForm), ''), ['status_kesantrian' => 'aktif']);
+        $this->waliForm = array_fill_keys(array_keys($this->waliForm), '');
+        $this->pas_foto = null;
+        $this->ijazah = null;
+        $this->skhun = null;
+        $this->akta_kelahiran = null;
+        $this->kartu_keluarga = null;
+        $this->terms = false;
+        $this->resetErrorBag();
+    }
 
     public function render()
     {

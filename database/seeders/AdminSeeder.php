@@ -43,6 +43,10 @@ class AdminSeeder extends Seeder
                 'user_id' => 8,
                 'roles_id' => 8
             ],
+            [
+                'user_id' => 9,
+                'roles_id' => 9
+            ],
         ];
 
         DB::table('admins')->insert($data);

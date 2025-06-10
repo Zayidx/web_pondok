@@ -33,8 +33,12 @@ class Dokumen extends Model
     protected $fillable = [
         'santri_id',
         'jenis_berkas',
+        'nama_berkas',
         'file_path',
-        'tanggal',
+        'file_type',
+        'file_size',
+        'is_verified',
+        'keterangan'
     ];
 
     /**
@@ -43,7 +47,8 @@ class Dokumen extends Model
      * @var array
      */
     protected $casts = [
-        'tanggal' => 'date',
+        'is_verified' => 'boolean',
+        'file_size' => 'integer'
     ];
 
     /**
