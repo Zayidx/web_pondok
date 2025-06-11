@@ -91,7 +91,8 @@
     </div>
 
     {{-- Modal Create/Update --}}
-    <div class="modal fade" wire:ignore.self id="createOrUpdateKategoriPelajaran" tabindex="-1">
+    <div class="modal fade" wire:ignore.self id="createOrUpdateKategoriPelajaran" tabindex="-1"
+         x-on:close-modal.window="bootstrap.Modal.getInstance($el).hide()">
         <div class="modal-dialog modal-md">
             <div class="modal-content">
                 <form

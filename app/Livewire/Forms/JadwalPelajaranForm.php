@@ -8,8 +8,6 @@ use Livewire\Form;
 class JadwalPelajaranForm extends Form
 {
     //
-    #[Validate('required|exists:jenjangs,id')]
-    public $jenjang_id;
     #[Validate('required|exists:kelas,id')]
     public $kelas_id;
     #[Validate('required|exists:kategori_pelajaran,id')]
@@ -20,7 +18,7 @@ class JadwalPelajaranForm extends Form
     public $waktu_mulai;
     #[Validate('required')]
     public $waktu_selesai;
-    #[Validate('required|in:Senin,Selasa,Rabu,Kamis,Jumat,Sabtu,Minggu')]
+    #[Validate('required|in:senin,selasa,rabu,kamis,jumat,sabtu,minggu')]
     public $hari;
     #[Validate('required|in:diniyyah,umum')]
     public $role_guru;

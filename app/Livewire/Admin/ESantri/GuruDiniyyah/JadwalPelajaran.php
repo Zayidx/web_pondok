@@ -1,11 +1,9 @@
 <?php
-
 namespace App\Livewire\Admin\ESantri\GuruDiniyyah;
 
 use App\Livewire\Forms\JadwalPelajaranForm;
 use App\Models\ESantri\JadwalPelajaran as ModelsJadwalPelajaran;
 use App\Models\ESantri\KategoriPelajaran;
-use App\Models\Jenjang;
 use App\Models\Kelas;
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
@@ -16,21 +14,22 @@ use Livewire\WithPagination;
 class JadwalPelajaran extends Component
 {
     use WithPagination;
-
+    
     protected $paginationTheme = 'bootstrap';
-
+    
     #[Title('Halaman Jadwal Pelajaran')]
     public JadwalPelajaranForm $jadwalPelajaranForm;
-
+    
     public $jadwalPelajaranId;
     public $detailJadwalPelajaranList;
 
-    public $kategoriPelajaranList;
-
-    public $hariList = ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu'];
-
+    public $kelasList, $kategoriPelajaranList;
+    
+    public $hariList = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'];
+    
     public function mount()
     {
+        $this->kelasList = $this->kelasList();
         $this->kategoriPelajaranList = $this->kategoriPelajaranList();
     }
 
@@ -44,17 +43,7 @@ class JadwalPelajaran extends Component
     #[Computed()]
     public function kelasList()
     {
-        if($this->jadwalPelajaranForm->jenjang_id){
-            return Kelas::with('jenjang')->where('jenjang_id', 'LIKE', "%{$this->jadwalPelajaranForm->jenjang_id}%")->get();
-        } else {
-            return [];
-        }
-    }
-
-    #[Computed()]
-    public function jenjangList()
-    {
-        return Jenjang::all();
+        return Kelas::all();
     }
 
     #[Computed()]
@@ -75,11 +64,12 @@ class JadwalPelajaran extends Component
             $this->jadwalPelajaranForm->role_guru = 'diniyyah';
 
             $this->jadwalPelajaranForm->validate();
-
+            
             ModelsJadwalPelajaran::create($this->jadwalPelajaranForm->all());
+            
+            session()->flash('success', 'Jadwal Pelajaran baru berhasil dibuat!');
+            $this->dispatch('close-modal');
 
-            return to_route('e-santri-guru-diniyyah.jadwal-pelajaran')->with('success', 'Jadwal Pelajaran berhasil dibuat!');
-            // $this->dispatch('close-modal');
         } catch (\Exception $e) {
             session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
@@ -98,12 +88,12 @@ class JadwalPelajaran extends Component
             $this->jadwalPelajaranForm->role_guru = 'diniyyah';
 
             $this->jadwalPelajaranForm->validate();
-
+            
             ModelsJadwalPelajaran::findOrFail($this->jadwalPelajaranId)
                 ->update($this->jadwalPelajaranForm->all());
-
-            return to_route('e-santri-guru-diniyyah.jadwal-pelajaran')->with('success', 'Jadwal Pelajaran berhasil diupdate!');
-            // $this->dispatch('close-modal');
+            
+            session()->flash('success', 'Jadwal Pelajaran berhasil diupdate!');
+            $this->dispatch('close-modal');
         } catch (\Exception $e) {
             session()->flash('error', 'Terjadi kesalahan: ' . $e->getMessage());
         }
@@ -112,14 +102,14 @@ class JadwalPelajaran extends Component
     public function deleteJadwalPelajaran($id)
     {
         $jadwal = ModelsJadwalPelajaran::findOrFail($id);
+        session()->flash('success', 'Berhasil hapus jadwal pelajaran');
         $jadwal->delete();
-        return to_route('e-santri-guru-diniyyah.jadwal-pelajaran')->with('success', 'Berhasil hapus jadwal pelajaran');
     }
 
     public function detailJadwalPelajaran($id)
     {
         $this->detailJadwalPelajaranList = ModelsJadwalPelajaran::where('role_guru', 'diniyyah')->with(['kelas', 'kategoriPelajaran'])
-            ->findOrFail($id);
+            ->findOrFail($id);  
     }
 
     public function render()

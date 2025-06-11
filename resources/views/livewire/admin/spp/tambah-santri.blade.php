@@ -11,13 +11,20 @@
         <div class="card-body">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <!-- Filter Section -->
-                <form wire:submit="cariSantri" class="d-flex gap-3">
+                <div class="d-flex gap-3">
                     <!-- Search Form -->
-                    <input type="text" wire:model="search" placeholder="Cari santri..."
-                        class="form-control border border-2 rounded-start-3 py-2" style="width: 250px;">
+                    <div class="position-relative d-flex">
+                        <form wire:submit="cariSantri" class="d-flex w-100">
+                            <input type="text" wire:model="search" placeholder="Cari santri..."
+                                class="form-control border border-2 rounded-start-3 py-2" style="width: 250px;">
+                            <button type="submit" class="btn btn-outline-secondary border-0 rounded-end-3 py-2">
+                                <i class="bi bi-search"></i>
+                            </button>
+                        </form>
+                    </div>
 
                     <!-- Jenjang Dropdown -->
-                    <select wire:model="filterList.jenjang"
+                    <select wire:model="filterList.jenjang" wire:change="cariSantri"
                         class="form-select py-2 rounded-3 border-2" wire:loading.attr="disabled">
                         <option value="">Pilih Jenjang</option>
                         @foreach ($jenjangOptions as $jenjang)
@@ -26,7 +33,7 @@
                     </select>
 
                     <!-- Kelas Dropdown -->
-                    <select wire:model="filterList.kelas"
+                    <select wire:model="filterList.kelas" wire:change="cariSantri"
                         class="form-select py-2 rounded-3 border-2" wire:loading.attr="disabled">
                         <option value="">Pilih Kelas</option>
                         @foreach ($kelasOptions as $kelas)
@@ -34,16 +41,14 @@
                         @endforeach
                     </select>
 
-                    <select wire:model="filterList.tahun"
+                    <select wire:model="filterList.tahun" wire:change="cariSantri"
                         class="form-select py-2 rounded-3 border-2" wire:loading.attr="disabled">
                         <option value="">Pilih Tahun</option>
                         @foreach ($tahunOptions as $tahun)
                             <option value="{{ $tahun->nama_tahun }}">{{ $tahun->nama_tahun }}</option>
                         @endforeach
                     </select>
-
-                    <button type="submit" class="btn btn-primary w-25">Cari</button>
-                </form>
+                </div>
 
                 <!-- Button Tambah SPP -->
                 <button type="button" class="btn btn-primary d-flex align-items-center gap-2 py-2 px-3 rounded-3"
@@ -134,7 +139,7 @@
                             <form wire:submit.prevent="filterTambahSantris">
                                 <div class="d-flex gap-3 mb-3">
                                     <!-- Dropdown Jenjang -->
-                                    <select wire:model="filterTambah.jenjang"
+                                    <select wire:model="filterTambah.jenjang" wire:change='filterTambahSantris'
                                         class="form-select" wire:loading.attr="disabled">
                                         <option value="">Pilih Jenjang</option>
                                         @foreach ($jenjangOptions as $jenjang)
@@ -143,7 +148,7 @@
                                     </select>
 
                                     <!-- Dropdown Kelas -->
-                                    <select wire:model="filterTambah.kelas"
+                                    <select wire:model="filterTambah.kelas" wire:change='filterTambahSantris'
                                         class="form-select" wire:loading.attr="disabled">
                                         <option value="">Pilih Kelas</option>
                                         @foreach ($kelasOptions as $kelas)
@@ -151,7 +156,7 @@
                                         @endforeach
                                     </select>
 
-                                    <select wire:model="filterTambah.tahun"
+                                    <select wire:model="filterTambah.tahun" wire:change='filterTambahSantris'
                                         class="form-select" wire:loading.attr="disabled">
                                         <option value="">Pilih Tahun</option>
                                         @foreach ($tahunOptions as $tahun)

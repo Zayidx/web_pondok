@@ -9,7 +9,6 @@ use App\Models\Spp\Pembayaran;
 use App\Models\Spp\PembayaranTimeline;
 use Carbon\Carbon;
 use Detection\MobileDetect;
-use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -20,7 +19,7 @@ class Dashboard extends Component
     #[Title('Dashboard Santri')]
     public $detailKegiatanModal, $detailPengumumanModal;
 
-    public $profile, $credentials, $timeline_spp, $pembayaran, $jadwalPelajaran, $jadwalHari;
+    public $profile, $credentials, $timeline_spp, $pembayaran;
     public $setStatusSpp, $isMobile;
 
     public function mount()
@@ -42,6 +41,9 @@ class Dashboard extends Component
             if (!$this->profile) {
                 throw new \Exception('Data santri tidak ditemukan');
             }
+        $this->profile = Santri::with('kamar', 'kelas', 'semester', 'angkatan')->where('nama', auth()->user()->name)->first();
+        $this->timeline_spp = PembayaranTimeline::all();
+        $this->setStatusSpp = Carbon::now()->format('F');
 
             // Get timeline SPP
             $this->timeline_spp = PembayaranTimeline::all();
@@ -95,6 +97,15 @@ class Dashboard extends Component
         } catch (\Exception $e) {
             $this->pembayaran = collect();
         }
+    public function updatedSetStatusSpp($value)
+    {
+        $this->pembayaran = Pembayaran::with('pembayaranTimeline', 'santri')
+            ->whereHas('santri', function ($query) {
+                return $query->where('nama', auth()->user()->name);
+            })
+            ->whereHas('pembayaranTimeline', function ($query) use ($value) {
+                return $query->where('nama_bulan', $value);
+            })->first();
     }
 
     #[Computed]

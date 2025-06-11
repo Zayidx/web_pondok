@@ -14,7 +14,7 @@ Route::prefix('spp')->middleware('auth')->group(function () {
     Route::get('/pembayaran-cicilan', Spp\PembayaranCicilan::class)->name('spp.pembayaran-cicilan');
     Route::get('/tambah-santri', Spp\TambahSantri::class)->name('spp.tambah-santri');
     Route::get('/detail-laporan-spp-santri/{id}', Spp\DetailLaporanSppSantri::class)->name('spp.detail-laporan-spp-santri');
-    Route::get('/detail-laporan-cicilan-santri/{id}/{bulan?}/{tahun?}', Spp\DetailLaporanCicilanSantri::class)->name('spp.detail-laporan-cicilan-santri');
+    Route::get('/detail-laporan-cicilan-santri/{id}/{bulan?}', Spp\DetailLaporanCicilanSantri::class)->name('spp.detail-laporan-cicilan-santri');
 
     Route::get('/laporan-keuangan', Spp\LaporanKeuangan::class)->name('spp.laporan-keuangan');
 

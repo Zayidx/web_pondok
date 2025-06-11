@@ -24,10 +24,10 @@ class DetailLaporanCicilanSantri extends Component
 
     public $cicilan, $tahunList, $bulanList, $total_cicilan, $total_nominal, $total_cicilan_belum_bayar;
 
-    public function mount($id, $bulan = null, $tahun = null)
+    public function mount($id, $bulan = null)
     {
         $this->filter['bulan'] = $bulan ?? Carbon::now()->monthName;
-        $this->filter['tahun'] = $tahun ?? date('Y');
+        $this->filter['tahun'] = date('Y');
         
         $this->santriId = $id;
 

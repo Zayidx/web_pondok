@@ -83,11 +83,57 @@
             </div>
         </div>
         <div class="card-body">
+            <div id="transactionChart"></div>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
             <div class="row">
-                <div class="col-lg-6">
-                    <div id="transactionChart"></div>
+                <ul class="nav nav-tabs card-header-tabs col-12 col-md-7 d-flex align-items-center mb-2 mb-md-0"
+                    role="tablist">
+                    <li class="nav-item">
+                        <a class="nav-link active" data-bs-toggle="tab" href="#jadwal-piket">Jadwal Piket</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" data-bs-toggle="tab" href="#mata-pelajaran">Mata Pelajaran</a>
+                    </li>
+                </ul>
+                <div
+                    class="col-12 col-md-5 d-flex mt-md-0 mt-4 flex-column flex-md-row justify-content-md-end align-items-start align-items-md-center gap-2">
+
+                    <select class="form-select" aria-label="Filter Kelas">
+                        @foreach ($kelasList as $kelas)
+                        <option value="{{ $kelas->nama }}">{{ $kelas->nama }}</option>
+                        @endforeach
+                    </select>
+                    <select class="form-select" aria-label="Filter Bulan">
+                        <option value="1">Januari</option>
+                        <option value="2">Februari</option>
+                        <option value="3">Maret</option>
+                        <option value="4">April</option>
+                        <option value="5">Mei</option>
+                        <option value="6">Juni</option>
+                        <option value="7">Juli</option>
+                        <option value="8">Agustus</option>
+                        <option value="9">September</option>
+                        <option value="10">Oktober</option>
+                        <option value="11">November</option>
+                        <option value="12">Desember</option>
+                    </select>
+                    <select class="form-select" aria-label="Filter Tahun">
+                        <option value="2024">2024</option>
+                        <option value="2023">2023</option>
+                        <option value="2022">2022</option>
+                        <option value="2021">2021</option>
+                    </select>
                 </div>
-                <div class="col-lg-6">
+            </div>
+        </div>
+        <div class="card-body mt-4">
+            <div class="tab-content">
+                <!-- Jadwal Piket -->
+                <div class="tab-pane fade show active" id="jadwal-piket">
                     <div class="table-responsive">
                         <table class="table table-hover">
                             <thead>
@@ -119,80 +165,42 @@
                         </table>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
 
-    <div class="card">
-        <div class="card-header">
-            <div class="row">
-                <ul class="card-header-tabs col-12 col-md-7 d-flex align-items-center mb-2 mb-md-0">
-                    <h5>Mata Pelajaran</h5>
-                </ul>
-                <div
-                    class="col-12 col-md-5 d-flex mt-md-0 mt-4 flex-column flex-md-row justify-content-md-end align-items-start align-items-md-center gap-2">
-
-                    <select class="form-select" aria-label="Filter Kelas">
-                        @foreach ($kelasList as $kelas)
-                            <option value="{{ $kelas->nama }}">{{ $kelas->nama }}</option>
-                        @endforeach
-                    </select>
-                    <select class="form-select" aria-label="Filter Bulan">
-                        <option value="1">Januari</option>
-                        <option value="2">Februari</option>
-                        <option value="3">Maret</option>
-                        <option value="4">April</option>
-                        <option value="5">Mei</option>
-                        <option value="6">Juni</option>
-                        <option value="7">Juli</option>
-                        <option value="8">Agustus</option>
-                        <option value="9">September</option>
-                        <option value="10">Oktober</option>
-                        <option value="11">November</option>
-                        <option value="12">Desember</option>
-                    </select>
-                    <select class="form-select" aria-label="Filter Tahun">
-                        <option value="2024">2024</option>
-                        <option value="2023">2023</option>
-                        <option value="2022">2022</option>
-                        <option value="2021">2021</option>
-                    </select>
+                <!-- Mata Pelajaran -->
+                <div class="tab-pane fade" id="mata-pelajaran">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Mata Pelajaran</th>
+                                    <th> Kelas</th>
+                                    <th>Kategori</th>
+                                    <th>Waktu Mulai</th>
+                                    <th>Waktu Selesai</th>
+                                    <th>Hari</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse($jadwalPelajaran as $pelajaran)
+                                    <tr>
+                                        <td>{{ $loop->iteration }}</td>
+                                        <td>{{ $pelajaran->mata_pelajaran }}</td>
+                                        <td>{{ $pelajaran->kelas->nama ?? 'N/A' }}</td>
+                                        <td>{{ $pelajaran->kategoriPelajaran->nama ?? 'N/A' }}</td>
+                                        <td>{{ $pelajaran->waktu_mulai }}</td>
+                                        <td>{{ $pelajaran->waktu_selesai }}</td>
+                                        <td>{{ $pelajaran->hari }}</td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="7" class="text-center">Tidak ada mata pelajaran</td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="card-body mt-4">
-            {{-- Mata Pelajaran --}}
-            <div class="table-responsive">
-                <table class="table table-hover">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Mata Pelajaran</th>
-                            <th> Kelas</th>
-                            <th>Kategori</th>
-                            <th>Waktu Mulai</th>
-                            <th>Waktu Selesai</th>
-                            <th>Hari</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @forelse($jadwalPelajaran as $pelajaran)
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $pelajaran->mata_pelajaran }}</td>
-                                <td>{{ $pelajaran->kelas->nama ?? 'N/A' }}</td>
-                                <td>{{ $pelajaran->kategoriPelajaran->nama ?? 'N/A' }}</td>
-                                <td>{{ $pelajaran->waktu_mulai }}</td>
-                                <td>{{ $pelajaran->waktu_selesai }}</td>
-                                <td>{{ $pelajaran->hari }}</td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="7" class="text-center">Tidak ada mata pelajaran</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>

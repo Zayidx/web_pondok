@@ -3,8 +3,8 @@
         <div class="d-flex align-items-center gap-3">
             <div class="position-relative" style="width: 60px; height: 60px;">
                 @if ($profile && $profile->foto)
-                    <img class="img-fluid rounded-circle" src="{{ Storage::url($profile->foto) }}" alt=""
-                        style="object-fit: cover; width: 100%; height: 100%;">
+                    <img class="img-fluid rounded-circle" src="{{ Storage::url($profile->foto) }}"
+                        alt="" style="object-fit: cover; width: 100%; height: 100%;">
                 @else
                     <img class="img-fluid rounded-circle"
                         src="https://a.storyblok.com/f/191576/1200x800/a3640fdc4c/profile_picture_maker_before.webp"
@@ -12,7 +12,7 @@
                 @endif
             </div>
             <div class="">
-                <h class="mb-0 text-dark fw-bold">Halo, {{ explode(' ', Auth::guard('santri')->user()->nama)[0] }}!</h>
+                <h class="mb-0 text-dark fw-bold">Halo, {{ explode(' ', auth()->user()->name)[0] }}!</h>
                 <p class="m-0 mt-1"><span class="badge bg-primary">{{ $profile?->kelas->nama ?? '-' }}</span></p>
             </div>
         </div>
@@ -20,9 +20,8 @@
             <i class="bi text-dark fs-4 bi-eye"></i>
         </a>
     </div>
-
     <div class="">
-        {{-- <div class="scroll-container">
+        <div class="scroll-container">
             <div class="card bg-primary mt-4 shadow">
                 <div class="card-body">
                     <h6 class="card-title text-white">Perkembangan Akademik</h6>
@@ -57,12 +56,12 @@
                     </div>
                 </div>
             </div>
-        </div> --}}
+        </div>
 
         <div class="card mt-3">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
-                    <h6 class="card-title text-dark m-0 d-inline-flex align-items-center gap-2">Status SPP: <div
+                    <h6 class="card-title text-dark m-0 d-inline-flex align-items-center gap-2">Status SPP <div
                             class="status-spp">
                             @php
                                 $statusClass = 'bg-secondary';
@@ -100,36 +99,42 @@
             <div class="d-flex mb-3 align-items-center justify-content-between">
                 <h6 class="card-title text-dark">Jadwal Hari Ini</h6>
                 <div class="form-group">
-                    <select wire:model.live='jadwalHari' class="form-control form-control-md" name=""
-                        id="">
-                        <option value="Senin">Senin</option>
-                        <option value="Selasa">Selasa</option>
-                        <option value="Rabu">Rabu</option>
-                        <option value="Kamis">Kamis</option>
-                        <option value="Jumat">Jum'at</option>
-                        <option value="Sabtu">Sabtu</option>
-                        <option value="Minggu">Minggu</option>
+                    <select class="form-control form-control-sm" name="" id="">
+                        <option>Senin</option>
+                        <option>Selasa</option>
+                        <option>Rabu</option>
+                        <option>Kamis</option>
+                        <option>Jum'at</option>
                     </select>
                 </div>
             </div>
             <div class="d-flex flex-column gap-md-3 gap-2">
-                @forelse ($this->getMataPelajaran() ?? [] as $mapel)
-                    <div class="d-flex justify-content-between align-items-center pb-2 rounded">
-                        <div>
-                            <h6 class="fw-medium text-dark mb-2">{{ $mapel->mata_pelajaran }}</h6>
-                            <p class="card-subtitle text-sm text-dark mb-0">
-                                {{ \Carbon\Carbon::parse($mapel->waktu_mulai)->format('H:i') }} -
-                                {{ \Carbon\Carbon::parse($mapel->waktu_selesai)->format('H:i') }}</p>
-                        </div>
+                <div class="d-flex justify-content-between align-items-center pb-2 rounded">
+                    <div>
+                        <h6 class="fw-medium text-dark mb-2">Tahfidz</h6>
+                        <p class="card-subtitle text-dark mb-0">04:30 - 06:00</p>
                     </div>
-                @empty
-                    <p>Belum ada mata pelajaran.</p>
-                @endforelse
+                    <span class="badge bg-success">Sekarang</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center pb-2 rounded">
+                    <div>
+                        <h6 class="fw-medium text-dark mb-2">Tahfidz</h6>
+                        <p class="card-subtitle text-dark mb-0">04:30 - 06:00</p>
+                    </div>
+                    <span class="badge bg-success">Sekarang</span>
+                </div>
+                <div class="d-flex justify-content-between align-items-center rounded">
+                    <div>
+                        <h6 class="fw-medium text-dark mb-2">Tahfidz</h6>
+                        <p class="card-subtitle text-dark mb-0">04:30 - 06:00</p>
+                    </div>
+                    <span class="badge bg-success">Sekarang</span>
+                </div>
             </div>
         </div>
     </div>
 
-    {{-- <div class="mt-4">
+    <div class="mt-4">
         <div class="card">
             <div class="card-body">
                 <h6 class="card-title text-dark">Jadwal Piket</h6>
@@ -165,7 +170,7 @@
                 </div>
             </div>
         </div>
-    </div> --}}
+    </div>
 
     <div class="mt-4">
         <div class="card">
@@ -176,9 +181,8 @@
                         Semua</a>
                 </div>
                 @forelse ($this->listPengumuman() as $item)
-                    <div style="background-color: #f5f5f5;" data-bs-toggle="modal"
-                        wire:click='detailPengumuman("{{ $item->id }}")' data-bs-target="#detailPengumuman"
-                        class="p-3">
+                    <div style="background-color: #f5f5f5;" data-bs-toggle="modal" wire:click='detailPengumuman("{{ $item->id }}")'
+                        data-bs-target="#detailPengumuman" class="p-3">
                         <div class="border-start border-info ps-3">
                             <h6 class="fw-bold text-dark mb-2">{{ $item->judul }}</h6>
                             <p class="fw-medium text-dark mb-0">

@@ -11,8 +11,6 @@ class SantriForm extends Form
     public $nama;
     #[Validate('required')]
     public $nisn;
-    #[Validate('nullable')]
-    public $password;
     #[Validate('required')]
     public $nism;
     #[Validate('required')]

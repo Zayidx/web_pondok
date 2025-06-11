@@ -44,13 +44,23 @@ class LoginSantri extends Component
         }
 
         $this->addError('credentials', 'Login gagal, password atau NISN salah.');
+        $user = User::where('email', $this->nisn)->first();
+
+        if (!$user) {
+            $this->addError('nisn', 'NISN tidak ditemukan.');
+            return;
+        }
+
+        if (!Hash::check($this->password, $user->password)) {
+            $this->addError('password', 'Password salah, pastikan password sama dengen NISN');
+            return;
+        }
+
+        Auth::login($user);
+
+        return to_route('santri.dashboard');
     }
 
-    public function logout()
-    {
-        Auth::guard('santri')->logout();
-        return redirect('/auth/login-santri');
-    }
 
     public function render()
     {

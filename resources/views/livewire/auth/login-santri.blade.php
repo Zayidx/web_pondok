@@ -14,6 +14,11 @@
             <div class="form-control-icon">
                 <i class="bi bi-person"></i>
             </div>
+
+            @if ($errors->has('nisn'))
+                <span class="text-danger mt-2">{{ $errors->first('nisn') }}</span>
+            @endif
+
         </div>
         <div x-data="{ show: false }" class="form-group position-relative has-icon-left mb-3">
             <input required :type="show ? 'text' : 'password'" class="form-control form-control-xl"
@@ -24,14 +29,16 @@
             <div class="form-control-icon" style="left:auto; right:0; cursor: pointer;" @click="show = !show">
                 <i :class="!show ? 'bi-eye-slash' : 'bi-eye'"></i>
             </div>
+            @if ($errors->has('password'))
+                <span class="text-danger mt-2">{{ $errors->first('password') }}</span>
+            @endif
         </div>
 
-        @error('credentials')
-            <div class="alert alert-danger mt-3 text-center">
-                Login gagal, password atau NISN salah.
+        @error('error')
+            <div class="text-center text-danger">
+                login gagal, password atau nisn salah
             </div>
         @enderror
-
         <button type="submit" class="btn btn-primary btn-block btn-lg shadow-lg mt-3">
             Log in <span wire:loading.class="spinner-border spinner-border-sm"></span>
         </button>

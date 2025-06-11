@@ -6,7 +6,7 @@
         <h5 class="m-0 text-dark">
             Profile
         </h5>
-        <div data-bs-toggle='modal' wire:click='edit("{{ Auth::guard('santri')->user()->id }}")' data-bs-target="#editProfile" data-bs
+        <div data-bs-toggle='modal' wire:click='edit("{{ auth()->user()->id }}")' data-bs-target="#editProfile" data-bs
             class="arrow-back">
             <i class="bi text-dark fs-5 bi-pencil"></i>
         </div>
@@ -25,7 +25,7 @@
                 @endif
             </div>
             <div class="text-center">
-                <h4 class="mb-0 text-dark fw-bold">{{ Auth::guard('santri')->user()->nama }}</h4>
+                <h4 class="mb-0 text-dark fw-bold">{{ auth()->user()->name }}</h4>
                 <p class="m-0 mt-1"><span class="badge bg-primary">{{ $profile?->kelas->nama ?? '-' }}</span></p>
             </div>
         </div>
@@ -34,9 +34,13 @@
     <div class="mt-4 px-3">
         <div class="card">
             <div class="card-body">
+                <div class="">
+                    <h6 class="mb-2 small text-dark ">Email</h6>
+                    <p class="fw-medium text-dark m-0">{{ auth()->user()->email ?? '-' }}</p>
+                </div>
                 <div class="mt-3">
                     <h6 class="mb-2 small text-dark ">Password</h6>
-                    <p class="fw-medium text-dark m-0">{{ Auth::guard('santri')->user()->password ?? '-' }}</p>
+                    <p class="fw-medium text-dark m-0">{{ auth()->user()->password ?? '-' }}</p>
                 </div>
                 <div class="mt-3">
                     <h6 class="mb-2 small text-dark ">Jenjang</h6>
@@ -87,10 +91,10 @@
                 <form wire:submit.prevent='updateProfileSantri'>
                     <div class="modal-body">
                         <div class="mb-2">
-                            <label for="nama" class="form-label text-dark">Nama</label>
-                            <input type="text" class="form-control" id="nama" wire:model.live="nama"
-                                placeholder="Nama Lengkap" required>
-                            @error('nama')
+                            <label for="email" class="form-label text-dark">Email</label>
+                            <input type="text" class="form-control" id="email" wire:model.live="userForm.email"
+                                placeholder="Email" required>
+                            @error('userForm.email')
                                 <span class="text-danger">{{ $message }}</span>
                             @enderror
                         </div>

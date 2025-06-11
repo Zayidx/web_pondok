@@ -72,7 +72,7 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
         ],
-        
+
         'santris' => [
             'driver' => 'eloquent',
             'model' => App\Models\PSB\PendaftaranSantri::class,

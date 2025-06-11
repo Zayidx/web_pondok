@@ -7,7 +7,7 @@
                 <input type="text" wire:model="search" class="form-control" placeholder="Cari Santri...">
 
                 <div class="d-flex gap-3 w-50">
-                    <select wire:model='filter.jenjang' class="form-select" name=""
+                    <select wire:change='searchSantri' wire:model='filter.jenjang' class="form-select" name=""
                         id="" wire:loading.attr='disabled'>
 
                         <option value="">Pilih Jenjang</option>
@@ -17,18 +17,11 @@
                         @endforeach
                     </select>
 
-                    <select wire:model='filter.kelas' class="form-select" name=""
+                    <select wire:change='searchSantri' wire:model='filter.kelas' class="form-select" name=""
                         id="" wire:loading.attr='disabled'>
                         <option value="">Pilih Kelas</option>
                         @foreach ($kelasOptions as $kelas)
                             <option value="{{ $kelas->nama }}">{{ $kelas->nama }}</option>
-                        @endforeach
-                    </select>
-
-                    <select wire:loading.attr='disabled' wire:model.live="filter.tahunAjaran" class="form-select">
-                        <option value="">Pilih Tahun Ajaran</option>
-                        @foreach ($tahunAjaranOptions as $tahun)
-                            <option value="{{ $tahun->nama_tahun }}">{{ $tahun->nama_tahun }}</option>
                         @endforeach
                     </select>
                 </div>
@@ -180,7 +173,6 @@
                                             <a href="{{ route('spp.detail-laporan-cicilan-santri', [
                                                 'id' => $santriSelected->id,
                                                 'bulan' => $pembayaranSelected->pembayaranTimeline->nama_bulan,
-                                                'tahun' => $pembayaranSelected->tahun_ajaran_id,
                                             ]) }}"
                                                 class="text-decoration-underline {{ $pembayaranSelected->cicilans->isNotEmpty() ? '' : 'd-none' }}">Lihat
                                                 Detail Cicilan</a>

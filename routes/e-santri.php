@@ -22,7 +22,7 @@ Route::prefix('e-santri')->middleware('auth')->group(function () {
     });
 });
 
-Route::prefix('santri')->middleware(['auth:santri'])->group(function () {
+Route::prefix('santri')->middleware('auth')->group(function () {
     Route::get('/dashboard', Santri\Dashboard::class)->name('santri.dashboard');
     Route::get('/profile', Santri\Profile::class)->name('santri.profile');
     Route::get('/kegiatan', Santri\Kegiatan::class)->name('santri.kegiatan');
