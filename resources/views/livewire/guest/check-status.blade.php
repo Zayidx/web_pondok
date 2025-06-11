@@ -2,13 +2,12 @@
 
 @section('content')
 <div>
-    <!-- Navigation -->
     <nav class="bg-white shadow-lg fixed w-full top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <img class="h-10 w-10" src="https://via.placeholder.com/40x40/1e40af/ffffff?text=SMA" alt="Logo SMA"/>
+                        <img class="h-10 w-10" src="https://via.placeholder.com/40x40/1e40af/ffffff?text=SMA" alt="Logo SMA" />
                     </div>
                     <div class="ml-3">
                         <h1 class="text-xl font-bold text-primary">SMA Bina Prestasi</h1>
@@ -34,7 +33,6 @@
                 </div>
             </div>
         </div>
-        <!-- Mobile menu -->
         <div id="mobile-menu" class="md:hidden hidden">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white shadow-lg">
                 <a href="#" class="text-primary block px-3 py-2 rounded-md text-base font-medium bg-blue-50">Dashboard</a>
@@ -49,24 +47,22 @@
         </div>
     </nav>
 
-    <!-- Flash Messages -->
     @if (session()->has('message'))
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-20">
-            <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
-                <span class="block sm:inline">{{ session('message') }}</span>
-            </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-20">
+        <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
+            <span class="block sm:inline">{{ session('message') }}</span>
         </div>
+    </div>
     @endif
 
     @if (session()->has('error'))
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-20">
-            <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
-                <span class="block sm:inline">{{ session('error') }}</span>
-            </div>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-20">
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative" role="alert">
+            <span class="block sm:inline">{{ session('error') }}</span>
         </div>
+    </div>
     @endif
 
-    <!-- Header Section -->
     <section class="bg-gradient-to-br from-blue-50 to-indigo-100 pt-20 pb-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center">
@@ -84,7 +80,6 @@
         </div>
     </section>
 
-    <!-- Student Info -->
     <section class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
@@ -130,7 +125,6 @@
         </div>
     </section>
 
-    <!-- Timeline Section -->
     <section class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
@@ -144,11 +138,8 @@
                     </div>
                 </div>
                 <div class="relative">
-                    <!-- Timeline Line -->
                     <div class="absolute left-8 top-0 bottom-0 w-1 bg-gray-300"></div>
-                    <!-- Timeline Items -->
                     <div class="space-y-8">
-                        <!-- Step 1 - Pendaftaran Online -->
                         <div class="relative flex items-center">
                             <div class="bg-green-500 p-6 rounded-full text-white z-10">
                                 <i class="fas fa-check text-lg"></i>
@@ -160,7 +151,6 @@
                             </div>
                         </div>
 
-                        <!-- Step 2 - Wawancara -->
                         <div class="relative flex items-center">
                             @php
                                 $showAsCompleted = $santri->status_santri === 'daftar_ulang' || $timelineStatus['wawancara']['completed'];
@@ -196,7 +186,6 @@
                             </div>
                         </div>
 
-                        <!-- Step 3 - Ujian Online -->
                         <div class="relative flex items-center">
                             @php
                                 $showAsCompleted = $santri->status_santri === 'daftar_ulang' || $timelineStatus['ujian']['completed'];
@@ -226,7 +215,6 @@
                             </div>
                         </div>
 
-                        <!-- Step 4 - Daftar Ulang -->
                         <div class="relative flex items-center mt-8">
                             <div class="{{ $timelineStatus['daftar_ulang']['completed'] ? 'bg-green-500' : ($timelineStatus['daftar_ulang']['current'] ? 'bg-yellow-500 animate-pulse' : 'bg-gray-300') }} p-6 rounded-full text-white z-10">
                                 <i class="fas {{ $timelineStatus['daftar_ulang']['completed'] ? 'fa-check' : 'fa-clipboard-list' }} text-lg"></i>
@@ -272,7 +260,6 @@
                             </div>
                         </div>
 
-                        <!-- Step 5 - Pengumuman Hasil -->
                         <div class="relative flex items-center">
                             <div class="{{ isset($timelineStatus['pengumuman_hasil']) && $timelineStatus['pengumuman_hasil']['completed'] ? 'bg-green-500' : 'bg-gray-300' }} p-6 rounded-full text-white z-10">
                                 <i class="fas {{ isset($timelineStatus['pengumuman_hasil']) && $timelineStatus['pengumuman_hasil']['completed'] ? 'fa-check' : 'fa-bullhorn' }} text-lg"></i>
@@ -280,17 +267,17 @@
                             <div class="ml-6">
                                 <h3 class="text-lg font-semibold {{ isset($timelineStatus['pengumuman_hasil']) && $timelineStatus['pengumuman_hasil']['completed'] ? 'text-gray-900' : 'text-gray-500' }}">Pengumuman Hasil</h3>
                                 @if(isset($timelineStatus['pengumuman_hasil']) && $timelineStatus['pengumuman_hasil']['completed'])
-                                    <p class="text-{{ isset($timelineStatus['pengumuman_hasil']['status']) && $timelineStatus['pengumuman_hasil']['status'] == 'diterima' ? 'green' : 'red' }}-600">
-                                        {{ isset($timelineStatus['pengumuman_hasil']['status']) && $timelineStatus['pengumuman_hasil']['status'] == 'diterima' ? 'Selamat! Anda dinyatakan DITERIMA' : 'Mohon maaf, Anda belum diterima' }}
-                                    </p>
-                                    @if(isset($timelineStatus['pengumuman_hasil']['date']))
-                                    <p class="text-sm text-gray-600 font-medium">
-                                        <i class="fas fa-calendar-alt mr-1"></i>
-                                        {{ $timelineStatus['pengumuman_hasil']['date'] }}
-                                    </p>
-                                    @endif
+                                <p class="text-{{ isset($timelineStatus['pengumuman_hasil']['status']) && $timelineStatus['pengumuman_hasil']['status'] == 'diterima' ? 'green' : 'red' }}-600">
+                                    {{ isset($timelineStatus['pengumuman_hasil']['status']) && $timelineStatus['pengumuman_hasil']['status'] == 'diterima' ? 'Selamat! Anda dinyatakan DITERIMA' : 'Mohon maaf, Anda belum diterima' }}
+                                </p>
+                                @if(isset($timelineStatus['pengumuman_hasil']['date']))
+                                <p class="text-sm text-gray-600 font-medium">
+                                    <i class="fas fa-calendar-alt mr-1"></i>
+                                    {{ $timelineStatus['pengumuman_hasil']['date'] }}
+                                </p>
+                                @endif
                                 @else
-                                    <p class="text-gray-500">Menunggu hasil seleksi</p>
+                                <p class="text-gray-500">Menunggu hasil seleksi</p>
                                 @endif
                             </div>
                         </div>
@@ -300,7 +287,6 @@
         </div>
     </section>
 
-    <!-- Status Cards -->
     <section class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white rounded-lg shadow-lg p-6">
@@ -393,18 +379,20 @@
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 mb-2">Selamat! Anda Diterima</h3>
                     <p class="text-gray-600 mb-4">Anda dinyatakan LULUS dan diterima di SMA Bina Prestasi. Silakan Download bukti penerimaan di bawah ini.</p>
-                    {{-- Tombol untuk mencetak sertifikat --}}
-                    <button wire:click="downloadCertificate"
-            class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 transform hover:scale-105">
-        {{-- Ikon Font Awesome --}}
-        <i class="fas fa-print mr-3"></i> Cetak Sertifikat Penerimaan
-    </button>
-                        <div class="bg-green-50 p-4 rounded-lg">
-                            <p class="text-sm text-green-800 font-medium">
-                                <i class="fas fa-info-circle mr-2"></i>
+                    
+                    {{-- Ganti button wire:click dengan link ke komponen Livewire baru --}}
+                    <a href="{{ route('psb.cetak-penerimaan', ['registrationId' => $santri->id]) }}"
+                       target="_blank" {{-- Buka di tab baru --}}
+                       class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 transform hover:scale-105">
+                        <i class="fas fa-file-pdf mr-3"></i> Unduh Surat Penerimaan (PDF)
+                    </a>
+                    
+                    <div class="bg-green-50 p-4 rounded-lg mt-4">
+                        <p class="text-sm text-green-800 font-medium">
+                            <i class="fas fa-info-circle mr-2"></i>
                             Informasi lengkap tentang daftar ulang akan dikirimkan melalui email dan WhatsApp.
-                            </p>
-                        </div>
+                        </p>
+                    </div>
                 @elseif($santri->status_santri == 'ditolak')
                     <div class="flex items-center justify-between mb-4">
                         <div class="bg-red-100 p-3 rounded-full">
@@ -465,12 +453,11 @@
                             </p>
                         </div>
                     @endif
-                @endif
+                @endif {{-- Ini adalah penutup untuk @if($santri->status_santri == 'daftar_ulang') --}}
             </div>
         </div>
     </section>
 
-    <!-- Informasi Penting -->
     <section class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
@@ -493,7 +480,6 @@
         </div>
     </section>
 
-    <!-- Kontak Bantuan -->
     <section class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white rounded-lg shadow-lg p-6">
@@ -502,7 +488,6 @@
                     <p class="text-gray-600">Tim PPDB siap membantu Anda</p>
                 </div>
                 <div class="grid md:grid-cols-3 gap-6">
-                    <!-- WhatsApp -->
                     <div class="text-center">
                         <div class="bg-green-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                             <i class="fab fa-whatsapp text-green-600 text-2xl"></i>
@@ -511,7 +496,6 @@
                         <p class="text-gray-600 mb-4">Chat langsung dengan tim PPDB</p>
                         <a href="https://wa.me/6281234567890" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition duration-300">Chat Sekarang</a>
                     </div>
-                    <!-- Email -->
                     <div class="text-center">
                         <div class="bg-blue-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                             <i class="fas fa-envelope text-blue-600 text-2xl"></i>
@@ -520,7 +504,6 @@
                         <p class="text-gray-600 mb-4">ppdb@smabinaprestasi.sch.id</p>
                         <a href="mailto:ppdb@smabinaprestasi.sch.id" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition duration-300">Kirim Email</a>
                     </div>
-                    <!-- Telepon -->
                     <div class="text-center">
                         <div class="bg-purple-100 p-4 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                             <i class="fas fa-phone text-purple-600 text-2xl"></i>
@@ -534,12 +517,11 @@
         </div>
     </section>
 
-    <!-- Footer -->
     <footer class="bg-gray-900 text-white py-8 mt-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center">
                 <div class="flex items-center justify-center mb-4">
-                    <img class="h-10 w-10 mr-3" src="https://via.placeholder.com/40x40/1e40af/ffffff?text=SMA" alt="Logo SMA"/>
+                    <img class="h-10 w-10 mr-3" src="https://via.placeholder.com/40x40/1e40af/ffffff?text=SMA" alt="Logo SMA" />
                     <h3 class="text-xl font-bold">SMA Bina Prestasi</h3>
                 </div>
                 <p class="text-gray-400 mb-4">Dashboard Penerimaan Siswa Baru Tahun Ajaran 2025/2026</p>
@@ -548,57 +530,46 @@
         </div>
     </footer>
 
-    <!-- Floating WhatsApp Button -->
-    <div class="fixed bottom-6 right-6 z-50">
-        <a href="https://wa.me/6281234567890" class="bg-green-500 text-white p-4 rounded-full shadow-lg hover:bg-green-600 transition duration-300 flex items-center justify-center">
-            <i class="fab fa-whatsapp text-2xl"></i>
-        </a>
-    </div>
 
-    
 </div>
 
 @endsection
 
+{{-- Hapus atau Komentar bagian JavaScript ini karena sudah tidak relevan dengan alur baru --}}
+{{--
 @push('scripts')
 <script>
-    // Memantau event 'downloadPdf' yang dikirim dari Livewire
     Livewire.on('downloadPdf', (data) => {
         const htmlContent = data.html;
         const fileName = data.fileName;
 
-        // Membuat form tersembunyi untuk mengirim konten HTML ke rute Laravel
         const form = document.createElement('form');
         form.method = 'POST';
-        // Definisikan rute ini di web.php
         form.action = '{{ route('download-certificate-pdf') }}';
-        form.target = '_blank'; // Membuka di tab baru (opsional, bisa dihapus jika ingin langsung unduh)
+        form.target = '_blank';
 
-        // Menambahkan token CSRF untuk keamanan Laravel
         const csrfToken = document.createElement('input');
         csrfToken.type = 'hidden';
         csrfToken.name = '_token';
         csrfToken.value = '{{ csrf_token() }}';
         form.appendChild(csrfToken);
 
-        // Menambahkan konten HTML sebagai input tersembunyi
         const htmlInput = document.createElement('input');
         htmlInput.type = 'hidden';
         htmlInput.name = 'html_content';
         htmlInput.value = htmlContent;
         form.appendChild(htmlInput);
 
-        // Menambahkan nama file sebagai input tersembunyi
         const fileNameInput = document.createElement('input');
         fileNameInput.type = 'hidden';
         fileNameInput.name = 'file_name';
         fileNameInput.value = fileName;
         form.appendChild(fileNameInput);
 
-        // Menambahkan form ke body dokumen dan mengirimkannya
         document.body.appendChild(form);
         form.submit();
-        document.body.removeChild(form); // Membersihkan form setelah submit
+        document.body.removeChild(form);
     });
 </script>
 @endpush
+--}}

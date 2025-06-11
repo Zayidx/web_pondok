@@ -15,6 +15,7 @@ use App\Livewire\Admin\PSB\PreviewUjian;
 use App\Livewire\Admin\PSB\HasilUjianSantri;
 use App\Livewire\Admin\PSB\DetailUjianSantri;
 use App\Http\Controllers\Auth\SantriAuthController;
+use App\Livewire\Guest\CetakPenerimaanSurat;
 use Illuminate\Support\Facades\Route;
 
 // Rute untuk tamu (tanpa autentikasi)
@@ -24,6 +25,9 @@ Route::middleware('guest:santri')->group(function () {
     Route::post('/login-ppdb', [SantriAuthController::class, 'login'])->name('login-ppdb-santri.post');
     Route::get('/check-status', CheckStatus::class)->name('check-status');
     Route::get('/pendaftaran-santri', PsbPage::class)->name('psb-page');
+    // Rute BARU untuk halaman cetak penerimaan surat
+    // {registrationId} adalah parameter yang akan diteruskan ke metode mount() komponen Livewire
+    Route::get('/psb/cetak-penerimaan/{registrationId}', CetakPenerimaanSurat::class)->name('psb.cetak-penerimaan');
     
 });
 

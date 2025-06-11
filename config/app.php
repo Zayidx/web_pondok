@@ -198,6 +198,8 @@ return [
         // PWA Package
         Ladumor\LaravelPwa\PWAServiceProvider::class,
 
+        // DOMPDF Package
+        Barryvdh\DomPDF\ServiceProvider::class,
     ],
 
     /*
@@ -214,6 +216,7 @@ return [
     'aliases' => Facade::defaultAliases()->merge([
         'Excel' => Maatwebsite\Excel\Facades\Excel::class,
         'LaravelPwa' => \Ladumor\LaravelPwa\LaravelPwa::class,
+        'Pdf' => Barryvdh\DomPDF\Facade\Pdf::class,
     ])->toArray(),
 
 ];

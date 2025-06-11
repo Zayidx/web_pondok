@@ -1,12 +1,11 @@
 <?php
+// routes/web.php
 
-use App\Http\Controllers\CertificateController;
+use App\Http\Controllers\CertificateController; // Ini bisa dihapus jika controllernya dihapus
 use App\Livewire\Auth;
 use App\Livewire\StudentExam;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
-// use Barryvdh\DomPDF\Facade\Pdf; // Tidak perlu diimpor di sini jika menggunakan Controller
-// use Illuminate\Http\Request; // Tidak perlu diimpor di sini jika menggunakan Controller
 
 Route::get('/', function () {
     return redirect('/auth/login');
@@ -35,10 +34,11 @@ Route::get('/generate', function () {
     echo 'ok';
 });
 
-// >>>>>> INI ADALAH DEFINISI RUTE YANG BENAR DAN PERLU DIJAGA <<<<<<
-Route::post('/download-certificate-pdf', [CertificateController::class, 'download'])->name('download-certificate-pdf');
+// >>>>>> INI ADALAH DEFINISI RUTE YANG PERLU DIHAPUS ATAU DIKOMENTARI <<<<<<
+// Karena sekarang unduhan ditangani langsung oleh komponen Livewire PSB/CetakPenerimaanSurat
+// Route::post('/download-certificate-pdf', [CertificateController::class, 'download'])->name('download-certificate-pdf');
 
-// >>>>>> KODE DI BAWAH INI HARUS DIHAPUS ATAU DIKOMENTARI <<<<<<
+// >>>>>> KODE DI BAWAH INI HARUS DIHAPUS ATAU DIKOMENTARI (Sudah dikomentari sebelumnya) <<<<<<
 /*
 Route::post('/download-certificate-pdf', function (Request $request) {
     $htmlContent = $request->input('html_content');
