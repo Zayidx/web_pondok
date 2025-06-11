@@ -6,7 +6,7 @@ use Illuminate\Database\Seeder;
 use App\Models\PSB\Periode;
 use App\Models\PSB\PendaftaranSantri;
 use App\Models\PSB\WaliSantri; // TAMBAHKAN: Import model WaliSantri
-use App\Models\Ujian;
+use App\Models\PSB\Ujian;
 use App\Models\Soal;
 use Illuminate\Support\Facades\Hash;
 use Faker\Factory as Faker;

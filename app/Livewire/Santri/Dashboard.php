@@ -97,16 +97,8 @@ class Dashboard extends Component
         } catch (\Exception $e) {
             $this->pembayaran = collect();
         }
-    public function updatedSetStatusSpp($value)
-    {
-        $this->pembayaran = Pembayaran::with('pembayaranTimeline', 'santri')
-            ->whereHas('santri', function ($query) {
-                return $query->where('nama', auth()->user()->name);
-            })
-            ->whereHas('pembayaranTimeline', function ($query) use ($value) {
-                return $query->where('nama_bulan', $value);
-            })->first();
     }
+
 
     #[Computed]
     public function listPengumuman()

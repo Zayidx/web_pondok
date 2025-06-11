@@ -75,29 +75,18 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @forelse ($this->listSoal() as $soal)
-                        <tr>
-                            <td>{{ $loop->iteration }}</td>
-                                        <td>{{ Str::limit($soal->pertanyaan, 50) }}</td>
-                                        <td>
-                                            <span class="badge {{ $soal->tipe_soal === 'pg' ? 'bg-info' : 'bg-warning' }}">
-                                                {{ $soal->tipe_soal === 'pg' ? 'Pilihan Ganda' : 'Essay' }}
-                                            </span>
-                                        </td>
-                            <td>
-                                            <button wire:click="edit({{ $soal->id }})" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#createOrUpdateSoal">
-                                                <i class="bi bi-pencil"></i>
-                                            </button>
-                                            <button wire:click="deleteSoal({{ $soal->id }})" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus soal ini?')">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                                        <td colspan="4" class="text-center">Belum ada soal</td>
-                        </tr>
-                    @endforelse
+                @foreach($soalForm->opsi as $index => $option)
+    <div class="row mb-2">
+        <div class="col-1">
+            {{-- Baris ini yang menampilkan huruf A, B, C, ... --}}
+            <span class="fw-bold">{{ chr($index + 65) }}.</span>
+        </div>
+        <div class="col-8">
+            <input type="text" class="form-control" wire:model="soalForm.opsi.{{ $index }}.teks" placeholder="Teks opsi">
+        </div>
+        {{-- ... sisa kode ... --}}
+    </div>
+@endforeach
                 </tbody>
             </table>
                     </div>
