@@ -12,18 +12,7 @@
     {{-- Judul Halaman --}}
     <div class="page-title">
         <div class="row">
-            <div class="col-12 col-md-6 order-md-1 order-last">
-                <h3>Hasil Ujian Santri</h3>
-                <p class="text-subtitle text-muted">Daftar santri yang telah menyelesaikan ujian dan menunggu penilaian.</p>
-            </div>
-            <div class="col-12 col-md-6 order-md-2 order-first">
-                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
-                    <ol class="breadcrumb">
-                        <li class="breadcrumb-item"><a href="{{ route('e-ppdb.dashboard') }}">Dashboard</a></li>
-                        <li class="breadcrumb-item active" aria-current="page">Hasil Ujian</li>
-                    </ol>
-                </nav>
-            </div>
+        <p class="text-subtitle text-muted">Daftar santri yang telah menyelesaikan ujian dan menunggu penilaian.</p>
         </div>
     </div>
 

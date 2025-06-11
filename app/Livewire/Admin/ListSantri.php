@@ -293,6 +293,17 @@ class ListSantri extends Component
 
     public function render()
     {
-        return view('livewire.admin.list-santri');
+        $santris = Santri::with(['kamar', 'kelas', 'jenjang', 'orangTua'])
+            ->when($this->search, function ($query) {
+                $query->where('nama_santri', 'like', '%' . $this->search . '%')
+                      ->orWhere('nis', 'like', '%' . $this->search . '%');
+            })
+            ->orderBy($this->sortField, $this->sortDirection)
+            ->paginate(10);
+    
+        return view('livewire.admin.list-santri', [
+            'santris' => $santris,
+            'jenjangs' => Jenjang::all(),
+        ]);
     }
 }

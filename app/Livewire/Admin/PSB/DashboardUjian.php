@@ -12,7 +12,7 @@ use Livewire\WithPagination;
 class DashboardUjian extends Component
 {
     use WithPagination;
-
+    protected $paginationTheme = 'bootstrap';
     #[Title('Halaman Dashboard Ujian')]
 
     public UjianForm $ujianForm;

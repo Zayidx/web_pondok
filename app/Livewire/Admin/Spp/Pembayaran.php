@@ -10,6 +10,7 @@ use App\Models\Spp\DetailItemPembayaran;
 use App\Models\Spp\Pembayaran as SppPembayaran;
 use App\Models\Spp\PembayaranTimeline;
 use App\Models\TahunAjaran;
+use App\Services\SppPaymentService;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -69,6 +70,23 @@ class Pembayaran extends Component
         $this->kelasOptions = Kelas::all();
     }
 
+    public function prosesBayar(SppPaymentService $paymentService)
+    {
+        $data = $this->validate([
+            'santri_id' => 'required',
+            'amount' => 'required|numeric|min:1',
+            'method' => 'required|string',
+        ]);
+
+        $pembayaran = $paymentService->process($data);
+
+        if ($pembayaran) {
+            session()->flash('success', 'Pembayaran berhasil diproses.');
+            $this->reset();
+        } else {
+            session()->flash('error', 'Terjadi kesalahan saat memproses pembayaran.');
+        }
+    }
     public function kembaliButton()
     {
         $this->searchResults = [];

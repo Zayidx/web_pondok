@@ -29,7 +29,7 @@
                 <div wire:ignore class="row">
                     <div class="col-lg-8">
                         <h4 class="mb-3">Statistik Pendaftar</h4>
-                        <div id="pendaftarChart" class="card rounded-4 p-4 h-100 w-100"></div>
+                        <div id="pendaftarChart" class="card rounded-4 p-4 w-100"></div>
                         
                     </div>
                     <div class="col-lg-4">
@@ -107,48 +107,40 @@
 
         <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
         <script>
-            // Bar Chart (Pendaftar Chart)
-            var pendaftarOptions = {
-                series: [{
-                    name: 'Laki-laki',
-                    data: [{{ $pendaftarByGender->where('jenis_kelamin', 'L')->sum('total') }}]
-                }, {
-                    name: 'Perempuan',
-                    data: [{{ $pendaftarByGender->where('jenis_kelamin', 'P')->sum('total') }}]
-                }],
-                chart: {
-                    type: 'bar',
-                    height: 400,
-                    stacked: false,
-                },
-                plotOptions: {
-                    bar: {
-                        horizontal: false,
-                        columnWidth: '55%',
-                    },
-                },
-                dataLabels: {
-                    enabled: false
-                },
-                colors: ['#1c1dab', '#e893c5'],
-                xaxis: {
-                    categories: ['Jenis Kelamin'],
-                },
-                legend: {
-                    position: 'top',
-                    fontSize: '14px',
-                },
-                responsive: [{
-                    breakpoint: 480,
-                    options: {
-                        legend: {
-                            position: 'bottom',
-                            offsetX: -10,
-                            offsetY: 0
-                        }
-                    }
-                }]
-            };
+           // Bar Chart (Pendaftar Chart By Tipe Pendaftaran)
+var pendaftarOptions = {
+    series: [{
+        name: 'Jumlah Pendaftar',
+        data: [
+            // Use the correct variable name here
+            {{ $pendaftarByProgram->where('tipe_pendaftaran', 'reguler')->first()->total ?? 0 }},
+            {{ $pendaftarByProgram->where('tipe_pendaftaran', 'olimpiade')->first()->total ?? 0 }},
+            {{ $pendaftarByProgram->where('tipe_pendaftaran', 'internasional')->first()->total ?? 0 }}
+        ]
+    }],
+    chart: {
+        type: 'bar',
+        height: 400,
+    },
+    plotOptions: {
+        bar: {
+            horizontal: false,
+            columnWidth: '55%',
+            distributed: true,
+        },
+    },
+    dataLabels: {
+        enabled: true
+    },
+    colors: ['#1c1dab', '#e893c5', '#6c757d'],
+    xaxis: {
+        categories: ['Reguler', 'Olimpiade', 'Internasional'],
+    },
+    legend: {
+        show: false,
+    },
+    // ... rest of your chart options
+};
 
             var pendaftarChart = new ApexCharts(document.querySelector("#pendaftarChart"), pendaftarOptions);
             pendaftarChart.render();

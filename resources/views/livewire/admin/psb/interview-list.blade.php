@@ -36,14 +36,7 @@
                         <option value="offline">Offline</option>
                     </select>
                 </div>
-                <div class="col-md-1">
-                    <select wire:model.live="perPage" class="form-select">
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                    </select>
-                </div>
+                
                 <div class="col-md-1">
                     <button wire:click="resetFilters" class="btn btn-secondary">
                         <i class="bi bi-x-circle"></i> Reset

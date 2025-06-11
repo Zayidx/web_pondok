@@ -24,6 +24,7 @@ Route::middleware('guest:santri')->group(function () {
     Route::post('/login-ppdb', [SantriAuthController::class, 'login'])->name('login-ppdb-santri.post');
     Route::get('/check-status', CheckStatus::class)->name('check-status');
     Route::get('/pendaftaran-santri', PsbPage::class)->name('psb-page');
+    
 });
 
 // Logout route for santri
@@ -66,7 +67,7 @@ Route::prefix('ppdb')->middleware('auth')->group(function () {
     });
 
     // Daftar Ulang Routes
-    Route::get('/list-daftar-ulang', \App\Livewire\PPDB\ListDaftarUlang::class)->name('list-daftar-ulang');
+    Route::get('/list-daftar-ulang', \App\Livewire\Admin\PSB\ListDaftarUlang::class)->name('list-daftar-ulang');
     Route::get('/dashboard-daftar-ulang', \App\Livewire\Admin\PSB\DashboardDaftarUlang::class)
         ->middleware(['role:Pendaftaran Santri'])
         ->name('ppdb.dashboard-daftar-ulang');
@@ -77,7 +78,7 @@ Route::prefix('ppdb')->middleware('auth')->group(function () {
 
 // Rute untuk santri PPDB (dengan autentikasi)
 Route::middleware(['auth:santri'])->group(function () {
-    Route::get('/dashboard', \App\Livewire\SantriPPDB\SantriDashboard::class)->name('santri.dashboard');
+    Route::get('/dashboard', \App\Livewire\SantriPPDB\SantriDashboard::class)->name('santri.Dashboard');
     
     // Exam Routes
     Route::get('/mulai-ujian/{ujianId}', \App\Livewire\SantriPPDB\MulaiUjian::class)->name('santri.mulai-ujian');

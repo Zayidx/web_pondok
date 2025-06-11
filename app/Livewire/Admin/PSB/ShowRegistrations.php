@@ -16,6 +16,8 @@ class ShowRegistrations extends Component
 {
     use WithPagination;
     #[Title('Halaman List Santri PPDB')]
+
+    protected $paginationTheme = 'bootstrap';
     public $perPage = 10;
     public $search = '';
     public $searchAlamat = '';

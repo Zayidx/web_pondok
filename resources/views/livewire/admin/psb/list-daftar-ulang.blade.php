@@ -11,7 +11,7 @@
     <div class="page-title">
         <div class="row">
             <div class="col-12 col-md-6 order-md-1 order-last">
-              
+                <h3>Dashboard Daftar Ulang</h3>
                 <p class="text-subtitle text-muted">Manajemen verifikasi pendaftaran ulang santri baru.</p>
             </div>
         </div>
@@ -23,107 +23,78 @@
             <h4>Daftar Pendaftar Ulang</h4>
         </div>
         <div class="card-body">
-        <div class="row mb-4 g-2">
-    <div class="col-md-5">
-        <input type="text" wire:model.live.debounce.300ms="search" class="form-control" placeholder="Cari berdasarkan nama atau NISN...">
-    </div>
-    <div class="col-md-3">
-        <select wire:model.live="filters.tipe" class="form-select">
-            @foreach($this->tipeOptions as $value => $label)
-                <option value="{{ $value }}">{{ $label }}</option>
-            @endforeach
-        </select>
-    </div>
-    <div class="col-md-2">
-        <select wire:model.live="filters.status" class="form-select">
-            @foreach($this->statusPaymentOptions as $value => $label)
-                <option value="{{ $value }}">{{ $label }}</option>
-            @endforeach
-        </select>
-    </div>
-    <div class="col-md-2">
-        <button wire:click="resetFilters" class="btn btn-secondary w-100">
-            <i class="bi bi-x-circle"></i> Reset Filter
-        </button>
-    </div>
-</div>
-
-<div class="table-responsive">
-    <table class="table table-hover table-striped">
-        <thead>
-            <tr>
-                {{-- Add sortBy method to table headers --}}
-                <th wire:click="sortBy('nama_lengkap')" style="cursor: pointer;">Nama Lengkap
-                    @if ($sortField === 'nama_lengkap')
-                        <i class="bi bi-arrow-{{ $sortDirection === 'asc' ? 'up' : 'down' }}"></i>
-                    @endif
-                </th>
-                <th wire:click="sortBy('nisn')" style="cursor: pointer;">NISN
-                    @if ($sortField === 'nisn')
-                        <i class="bi bi-arrow-{{ $sortDirection === 'asc' ? 'up' : 'down' }}"></i>
-                    @endif
-                </th>
-                <th wire:click="sortBy('created_at')" style="cursor: pointer;">Tanggal Daftar
-                    @if ($sortField === 'created_at')
-                        <i class="bi bi-arrow-{{ $sortDirection === 'asc' ? 'up' : 'down' }}"></i>
-                    @endif
-                </th>
-                <th>Status Pembayaran</th>
-                <th class="text-center">Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            @forelse($registrations as $registration)
-                <tr>
-                    <td>{{ $registration->nama_lengkap }}</td>
-                    <td>{{ $registration->nisn }}</td>
-                    <td>{{ $registration->created_at->format('d F Y') }}</td>
-                    <td>
-                        {{-- Use the new 'no_proof' status for better clarity --}}
-                        @if(is_null($registration->bukti_pembayaran))
-                            <span class="badge bg-warning">Menunggu Bukti</span>
-                        @elseif($registration->status_pembayaran === 'verified')
-                            <span class="badge bg-success">Terverifikasi</span>
-                        @elseif($registration->status_pembayaran === 'rejected')
-                            <span class="badge bg-danger">Ditolak</span>
-                        @else {{-- This will cover 'pending' status --}}
-                            <span class="badge bg-info">Menunggu Verifikasi</span>
-                        @endif
-                    </td>
-                    <td class="text-center text-nowrap">
-                        <button wire:click="showDetail({{ $registration->id }})" class="btn btn-primary btn-sm" title="Detail">
-                            <i class="bi bi-eye"></i> Detail Pembayaran
-                        </button>
-                        @if($registration->bukti_pembayaran)
-                            <button wire:click="viewPaymentProof({{ $registration->id }})" class="btn btn-info btn-sm" title="Lihat Bukti Pembayaran">
-                                <i class="bi bi-file-earmark-image"></i> Lihat Bukti
-                            </button>
-                            {{-- Only show action buttons if payment is pending or rejected --}}
-                            @if($registration->status_pembayaran === 'pending' || $registration->status_pembayaran === 'rejected')
-                                <button wire:click="verifyRegistration({{ $registration->id }})"
-                                        wire:confirm="Anda yakin ingin memverifikasi pendaftaran ulang santri ini?"
-                                        class="btn btn-success btn-sm" title="Terima">
-                                    <i class="bi bi-check-lg"></i> Terima
-                                </button>
-                                <button wire:click="rejectRegistration({{ $registration->id }})"
-                                        wire:confirm="Anda yakin ingin menolak bukti pembayaran ini? Santri harus mengupload ulang."
-                                        class="btn btn-danger btn-sm" title="Tolak">
-                                    <i class="bi bi-x-lg"></i> Tolak
-                                </button>
-                            @endif
-                        @endif
-                    </td>
-                </tr>
-            @empty
-                <tr>
-                    <td colspan="5" class="text-center">Tidak ada data pendaftaran ulang.</td>
-                </tr>
-            @endforelse
-        </tbody>
-    </table>
-</div>
+            <div class="row mb-4 g-2">
+                <div class="col-md-9">
+                    <input type="text" wire:model.live.debounce.300ms="search" class="form-control" placeholder="Cari berdasarkan nama atau NISN...">
+                </div>
+                <div class="col-md-3">
+                    <button wire:click="resetFilters" class="btn btn-secondary w-100">
+                        <i class="bi bi-x-circle"></i> Reset Filter
+                    </button>
+                </div>
             </div>
-            <div class="mx-3">
+
+            <div class="table-responsive">
+                <table class="table table-hover table-striped">
+                    <thead>
+                        <tr>
+                            <th>Nama Lengkap</th>
+                            <th>NISN</th>
+                            <th>Tanggal Daftar</th>
+                            <th>Status Pembayaran</th>
+                            <th class="text-center">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($registrations as $registration)
+                            <tr>
+                                <td>{{ $registration->nama_lengkap }}</td>
+                                <td>{{ $registration->nisn }}</td>
+                                <td>{{ $registration->created_at->format('d F Y') }}</td>
+                                <td>
+                                    @if(!$registration->bukti_pembayaran)
+                                        <span class="badge bg-warning">Menunggu Bukti</span>
+                                    @elseif($registration->status_pembayaran === 'verified')
+                                        <span class="badge bg-success">Terverifikasi</span>
+                                    @elseif($registration->status_pembayaran === 'rejected')
+                                         <span class="badge bg-danger">Ditolak</span>
+                                    @else
+                                        <span class="badge bg-info">Menunggu Verifikasi</span>
+                                    @endif
+                                </td>
+                                <td class="text-center text-nowrap">
+                                    <button wire:click="showDetail({{ $registration->id }})" class="btn btn-primary btn-sm" title="Detail">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                    @if($registration->bukti_pembayaran)
+                                        <button wire:click="viewPaymentProof({{ $registration->id }})" class="btn btn-info btn-sm" title="Lihat Bukti Pembayaran">
+                                            <i class="bi bi-file-earmark-image"></i>
+                                        </button>
+                                        @if($registration->status_pembayaran === 'pending' || $registration->status_pembayaran === null)
+                                            <button wire:click="verifyRegistration({{ $registration->id }})" 
+                                                    wire:confirm="Anda yakin ingin memverifikasi pendaftaran ulang santri ini?"
+                                                    class="btn btn-success btn-sm" title="Terima">
+                                                <i class="bi bi-check-lg"></i>
+                                            </button>
+                                            <button wire:click="rejectRegistration({{ $registration->id }})" 
+                                                    wire:confirm="Anda yakin ingin menolak bukti pembayaran ini? Santri harus mengupload ulang."
+                                                    class="btn btn-danger btn-sm" title="Tolak">
+                                                <i class="bi bi-x-lg"></i>
+                                            </button>
+                                        @endif
+                                    @endif
+                                </td>
+                            </tr>
+                        @empty
+                            <tr>
+                                <td colspan="5" class="text-center">Tidak ada data pendaftaran ulang.</td>
+                            </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="d-flex justify-content-end mt-4">
                 {{ $registrations->links() }}
             </div>
         </div>
@@ -142,7 +113,6 @@
                             <div class="col-md-6">
                                 <h6>Data Santri</h6>
                                 <table class="table table-borderless table-sm">
-                                    
                                     <tr>
                                         <td class="fw-bold">Nama Lengkap</td>
                                         <td>: {{ $selectedRegistration->nama_lengkap }}</td>

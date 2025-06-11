@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\DB;
 class HasilUjianSantri extends Component
 {
     use WithPagination;
-
+    protected $paginationTheme = 'bootstrap';
     #[Title('Hasil Ujian Santri')]
 
     public $perPage = 10;

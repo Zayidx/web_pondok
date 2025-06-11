@@ -5,9 +5,9 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use App\Models\PSB\Periode;
 use App\Models\PSB\PendaftaranSantri;
-use App\Models\PSB\WaliSantri; // TAMBAHKAN: Import model WaliSantri
+use App\Models\PSB\WaliSantri;
 use App\Models\PSB\Ujian;
-use App\Models\Soal;
+use App\Models\PSB\Soal;
 use Illuminate\Support\Facades\Hash;
 use Faker\Factory as Faker;
 
@@ -22,17 +22,59 @@ class PsbSeeder extends Seeder
     {
         $faker = Faker::create('id_ID');
 
-        $pendaftaranPeriode = Periode::where('tipe_periode', 'pendaftaran_baru')->firstOrFail();
-        $ujianPeriode = Periode::where('tipe_periode', 'ujian_masuk')->firstOrFail();
+        // Mengambil atau membuat periode yang relevan jika belum ada di database.
+        // Periode ini digunakan untuk pendaftaran santri.
+        $pendaftaranPeriode = Periode::firstOrCreate(
+            ['tipe_periode' => 'pendaftaran_baru', 'tahun_ajaran' => '2025/2026'],
+            ['nama_periode' => 'Pendaftaran Santri Baru 2025', 'tanggal_mulai' => now(), 'tanggal_selesai' => now()->addMonths(3)]
+        );
 
-        $this->command->info('Membuat 10 data santri lengkap beserta walinya...');
-        for ($i = 0; $i < 10; $i++) {
-            $gender = $faker->randomElement(['L', 'P']);
-            $modeWawancara = $faker->randomElement(['online', 'offline']);
+        // Mengambil atau membuat periode untuk ujian masuk.
+        $ujianPeriode = Periode::firstOrCreate(
+            ['tipe_periode' => 'ujian_masuk', 'tahun_ajaran' => '2025/2026'],
+            ['nama_periode' => 'Ujian Masuk Santri Baru 2025', 'tanggal_mulai' => now()->addMonths(3), 'tanggal_selesai' => now()->addMonths(4)]
+        );
+
+        // Daftar kemungkinan status santri
+        // Diperbarui berdasarkan list status yang Anda berikan
+        $santriStatuses = [
+            'menunggu',          // Santri baru mendaftar, menunggu tindakan selanjutnya
+            'wawancara',         // Santri sedang dalam tahap wawancara
+            'sedang_ujian',      // Santri sedang/akan menjalani ujian
+            'diterima',          // Santri telah diterima
+            'ditolak',           // Pendaftaran santri ditolak
+            'daftar_ulang'       // Santri sedang dalam proses daftar ulang
+        ];
+
+        // Daftar kemungkinan status pembayaran
+        $paymentStatuses = [
+            null, // Belum ada bukti pembayaran
+            'pending', // Bukti pembayaran sudah diunggah, menunggu verifikasi
+            'verified', // Pembayaran sudah terverifikasi
+            'rejected' // Pembayaran ditolak (misal: bukti tidak valid)
+        ];
+
+        $this->command->info('Membuat 1000 data santri pendaftar lengkap beserta walinya...');
+        for ($i = 0; $i < 1000; $i++) {
+            $gender = $faker->randomElement(['L', 'P']); // Jenis kelamin acak
+            $modeWawancara = $faker->randomElement(['online', 'offline']); // Mode wawancara acak
             $namaAyah = $faker->name('male');
             $pekerjaanAyah = $faker->jobTitle;
             $namaIbu = $faker->name('female');
             $pekerjaanIbu = $faker->jobTitle;
+
+            // Pilih status santri secara acak dari array yang telah didefinisikan
+            $randomSantriStatus = $faker->randomElement($santriStatuses);
+            // Pilih status pembayaran secara acak
+            $randomPaymentStatus = $faker->randomElement($paymentStatuses);
+
+            // Tentukan apakah ada bukti pembayaran berdasarkan status pembayaran yang dipilih
+            $buktiPembayaran = null;
+            if ($randomPaymentStatus === 'pending' || $randomPaymentStatus === 'verified' || $randomPaymentStatus === 'rejected') {
+                // Asumsi ada bukti pembayaran jika statusnya bukan null
+                // Dalam skenario nyata, ini akan menjadi path file yang sebenarnya
+                $buktiPembayaran = 'path/to/bukti_pembayaran_' . $faker->unique()->randomNumber(5) . '.jpg';
+            }
 
             // Langkah 1: Buat data santri
             $santri = PendaftaranSantri::create([
@@ -49,7 +91,9 @@ class PsbSeeder extends Seeder
                 'asal_sekolah'    => 'SMP Negeri ' . $faker->numberBetween(1, 20) . ' ' . $faker->city,
                 'tahun_lulus'     => '2025',
                 'tipe_pendaftaran' => $faker->randomElement(['reguler', 'olimpiade', 'internasional']),
-                'status_santri'   => 'sedang_ujian',
+                'status_santri'   => $randomSantriStatus, // Menggunakan status acak di sini
+                'status_pembayaran' => $randomPaymentStatus, // Menggunakan status pembayaran acak
+                'bukti_pembayaran' => $buktiPembayaran, // Menambahkan bukti pembayaran jika status relevan
                 'password'        => Hash::make('password'),
                 'periode_id'      => $pendaftaranPeriode->id,
                 'nama_ayah'       => $namaAyah,
@@ -64,17 +108,14 @@ class PsbSeeder extends Seeder
                 'lokasi_offline'  => ($modeWawancara == 'offline') ? 'Ruang Wawancara ' . $faker->randomElement(['A', 'B', 'C']) : null,
             ]);
 
-            // =================================================================
-            // **BAGIAN BARU: Membuat data WaliSantri untuk santri di atas**
-            // =================================================================
+            // Langkah 2: Buat data wali santri yang terkait
             WaliSantri::create([
-                'pendaftaran_santri_id' => $santri->id, // Tautkan ke santri yang baru dibuat
-                'nama_wali'     => $namaAyah, // Gunakan nama ayah sebagai wali utama
+                'pendaftaran_santri_id' => $santri->id,
+                'nama_wali'     => $namaAyah,
                 'hubungan'      => 'ayah',
                 'pekerjaan'     => $pekerjaanAyah,
-                'no_hp'         => $faker->phoneNumber,
-                'alamat'        => $santri->alamat, // Gunakan alamat yang sama dengan santri
-                // Mengisi kolom-kolom tambahan
+                'no_hp'         => '6281' . $faker->numerify('#########'),
+                'alamat'        => $santri->alamat,
                 'nama_ayah'       => $namaAyah,
                 'pekerjaan_ayah'  => $pekerjaanAyah,
                 'pendidikan_ayah' => $faker->randomElement(['SMA Sederajat', 'D3', 'S1', 'S2']),
@@ -85,30 +126,35 @@ class PsbSeeder extends Seeder
                 'no_telp_ibu'     => $santri->no_telp_ibu,
             ]);
         }
-        $this->command->info('Data santri dan wali berhasil dibuat.');
+        $this->command->info('Data santri pendaftar dan wali berhasil dibuat.');
 
-        // Membuat 10 data ujian beserta soal-soalnya (tidak ada perubahan di sini)
-        $this->command->info('Membuat 10 ujian beserta soal-soalnya...');
+        // Membuat data ujian beserta soal-soalnya
+        $this->command->info('Membuat ujian beserta soal-soalnya...');
         $subjects = [
-            'Matematika', 'Bahasa Indonesia', 'Bahasa Inggris', 'Ilmu Pengetahuan Alam', 
+            'Matematika', 'Bahasa Indonesia', 'Bahasa Inggris', 'Ilmu Pengetahuan Alam',
             'Fiqih', 'Aqidah Akhlak', 'Sejarah Kebudayaan Islam', 'Bahasa Arab', 'Tahfidz', 'Tes Potensi Akademik'
         ];
-        foreach ($subjects as $subject) {
-            $ujian = Ujian::create([/*...*/]);
-            // =================================================================
-            // **BAGIAN BARU: Membuat Soal untuk Ujian di atas**
-            // =================================================================
+
+        foreach ($subjects as $key => $subject) {
+            $ujian = Ujian::create([
+                'nama_ujian' => 'Ujian ' . $subject,
+                'mata_pelajaran' => $subject, // Mengisi kolom mata_pelajaran yang wajib
+                'tanggal_ujian' => now()->addDays($key + 1),
+                'waktu_mulai' => '08:00:00',
+                'waktu_selesai' => '10:00:00',
+                'periode_id' => $ujianPeriode->id,
+            ]);
 
             // Buat 3 Soal Pilihan Ganda
             for ($i = 1; $i <= 3; $i++) {
                 $pilihan = ['A', 'B', 'C', 'D'];
-                $kunciJawabanIndex = array_rand($pilihan);
+                $kunciJawabanIndex = array_rand($pilihan); // Pilih indeks kunci jawaban secara acak
                 $opsiJawaban = [];
 
                 foreach ($pilihan as $index => $huruf) {
                     $opsiJawaban[] = [
                         'teks' => "Ini adalah pilihan jawaban $huruf untuk soal no. $i.",
-                        'bobot' => ($index == $kunciJawabanIndex) ? 100 : 0 // Bobot 100 untuk jawaban benar
+                        'bobot' => ($index == $kunciJawabanIndex) ? 100 : 0 // Bobot 100 untuk kunci jawaban, 0 untuk lainnya
                     ];
                 }
 
@@ -116,9 +162,9 @@ class PsbSeeder extends Seeder
                     'ujian_id'      => $ujian->id,
                     'pertanyaan'    => "Ini adalah pertanyaan Pilihan Ganda nomor $i untuk mata pelajaran $subject. Apa jawaban yang benar?",
                     'tipe_soal'     => 'pg',
-                    'opsi'          => $opsiJawaban,
-                    'kunci_jawaban' => $pilihan[$kunciJawabanIndex],
-                    'poin'          => 5, // Poin untuk soal PG
+                    'opsi'          => $opsiJawaban, // Menyimpan opsi jawaban sebagai JSON
+                    'kunci_jawaban' => $kunciJawabanIndex,
+                    'poin'          => 5,
                 ]);
             }
 
@@ -128,7 +174,7 @@ class PsbSeeder extends Seeder
                     'ujian_id'      => $ujian->id,
                     'pertanyaan'    => "Ini adalah pertanyaan Essay nomor $j untuk mata pelajaran $subject. Jelaskan secara singkat.",
                     'tipe_soal'     => 'essay',
-                    'poin'          => 10, // Poin untuk soal Essay
+                    'poin'          => 10,
                 ]);
             }
         }

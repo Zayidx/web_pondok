@@ -1,6 +1,7 @@
 <ul class="menu">
     <li class="sidebar-title">Menu</li>
 
+    {{-- Link Dashboard Utama --}}
     <li class="sidebar-item {{ Request::routeIs('e-ppdb.dashboard') ? 'active' : '' }}">
         <a href="{{ route('e-ppdb.dashboard') }}" class='sidebar-link'>
             <i class="bi bi-grid-fill"></i>
@@ -8,37 +9,62 @@
         </a>
     </li>
 
-    {{-- Data Pendaftaran Santri --}}
-    <li class="sidebar-title">Data Pendaftaran Santri</li>
+    <li class="sidebar-title">Manajemen Pendaftaran</li>
 
-    {{-- Master Pendaftaran Santri Baru --}}
-    <li class="sidebar-item has-sub {{ Request::routeIs('admin.master-psb*') ? 'active' : '' }}">
-        <a href="" class='sidebar-link'>
+    {{-- DROPDOWN 1: MASTER PSB --}}
+    @php
+        // Daftar route yang akan mengaktifkan dropdown Master PSB
+        $masterPsbRoutes = [
+            'admin.master-periode.dashboard',
+            'admin.master-psb.show-registrations',
+            'admin.master-psb.interview-list',
+            'ppdb.dashboard-daftar-ulang'
+        ];
+    @endphp
+    <li class="sidebar-item has-sub {{ Request::routeIs($masterPsbRoutes) ? 'active' : '' }}">
+        <a href="#" class='sidebar-link'>
             <i class="bi bi-journal-text"></i>
             <span>Master PSB</span>
         </a>
 
-        <ul class="submenu">
-            <li class="submenu-item">
-                <a href="{{ route('admin.master-periode.dashboard') }}" wire:navigate class="submenu-link {{ Request::routeIs('admin.master-periode.dashboard') ? 'text-primary fs-6' : '' }}">Periode Ujian</a>
+        <ul class="submenu {{ Request::routeIs($masterPsbRoutes) ? 'active' : '' }}">
+            <li class="submenu-item {{ Request::routeIs('admin.master-periode.dashboard') ? 'active' : '' }}">
+                {{-- Nama link diubah sesuai permintaan --}}
+                <a href="{{ route('admin.master-periode.dashboard') }}" wire:navigate>Dashboard Periode</a>
             </li>
-            <li class="submenu-item">
-                <a href="{{ route('admin.master-psb.dashboard') }}" wire:navigate class="submenu-link {{ Request::routeIs('admin.master-psb.dashboard') ? 'text-primary fs-6' : '' }}">Dashboard PSB</a>
+            <li class="submenu-item {{ Request::routeIs('admin.master-psb.show-registrations') ? 'active' : '' }}">
+                <a href="{{ route('admin.master-psb.show-registrations') }}" wire:navigate>List Santri</a>
             </li>
-            <li class="submenu-item">
-                <a href="{{ route('admin.master-psb.show-registrations') }}" wire:navigate class="submenu-link {{ Request::routeIs('admin.master-psb.show-registrations') ? 'text-primary fs-6' : '' }}">List Santri Baru</a>
+            <li class="submenu-item {{ Request::routeIs('admin.master-psb.interview-list') ? 'active' : '' }}">
+                <a href="{{ route('admin.master-psb.interview-list') }}" wire:navigate>List Wawancara</a>
             </li>
-            <li class="submenu-item">
-                <a href="{{ route('admin.master-psb.interview-list') }}" wire:navigate class="submenu-link {{ Request::routeIs('admin.master-psb.interview-list') ? 'text-primary fs-6' : '' }}">Wawancara Santri Baru</a>
+            <li class="submenu-item {{ Request::routeIs('ppdb.dashboard-daftar-ulang') ? 'active' : '' }}">
+                <a href="{{ route('ppdb.dashboard-daftar-ulang') }}" wire:navigate>Daftar Ulang</a>
             </li>
-            <li class="submenu-item">
-                <a href="{{ route('admin.master-ujian.dashboard') }}" wire:navigate class="submenu-link {{ Request::routeIs('admin.master-ujian.dashboard') ? 'text-primary fs-6' : '' }}">List Ujian</a>
+        </ul>
+    </li>
+
+
+    {{-- DROPDOWN 2: MASTER UJIAN --}}
+    @php
+        // Daftar route yang akan mengaktifkan dropdown Master Ujian
+        $masterUjianRoutes = [
+            'admin.master-ujian.*', // Wildcard agar mencakup detail, dll.
+            'admin.psb.ujian.hasil'
+        ];
+    @endphp
+    <li class="sidebar-item has-sub {{ Request::routeIs($masterUjianRoutes) ? 'active' : '' }}">
+        <a href="#" class='sidebar-link'>
+            <i class="bi bi-file-earmark-check-fill"></i>
+            <span>Master Ujian</span>
+        </a>
+
+        <ul class="submenu {{ Request::routeIs($masterUjianRoutes) ? 'active' : '' }}">
+            <li class="submenu-item {{ Request::routeIs('admin.master-ujian.dashboard') ? 'active' : '' }}">
+                <a href="{{ route('admin.master-ujian.dashboard') }}" wire:navigate>Dashboard Ujian</a>
             </li>
-            <li class="submenu-item">
-                <a href="{{ route('admin.psb.ujian.hasil') }}" wire:navigate class="submenu-link {{ Request::routeIs('admin.psb.ujian.hasil') ? 'text-primary fs-6' : '' }}">Hasil Ujian Santri</a>
-            </li>
-            <li class="submenu-item">
-                <a href="{{ route('ppdb.dashboard-daftar-ulang') }}" wire:navigate class="submenu-link {{ Request::routeIs('ppdb.dashboard-daftar-ulang') ? 'text-primary fs-6' : '' }}">Dashboard Daftar Ulang</a>
+            <li class="submenu-item {{ Request::routeIs('admin.psb.ujian.hasil') ? 'active' : '' }}">
+                <a href="{{ route('admin.psb.ujian.hasil') }}" wire:navigate>Hasil Ujian Santri</a>
             </li>
         </ul>
     </li>

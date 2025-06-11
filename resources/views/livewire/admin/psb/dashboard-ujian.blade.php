@@ -5,11 +5,13 @@
         @if (session()->has('error'))
             <div class="alert alert-danger">{{ session('error') }}</div>
         @endif
-
+{{-- Judul Halaman --}}
+<div class="page-title">
+        <div class="row">
+        <p class="text-subtitle text-muted">Dashboard pembuatan Ujian dan soal.</p>
+        </div>
+    </div>
         <div class="card">
-            <div class="card-header">
-                <h4>Daftar Ujian</h4>
-            </div>
             <div class="card-body">
                 <div class="row mb-4">
                     <div class="col-md-3">

@@ -16,6 +16,7 @@ class InterviewList extends Component
     use WithPagination;
     #[Title('Halaman List Wawancara Santri PPDB')]
     
+    protected $paginationTheme = 'bootstrap';
     public $perPage = 10;
     public $search = '';
     public $searchLokasi = '';

@@ -1,9 +1,12 @@
 <?php
 
+use App\Http\Controllers\CertificateController;
 use App\Livewire\Auth;
 use App\Livewire\StudentExam;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
+// use Barryvdh\DomPDF\Facade\Pdf; // Tidak perlu diimpor di sini jika menggunakan Controller
+// use Illuminate\Http\Request; // Tidak perlu diimpor di sini jika menggunakan Controller
 
 Route::get('/', function () {
     return redirect('/auth/login');
@@ -31,6 +34,30 @@ Route::get('/generate', function () {
     Artisan::call('storage:link');
     echo 'ok';
 });
+
+// >>>>>> INI ADALAH DEFINISI RUTE YANG BENAR DAN PERLU DIJAGA <<<<<<
+Route::post('/download-certificate-pdf', [CertificateController::class, 'download'])->name('download-certificate-pdf');
+
+// >>>>>> KODE DI BAWAH INI HARUS DIHAPUS ATAU DIKOMENTARI <<<<<<
+/*
+Route::post('/download-certificate-pdf', function (Request $request) {
+    $htmlContent = $request->input('html_content');
+    $fileName = $request->input('file_name', 'sertifikat.pdf'); // Default filename
+
+    // Perbaiki URL CDN di dalam HTML jika ada
+    $htmlContent = str_replace(
+        ['[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)', '[https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap](https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap)'],
+        ['https://cdn.tailwindcss.com', 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap'],
+        $htmlContent
+    );
+
+    $pdf = Pdf::loadHtml($htmlContent);
+
+    // Mengembalikan PDF sebagai unduhan
+    return $pdf->download($fileName);
+})->name('download-certificate-pdf');
+*/
+// >>>>>> BATAS KODE YANG HARUS DIHAPUS/DIKOMENTARI <<<<<<
 
 // Route redirect
 require __DIR__ . '/superadmin.php';

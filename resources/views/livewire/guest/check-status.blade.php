@@ -392,7 +392,13 @@
                         <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">Diterima</span>
                     </div>
                     <h3 class="text-xl font-bold text-gray-900 mb-2">Selamat! Anda Diterima</h3>
-                    <p class="text-gray-600 mb-4">Anda dinyatakan LULUS dan diterima di SMA Bina Prestasi. Silakan melakukan daftar ulang sesuai jadwal yang ditentukan.</p>
+                    <p class="text-gray-600 mb-4">Anda dinyatakan LULUS dan diterima di SMA Bina Prestasi. Silakan Download bukti penerimaan di bawah ini.</p>
+                    {{-- Tombol untuk mencetak sertifikat --}}
+                    <button wire:click="downloadCertificate"
+            class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 transform hover:scale-105">
+        {{-- Ikon Font Awesome --}}
+        <i class="fas fa-print mr-3"></i> Cetak Sertifikat Penerimaan
+    </button>
                         <div class="bg-green-50 p-4 rounded-lg">
                             <p class="text-sm text-green-800 font-medium">
                                 <i class="fas fa-info-circle mr-2"></i>
@@ -549,16 +555,50 @@
         </a>
     </div>
 
-    <!-- JavaScript for Mobile Menu Toggle -->
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            const mobileMenuButton = document.getElementById('mobile-menu-button');
-            const mobileMenu = document.getElementById('mobile-menu');
-
-            mobileMenuButton.addEventListener('click', function () {
-                mobileMenu.classList.toggle('hidden');
-            });
-        });
-    </script>
+    
 </div>
+
 @endsection
+
+@push('scripts')
+<script>
+    // Memantau event 'downloadPdf' yang dikirim dari Livewire
+    Livewire.on('downloadPdf', (data) => {
+        const htmlContent = data.html;
+        const fileName = data.fileName;
+
+        // Membuat form tersembunyi untuk mengirim konten HTML ke rute Laravel
+        const form = document.createElement('form');
+        form.method = 'POST';
+        // Definisikan rute ini di web.php
+        form.action = '{{ route('download-certificate-pdf') }}';
+        form.target = '_blank'; // Membuka di tab baru (opsional, bisa dihapus jika ingin langsung unduh)
+
+        // Menambahkan token CSRF untuk keamanan Laravel
+        const csrfToken = document.createElement('input');
+        csrfToken.type = 'hidden';
+        csrfToken.name = '_token';
+        csrfToken.value = '{{ csrf_token() }}';
+        form.appendChild(csrfToken);
+
+        // Menambahkan konten HTML sebagai input tersembunyi
+        const htmlInput = document.createElement('input');
+        htmlInput.type = 'hidden';
+        htmlInput.name = 'html_content';
+        htmlInput.value = htmlContent;
+        form.appendChild(htmlInput);
+
+        // Menambahkan nama file sebagai input tersembunyi
+        const fileNameInput = document.createElement('input');
+        fileNameInput.type = 'hidden';
+        fileNameInput.name = 'file_name';
+        fileNameInput.value = fileName;
+        form.appendChild(fileNameInput);
+
+        // Menambahkan form ke body dokumen dan mengirimkannya
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form); // Membersihkan form setelah submit
+    });
+</script>
+@endpush
