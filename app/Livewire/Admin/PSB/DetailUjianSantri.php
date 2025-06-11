@@ -32,13 +32,18 @@ class DetailUjianSantri extends Component
     public function loadUjianList()
     {
         $this->ujianList = Ujian::with(['hasilUjians' => function($query) {
-            $query->where('santri_id', $this->santriId);
+            $query->where('santri_id',
+    $this->santriId);
         }])->get();
-
+    
         foreach ($this->ujianList as $ujian) {
             $hasilUjian = $ujian->hasilUjians->first();
-            $this->totalNilaiPerUjian[$ujian->id] = $hasilUjian && $hasilUjian->status === 'selesai' 
-                ? ($hasilUjian->nilai_akhir ?? 0) 
+    
+            // Baris ini adalah kuncinya:
+            // Jika ujian sudah 'selesai', ambil nilai dari kolom 'nilai_akhir',
+            // jika tidak, nilainya dianggap 0.
+            $this->totalNilaiPerUjian[$ujian->id] = $hasilUjian && $hasilUjian->status === 'selesai'
+                ? ($hasilUjian->nilai_akhir ?? 0)
                 : 0;
         }
     }

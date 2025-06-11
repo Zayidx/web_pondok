@@ -14,7 +14,7 @@ use App\Livewire\Admin\PSB\HasilUjianSantri;
 use App\Livewire\Admin\PSB\DetailUjianSantri;
 use Illuminate\Support\Facades\Route;
 
-Route::prefix('admin')->middleware(['auth', 'role:superadmin'])->group(function () {
+Route::prefix('admin')->middleware(['auth', 'role:Super Admin'])->group(function () {
     Route::get('/dashboard', Admin\Dashboard::class)->name('admin.dashboard');
 
     Route::prefix('master-pondok')->group(function () {
@@ -51,22 +51,20 @@ Route::prefix('admin')->middleware(['auth', 'role:superadmin'])->group(function 
         Route::get('/registrations/{santriId}/edit', \App\Livewire\Admin\PSB\EditRegistration::class)->name('admin.master-psb.edit-registration');
         Route::get('/wawancara-santri', InterviewList::class)->name('admin.master-psb.interview-list');
     });
-    
+
     Route::prefix('master-periode')->group(function () {
         Route::get('/dashboard', PeriodeManager::class)->name('admin.master-periode.dashboard');
     });
-    
+
     Route::prefix('master-ujian')->group(function () {
         Route::get('/dashboard', DashboardUjian::class)->name('admin.master-ujian.dashboard');
         Route::get('/detail/{ujianId}', DetailUjian::class)->name('admin.master-ujian.detail');
         Route::get('/preview/{ujianId}', PreviewUjian::class)->name('admin.psb.ujian.preview');
         Route::get('/essay/{ujianId}', UjianEssay::class)->name('admin.master-ujian.essay');
     });
-    
-    // PSB Exam Results Routes
+
     Route::prefix('psb/ujian')->name('admin.psb.ujian.')->group(function () {
         Route::get('/hasil', HasilUjianSantri::class)->name('hasil');
         Route::get('/detail/{id}', DetailUjianSantri::class)->name('detail');
     });
-    
 });

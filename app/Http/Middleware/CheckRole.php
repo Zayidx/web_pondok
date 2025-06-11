@@ -23,17 +23,12 @@ class CheckRole
         // Get the user's role name
         $userRole = $request->user()->admin->role->nama;
 
-        // Check if the user's role matches the required role
+        // Check if the user's role matches the required role or is superadmin
         // Using trim to remove any whitespace and case-insensitive comparison
-        if (strtolower(trim($userRole)) !== strtolower(trim($role))) {
+        if (strtolower(trim($userRole)) !== strtolower(trim($role)) && strtolower(trim($userRole)) !== 'superadmin') {
             abort(403, "Unauthorized action. You need {$role} role to access this page.");
         }
 
         return $next($request);
     }
-} 
- 
- 
- 
- 
- 
+}

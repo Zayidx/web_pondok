@@ -3,7 +3,7 @@
         <!-- Page Heading -->
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
             
-            <a href="{{ route('e-ppdb.master-ujian.hasil') }}" class="btn btn-secondary">
+            <a href="{{ route('e-ppdb.dashboard') }}" class="btn btn-secondary">
                 <i class="fas fa-arrow-left"></i> Kembali Ke Dashboard Ujian
             </a>
         </div>
@@ -83,13 +83,21 @@
                                             {{ str_replace('_', ' ', ucfirst($status)) }}
                                         </span>
                                     </td>
-                                    <td class="text-center">
-                                        @if($hasilUjian && $status === 'selesai')
-                                            {{ $totalNilaiPerUjian[$ujian->id] ?? 'Belum dinilai' }}
-                                        @else
-                                            -
-                                        @endif
-                                    </td>
+                                   {{-- resources/views/livewire/admin/psb/detail-ujian-santri.blade.php --}}
+
+<td class="text-center">
+    {{-- Kode ini memeriksa apakah status ujian sudah 'selesai' --}}
+    @if($hasilUjian && $status === 'selesai')
+
+        {{-- Jika ya, maka ia akan menampilkan nilai dari array
+             yang sudah kita siapkan di komponen. --}}
+        {{ $totalNilaiPerUjian[$ujian->id] ?? 'Belum dinilai' }}
+
+    @else
+        {{-- Jika belum selesai, tampilkan strip (-) --}}
+        -
+    @endif
+</td>
                                     <td>
                                         @if($hasilUjian && $status === 'selesai')
                                             <a href="{{ route('admin.psb.ujian.detail-soal', ['ujianId' => $ujian->id, 'santriId' => $santri->id]) }}" 

@@ -20,8 +20,8 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 2. Create psb_pendaftaran_santri table (gabungan semua perubahan)
-        Schema::create('psb_pendaftaran_santri', function (Blueprint $table) {
+         // 2. Create psb_pendaftaran_santri table
+         Schema::create('psb_pendaftaran_santri', function (Blueprint $table) {
             $table->id();
             $table->string('nama_jenjang')->nullable();
             $table->string('nama_lengkap');
@@ -55,6 +55,7 @@ return new class extends Migration
             $table->enum('status', ['daftar', 'verifikasi', 'ujian', 'wawancara', 'diterima', 'ditolak'])->default('daftar');
             $table->rememberToken();
             $table->string('password')->nullable();
+            
             // Kolom untuk pendaftaran ulang
             $table->decimal('nominal_pembayaran', 12, 2)->nullable();
             $table->date('tanggal_pembayaran')->nullable();
@@ -62,6 +63,12 @@ return new class extends Migration
             $table->string('nama_pengirim')->nullable();
             $table->string('bukti_pembayaran')->nullable();
             $table->enum('status_pembayaran', ['pending', 'verified', 'rejected'])->nullable();
+
+            // =================================================================
+            // PENAMBAHAN KOLOM BARU UNTUK NILAI RATA-RATA
+            // =================================================================
+            $table->decimal('rata_rata_ujian', 5, 2)->nullable()->comment('Menyimpan nilai rata-rata dari semua ujian');
+            
             $table->foreignId('verified_by')->nullable()->constrained('users');
             $table->timestamp('verified_at')->nullable();
             $table->text('catatan_verifikasi')->nullable();

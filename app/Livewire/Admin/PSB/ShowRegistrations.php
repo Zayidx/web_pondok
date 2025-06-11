@@ -201,7 +201,7 @@ class ShowRegistrations extends Component
             $santri->catatan_verifikasi = null;
 
             // Update status back to diterima
-            $santri->status_santri = 'diterima';
+            $santri->status_santri = 'sedang_ujian';
             $santri->save();
 
             DB::commit();
@@ -209,7 +209,7 @@ class ShowRegistrations extends Component
             Log::info('Daftar ulang cancelled successfully', [
                 'santri_id' => $santri->id,
                 'old_status' => 'daftar_ulang',
-                'new_status' => 'diterima'
+                'new_status' => 'sedang_ujian'
             ]);
 
             session()->flash('success', 'Daftar ulang berhasil dibatalkan dan status dikembalikan ke tahap diterima.');

@@ -51,7 +51,7 @@ Route::prefix('ppdb')->middleware('auth')->group(function () {
         Route::get('/detail/{ujianId}', DetailUjian::class)->name('admin.master-ujian.detail');
         Route::get('/preview/{ujianId}', PreviewUjian::class)->name('admin.psb.ujian.preview');
         Route::get('/essay/{ujianId}', UjianEssay::class)->name('admin.master-ujian.essay');
-        Route::get('/detail/{ujianId}/{santriId}', \App\Livewire\Psb\DetailSoalSantri::class)->name('master-ujian.detail-soal');
+        Route::get('/detail/{ujianId}/{santriId}', \App\Livewire\PSB\DetailSoalSantri::class)->name('master-ujian.detail-soal');
         Route::get('/hasil', \App\Livewire\Admin\PSB\HasilUjian::class)->name('master-ujian.hasil');
         Route::get('/detail-santri/{santriId}', \App\Livewire\Admin\PSB\DetailUjianSantri::class)->name('master-ujian.detail-santri');
     });

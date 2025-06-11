@@ -164,9 +164,9 @@
                                 </div>
                             </div>
                         </div>
-                        <button wire:click="mulaiUjian({{ $ujian['id'] }})" class="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-primary-dark transition duration-300">
-                            Mulai Ujian
-                        </button>
+                        <a href="{{ route('santri.konfirmasi-ujian', $ujian['id']) }}" wire:navigate class="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-primary-dark transition duration-300">
+    Mulai Ujian
+</a>
                     </div>
                 </div>
                 @endforeach

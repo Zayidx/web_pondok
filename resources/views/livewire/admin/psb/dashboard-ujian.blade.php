@@ -107,7 +107,7 @@
                                         </span>
                                     </td>
                                     <td class="text-nowrap">
-                                        <a href="{{ route('admin.master-ujian.detail', $ujian->id) }}" class="btn btn-info btn-sm me-1">
+                                        <a href="{{ route('admin.master-ujian.detail', $ujian->id) }}" wire:navigate class="btn btn-info btn-sm me-1">
                                             <i class="bi bi-journal-text"></i> Soal
                                         </a>
                                         <button wire:click="edit({{ $ujian->id }})" data-bs-toggle="modal" data-bs-target="#createUjianModal" class="btn btn-warning btn-sm me-1">

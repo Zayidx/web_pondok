@@ -3,401 +3,241 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pendaftaran Ulang - Santri</title>
+    <title>Sertifikat Penerimaan - Santri Baru</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        primary: '#3b82f6',
-                        'primary-dark': '#2563eb',
-                    }
-                }
+    <style>
+        @page {
+            size: A4;
+            margin: 0;
+        }
+        
+        @media print {
+            body {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+            .no-print {
+                display: none;
             }
         }
-    </script>
-    <style>
-        .gradient-bg {
-            background: linear-gradient(135deg, #dbeafe 0%, #e0e7ff 100%);
+
+        .a4-page {
+            width: 210mm;
+            height: 297mm;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            position: relative;
+            overflow: hidden;
         }
-        .card-shadow {
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+        .ornament-corner {
+            position: absolute;
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+            clip-path: polygon(0 0, 100% 0, 0 100%);
         }
-        .hover-lift:hover {
-            transform: translateY(-2px);
-            transition: all 0.3s ease;
+
+        .ornament-corner.top-left {
+            top: 0;
+            left: 0;
         }
-        .file-upload-area {
-            border: 2px dashed #d1d5db;
-            transition: all 0.3s ease;
+
+        .ornament-corner.top-right {
+            top: 0;
+            right: 0;
+            transform: rotate(90deg);
         }
-        .file-upload-area:hover {
-            border-color: #3b82f6;
-            background-color: #f8fafc;
+
+        .ornament-corner.bottom-left {
+            bottom: 0;
+            left: 0;
+            transform: rotate(-90deg);
         }
-        .file-upload-area.dragover {
-            border-color: #3b82f6;
-            background-color: #eff6ff;
+
+        .ornament-corner.bottom-right {
+            bottom: 0;
+            right: 0;
+            transform: rotate(180deg);
+        }
+
+        .border-ornament {
+            border: 4px solid #3b82f6;
+            border-image: linear-gradient(45deg, #3b82f6, #1d4ed8, #3b82f6) 1;
+        }
+
+        .certificate-bg {
+            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        }
+
+        .seal {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 0 20px rgba(59, 130, 246, 0.3);
+        }
+
+        .seal::before {
+            content: '';
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 2px solid white;
+        }
+
+        .signature-line {
+            border-bottom: 2px solid #374151;
+            width: 200px;
+            margin: 0 auto;
+        }
+
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 120px;
+            color: rgba(59, 130, 246, 0.05);
+            font-weight: bold;
+            z-index: 1;
+            pointer-events: none;
         }
     </style>
 </head>
-<body class="gradient-bg min-h-screen">
-    <div class="max-w-4xl mx-auto px-4 py-8">
-        <!-- Header Section -->
-        <div class="bg-white rounded-xl card-shadow p-6 mb-8 hover-lift">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <h1 class="text-3xl font-bold text-gray-900 mb-2">Pendaftaran Ulang</h1>
-                    <p class="text-lg text-gray-600">Tahun Ajaran 2024/2025 - Semester Genap</p>
-                </div>
-                <button onclick="window.location.href='dashboard-ujian.html'" class="bg-gray-100 hover:bg-gray-200 text-gray-700 px-6 py-3 rounded-lg font-medium transition duration-300 flex items-center gap-2">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/>
-                    </svg>
-                    Kembali ke Dashboard
-                </button>
-            </div>
-        </div>
-
-        <!-- Status Section -->
-        <div class="bg-white rounded-xl card-shadow p-6 mb-8">
-            <div class="flex items-center gap-4 mb-4">
-                <div class="bg-yellow-100 p-3 rounded-full">
-                    <svg class="w-6 h-6 text-yellow-600" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
-                    </svg>
-                </div>
-                <div>
-                    <h2 class="text-xl font-bold text-gray-900">Status Pendaftaran Ulang</h2>
-                    <p class="text-yellow-600 font-medium">Menunggu Upload Bukti Transfer</p>
-                </div>
-            </div>
-            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                <p class="text-yellow-800">
-                    <strong>Perhatian:</strong> Batas waktu pendaftaran ulang adalah <strong>31 Januari 2025</strong>. 
-                    Pastikan Anda melengkapi semua dokumen yang diperlukan sebelum batas waktu berakhir.
-                </p>
-            </div>
-        </div>
-
-        <!-- Payment Information -->
-        <div class="bg-white rounded-xl card-shadow p-6 mb-8">
-            <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                <div class="w-2 h-8 bg-green-600 rounded-full"></div>
-                Informasi Pembayaran
-            </h2>
-            <div class="grid md:grid-cols-2 gap-6">
-                <div class="space-y-4">
-                    <div class="bg-gray-50 rounded-lg p-4">
-                        <h3 class="font-semibold text-gray-800 mb-3">Rincian Biaya</h3>
-                        <div class="space-y-2">
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">SPP Semester Genap</span>
-                                <span class="font-medium">Rp 2.500.000</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Biaya Kegiatan</span>
-                                <span class="font-medium">Rp 500.000</span>
-                            </div>
-                            <div class="flex justify-between">
-                                <span class="text-gray-600">Biaya Buku</span>
-                                <span class="font-medium">Rp 300.000</span>
-                            </div>
-                            <hr class="my-2">
-                            <div class="flex justify-between font-bold text-lg">
-                                <span>Total</span>
-                                <span class="text-primary">Rp 3.300.000</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="space-y-4">
-                    <div class="bg-blue-50 rounded-lg p-4">
-                        <h3 class="font-semibold text-blue-800 mb-3">Informasi Rekening</h3>
-                        <div class="space-y-2 text-sm">
-                            <div>
-                                <span class="text-blue-600 font-medium">Bank:</span>
-                                <span class="text-blue-800 ml-2">Bank Mandiri</span>
-                            </div>
-                            <div>
-                                <span class="text-blue-600 font-medium">No. Rekening:</span>
-                                <span class="text-blue-800 ml-2 font-mono">1234567890</span>
-                            </div>
-                            <div>
-                                <span class="text-blue-600 font-medium">Atas Nama:</span>
-                                <span class="text-blue-800 ml-2">Yayasan Pendidikan Al-Hikmah</span>
-                            </div>
-                          
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Registration Form -->
-        <div class="bg-white rounded-xl card-shadow p-6 mb-8">
-            <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                <div class="w-2 h-8 bg-primary rounded-full"></div>
-                Form Pendaftaran Ulang
-            </h2>
-
-            <form id="registrationForm" class="space-y-6">
-                <!-- Student Information -->
-                <div class="grid md:grid-cols-2 gap-6">
-                    <div>
-                        <label for="nama" class="block text-sm font-medium text-gray-700 mb-2">Nama Lengkap</label>
-                        <input type="text" id="nama" name="nama" value="Ahmad Fauzi" readonly class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed">
-                    </div>
-                    <div>
-                        <label for="nis" class="block text-sm font-medium text-gray-700 mb-2">NISN</label>
-                        <input type="text" id="nis" name="nis" value="202400111" readonly class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed">
-                    </div>
-                    <div>
-                        <label for="Telepon" class="block text-sm font-medium text-gray-700 mb-2">Telepon</label>
-                        <input type="number" id="Telepon" name="Telepon" value="628xxxxxxxx" readonly class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed">
-                    </div>
-                    <div>
-                        <label for="tahun_ajaran" class="block text-sm font-medium text-gray-700 mb-2">Tahun Ajaran</label>
-                        <input type="text" id="tahun_ajaran" name="tahun_ajaran" value="2024/2025" readonly class="w-full px-4 py-3 border border-gray-300 rounded-lg bg-gray-50 text-gray-600 cursor-not-allowed">
-                    </div>
-                </div>
-
-                <!-- Payment Details -->
-                <div class="border-t border-gray-200 pt-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Detail Pembayaran</h3>
-                    <div class="grid md:grid-cols-2 gap-6">
-                        <div>
-                            <label for="nominal_transfer" class="block text-sm font-medium text-gray-700 mb-2">Nominal Transfer <span class="text-red-500">*</span></label>
-                            <input type="text" id="nominal_transfer" name="nominal_transfer" placeholder="Rp 3.300.001" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" required>
-                            <p class="text-xs text-gray-500 mt-1">Masukkan nominal sesuai dengan totalk</p>
-                        </div>
-                        <div>
-                            <label for="tanggal_transfer" class="block text-sm font-medium text-gray-700 mb-2">Tanggal Transfer <span class="text-red-500">*</span></label>
-                            <input type="date" id="tanggal_transfer" name="tanggal_transfer" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" required>
-                        </div>
-                        <div>
-                            <label for="bank_pengirim" class="block text-sm font-medium text-gray-700 mb-2">Bank Pengirim <span class="text-red-500">*</span></label>
-                            <select id="bank_pengirim" name="bank_pengirim" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" required>
-                                <option value="">Pilih Bank</option>
-                                <option value="mandiri">Bank Mandiri</option>
-                                <option value="bca">Bank BCA</option>
-                                <option value="bni">Bank BNI</option>
-                                <option value="bri">Bank BRI</option>
-                                <option value="cimb">Bank CIMB Niaga</option>
-                                <option value="danamon">Bank Danamon</option>
-                                <option value="other">Lainnya</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label for="nama_pengirim" class="block text-sm font-medium text-gray-700 mb-2">Nama Pengirim <span class="text-red-500">*</span></label>
-                            <input type="text" id="nama_pengirim" name="nama_pengirim" placeholder="Nama sesuai rekening pengirim" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary" required>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- File Upload Section -->
-                <div class="border-t border-gray-200 pt-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Upload Bukti Transfer</h3>
-                    
-                    <div class="file-upload-area rounded-lg p-8 text-center cursor-pointer" id="fileUploadArea">
-                        <input type="file" id="bukti_transfer" name="bukti_transfer" accept="image/*,.pdf" class="hidden" required>
-                        <div id="uploadContent">
-                            <svg class="mx-auto h-12 w-12 text-gray-400 mb-4" stroke="currentColor" fill="none" viewBox="0 0 48 48">
-                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                            </svg>
-                            <p class="text-lg font-medium text-gray-900 mb-2">Klik untuk upload atau drag & drop</p>
-                            <p class="text-sm text-gray-500 mb-4">PNG, JPG, JPEG atau PDF (Maks. 5MB)</p>
-                            <button type="button" class="bg-primary text-white px-6 py-2 rounded-lg font-medium hover:bg-primary-dark transition duration-300">
-                                Pilih File
-                            </button>
-                        </div>
-                        <div id="filePreview" class="hidden">
-                            <div class="flex items-center justify-center gap-4">
-                                <div class="bg-green-100 p-2 rounded-full">
-                                    <svg class="w-6 h-6 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
-                                    </svg>
-                                </div>
-                                <div class="text-left">
-                                    <p class="font-medium text-gray-900" id="fileName"></p>
-                                    <p class="text-sm text-gray-500" id="fileSize"></p>
-                                </div>
-                                <button type="button" id="removeFile" class="text-red-500 hover:text-red-700">
-                                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-                                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/>
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-4 p-4 bg-blue-50 rounded-lg">
-                        <h4 class="font-semibold text-blue-800 mb-2">Persyaratan Bukti Transfer:</h4>
-                        <ul class="text-sm text-blue-700 space-y-1">
-                            <li>• File harus berupa screenshot atau foto bukti transfer yang jelas</li>
-                            <li>• Pastikan nominal, tanggal, dan nama pengirim terlihat dengan jelas</li>
-                            <li>• Format file: PNG, JPG, JPEG, atau PDF</li>
-                            <li>• Ukuran file maksimal 5MB</li>
-                            <li>• Bukti transfer harus asli dan tidak boleh dimanipulasi</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Additional Information -->
-                <div class="border-t border-gray-200 pt-6">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-4">Keterangan Tambahan</h3>
-                    <div>
-                        <label for="keterangan" class="block text-sm font-medium text-gray-700 mb-2">Keterangan (Opsional)</label>
-                        <textarea id="keterangan" name="keterangan" rows="3" placeholder="Tambahkan keterangan jika diperlukan..." class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary resize-none"></textarea>
-                    </div>
-                </div>
-
-                <!-- Terms and Conditions -->
-                <div class="border-t border-gray-200 pt-6">
-                    <div class="flex items-start gap-3">
-                        <input type="checkbox" id="terms" name="terms" class="mt-1 w-5 h-5 text-primary border-gray-300 rounded focus:ring-primary" required>
-                        <label for="terms" class="text-sm text-gray-700">
-                            Saya menyatakan bahwa data yang saya berikan adalah benar dan saya bersedia mengikuti semua peraturan yang berlaku di sekolah. 
-                            <a href="#" class="text-primary hover:text-primary-dark">Baca syarat dan ketentuan lengkap</a>
-                        </label>
-                    </div>
-                </div>
-
-                <!-- Submit Button -->
-                <div class="flex flex-col sm:flex-row gap-4 justify-center pt-6">
-                    <button type="button" onclick="window.location.href='dashboard-ujian.html'" class="px-8 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition duration-300">
-                        Batal
-                    </button>
-                    <button type="submit" class="px-8 py-3 bg-primary text-white rounded-lg font-medium hover:bg-primary-dark transition duration-300 shadow-lg">
-                        Submit Pendaftaran Ulang
-                    </button>
-                </div>
-            </form>
-        </div>
+<body class="bg-gray-100 p-4">
+    <!-- Print Button -->
+    <div class="no-print text-center mb-4">
+        <button onclick="window.print()" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition duration-300 shadow-lg">
+            <svg class="w-5 h-5 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd"/>
+            </svg>
+            Cetak Sertifikat
+        </button>
+        <button onclick="window.location.href='dashboard-ujian.html'" class="ml-4 bg-gray-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-700 transition duration-300">
+            Kembali ke Dashboard
+        </button>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const fileUploadArea = document.getElementById('fileUploadArea');
-            const fileInput = document.getElementById('bukti_transfer');
-            const uploadContent = document.getElementById('uploadContent');
-            const filePreview = document.getElementById('filePreview');
-            const fileName = document.getElementById('fileName');
-            const fileSize = document.getElementById('fileSize');
-            const removeFileBtn = document.getElementById('removeFile');
+    <!-- A4 Certificate Page -->
+    <div class="a4-page certificate-bg">
+        <!-- Watermark -->
+        <div class="watermark">DITERIMA</div>
+        
+        <!-- Corner Ornaments -->
+        <div class="ornament-corner top-left"></div>
+        <div class="ornament-corner top-right"></div>
+        <div class="ornament-corner bottom-left"></div>
+        <div class="ornament-corner bottom-right"></div>
 
-            // Click to upload
-            fileUploadArea.addEventListener('click', function() {
-                fileInput.click();
-            });
+        <!-- Main Content -->
+        <div class="h-full flex flex-col justify-between p-12 relative z-10">
+            <!-- Header -->
+            <div class="text-center">
+                <!-- Logo and School Info -->
+                <div class="flex items-center justify-center mb-6">
+                    <div class="w-20 h-20 bg-blue-600 rounded-full flex items-center justify-center mr-6">
+                        <svg class="w-12 h-12 text-white" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3zM3.31 9.397L5 10.12v4.102a8.969 8.969 0 00-1.05-.174 1 1 0 01-.89-.89 11.115 11.115 0 01.25-3.762zM9.3 16.573A9.026 9.026 0 007 14.935v-3.957l1.818.78a3 3 0 002.364 0l5.508-2.361a11.026 11.026 0 01.25 3.762 1 1 0 01-.89.89 8.968 8.968 0 00-5.35 2.524 1 1 0 01-1.4 0zM6 18a1 1 0 001-1v-2.065a8.935 8.935 0 00-2-.712V17a1 1 0 001 1z"/>
+                        </svg>
+                    </div>
+                    <div class="text-left">
+                        <h1 class="text-2xl font-bold text-gray-800">PESANTREN AL-HIKMAH</h1>
+                        <p class="text-lg text-gray-600">Yayasan Pendidikan Islam Terpadu</p>
+                        <p class="text-sm text-gray-500">Jl. Pendidikan No. 123, Jakarta Selatan 12345</p>
+                        <p class="text-sm text-gray-500">Telp: (021) 1234-5678 | Email: info@alhikmah.ac.id</p>
+                    </div>
+                </div>
 
-            // Drag and drop functionality
-            fileUploadArea.addEventListener('dragover', function(e) {
-                e.preventDefault();
-                fileUploadArea.classList.add('dragover');
-            });
+                <!-- Certificate Title -->
+                <div class="border-ornament rounded-lg p-6 mb-8 bg-white shadow-lg">
+                    <h2 class="text-4xl font-bold text-blue-600 mb-2">SERTIFIKAT PENERIMAAN</h2>
+                    <p class="text-xl text-gray-600">SANTRI BARU TAHUN AJARAN 2024/2025</p>
+                </div>
+            </div>
 
-            fileUploadArea.addEventListener('dragleave', function(e) {
-                e.preventDefault();
-                fileUploadArea.classList.remove('dragover');
-            });
+            <!-- Main Content -->
+            <div class="flex-1 flex flex-col justify-center">
+                <!-- Congratulations Message -->
+                <div class="text-center mb-8">
+                    <p class="text-lg text-gray-700 mb-4">Dengan ini menyatakan bahwa:</p>
+                    
+                    <!-- Student Name -->
+                    <div class="bg-white rounded-lg p-6 shadow-lg border-2 border-blue-200 mb-6">
+                        <h3 class="text-3xl font-bold text-blue-800 mb-2">AHMAD FAUZI</h3>
+                        <p class="text-lg text-gray-600">Telah diterima sebagai Santri Baru</p>
+                    </div>
 
-            fileUploadArea.addEventListener('drop', function(e) {
-                e.preventDefault();
-                fileUploadArea.classList.remove('dragover');
-                const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                    handleFile(files[0]);
-                }
-            });
+                    <p class="text-lg text-gray-700 mb-6">
+                        Telah <span class="font-bold text-green-600">DITERIMA</span> dan terdaftar sebagai santri baru di 
+                        <span class="font-bold text-blue-600">Pesantren Al-Hikmah</span> untuk mengikuti pendidikan 
+                        pada Tahun Ajaran <span class="font-bold">2024/2025</span>
+                    </p>
+                </div>
 
-            // File input change
-            fileInput.addEventListener('change', function(e) {
-                if (e.target.files.length > 0) {
-                    handleFile(e.target.files[0]);
-                }
-            });
 
-            // Remove file
-            removeFileBtn.addEventListener('click', function(e) {
-                e.stopPropagation();
-                fileInput.value = '';
-                uploadContent.classList.remove('hidden');
-                filePreview.classList.add('hidden');
-            });
+            <!-- Footer with Signatures -->
+            <div class="mt-8">
+                <!-- Important Notes -->
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
+                    <h5 class="font-bold text-yellow-800 mb-2">CATATAN PENTING:</h5>
+                    <ul class="text-sm text-yellow-700 space-y-1">
+                        <li>• Orientasi santri baru dimulai tanggal 15 Juli 2024</li>
+                        <li>• Harap membawa sertifikat ini saat registrasi ulang</li>
+                        <li>• Pembayaran SPP semester pertama paling lambat 20 Juli 2024</li>
+                        <li>• Untuk informasi lebih lanjut hubungi bagian administrasi</li>
+                    </ul>
+                </div>
 
-            function handleFile(file) {
-                // Validate file type
-                const allowedTypes = ['image/png', 'image/jpg', 'image/jpeg', 'application/pdf'];
-                if (!allowedTypes.includes(file.type)) {
-                    alert('Format file tidak didukung. Gunakan PNG, JPG, JPEG, atau PDF.');
-                    return;
-                }
+                <!-- Signatures -->
+                <div class="flex justify-between items-end">
+                    <!-- Date and Place -->
+                    <div class="text-left">
+                        <p class="text-gray-700 mb-8">Jakarta, 15 Desember 2024</p>
+                        <div class="text-center">
+                            <div class="seal mx-auto mb-4">
+                                <div class="text-white text-center">
+                                    <div class="text-xs font-bold">PESANTREN</div>
+                                    <div class="text-xs font-bold">AL-HIKMAH</div>
+                                    <div class="text-xs">2024</div>
+                                </div>
+                            </div>
+                            <p class="text-sm text-gray-600">Stempel Resmi</p>
+                        </div>
+                    </div>
 
-                // Validate file size (5MB)
-                if (file.size > 5 * 1024 * 1024) {
-                    alert('Ukuran file terlalu besar. Maksimal 5MB.');
-                    return;
-                }
+                    <!-- Director Signature -->
+                    <div class="text-center">
+                        <p class="text-gray-700 mb-2">Direktur Pesantren</p>
+                        <div class="signature-line mb-4"></div>
+                        <p class="font-bold text-gray-800">Dr. H. Abdul Rahman, M.Pd</p>
+                        <p class="text-sm text-gray-600">NIK: 1234567890123456</p>
+                    </div>
 
-                // Update UI
-                fileName.textContent = file.name;
-                fileSize.textContent = formatFileSize(file.size);
-                uploadContent.classList.add('hidden');
-                filePreview.classList.remove('hidden');
+                    <!-- Admin Signature -->
+                    <div class="text-center">
+                        <p class="text-gray-700 mb-2">Kepala Administrasi</p>
+                        <div class="signature-line mb-4"></div>
+                        <p class="font-bold text-gray-800">Hj. Fatimah, S.Pd</p>
+                        <p class="text-sm text-gray-600">NIK: 9876543210987654</p>
+                    </div>
+                </div>
 
-                // Update file input
-                const dt = new DataTransfer();
-                dt.items.add(file);
-                fileInput.files = dt.files;
-            }
-
-            function formatFileSize(bytes) {
-                if (bytes === 0) return '0 Bytes';
-                const k = 1024;
-                const sizes = ['Bytes', 'KB', 'MB', 'GB'];
-                const i = Math.floor(Math.log(bytes) / Math.log(k));
-                return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
-            }
-
-            // Form submission
-            document.getElementById('registrationForm').addEventListener('submit', function(e) {
-                e.preventDefault();
-                
-                // Validate required fields
-                const requiredFields = ['nominal_transfer', 'tanggal_transfer', 'bank_pengirim', 'nama_pengirim', 'bukti_transfer', 'terms'];
-                let isValid = true;
-
-                requiredFields.forEach(field => {
-                    const element = document.getElementById(field);
-                    if (!element.value || (element.type === 'checkbox' && !element.checked)) {
-                        isValid = false;
-                        element.classList.add('border-red-500');
-                    } else {
-                        element.classList.remove('border-red-500');
-                    }
-                });
-
-                if (!isValid) {
-                    alert('Mohon lengkapi semua field yang wajib diisi.');
-                    return;
-                }
-
-                // Show success message
-                alert('Pendaftaran ulang berhasil disubmit! Anda akan diarahkan ke dashboard.');
-                window.location.href = 'dashboard-ujian.html';
-            });
-
-            // Format nominal input
-            document.getElementById('nominal_transfer').addEventListener('input', function(e) {
-                let value = e.target.value.replace(/[^\d]/g, '');
-                if (value) {
-                    value = 'Rp ' + parseInt(value).toLocaleString('id-ID');
-                }
-                e.target.value = value;
-            });
-        });
-    </script>
+                <!-- Certificate Number -->
+                <div class="text-center mt-6 pt-4 border-t border-gray-300">
+                    <p class="text-sm text-gray-500">
+                        No. Sertifikat: <span class="font-mono font-bold">CERT/2024/001234</span> | 
+                        Tanggal Terbit: 15 Desember 2024
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>
