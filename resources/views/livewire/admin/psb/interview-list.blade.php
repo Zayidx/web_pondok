@@ -6,14 +6,17 @@
     @if (session('error'))
         <div class="alert alert-danger">{{ session('error') }}</div>
     @endif
-
-    <div class="card">
-        <div class="card-header">
-            <h4>Daftar Wawancara Santri</h4>
+{{-- Judul Halaman --}}
+<div class="page-title">
+        <div class="row">
+        <p class="text-subtitle text-muted">Daftar santri yang telah memiliki jadwal wawancara.</p>
         </div>
+    </div>
+    <div class="card">
+
         <div class="card-body">
             <div class="row mb-4">
-                <div class="col-md-3">
+                <div class="col-md-2">
                     <input type="text" wire:model.live="search" class="form-control" placeholder="Cari nama/NISN...">
                 </div>
                 <div class="col-md-2">
@@ -37,15 +40,15 @@
                     </select>
                 </div>
                 
-                <div class="col-md-1">
+                <div class="col-md-2">
                     <button wire:click="resetFilters" class="btn btn-secondary">
-                        <i class="bi bi-x-circle"></i> Reset
+                        <i class="bi bi-x-circle"></i> Reset Filter
                     </button>
                 </div>
             </div>
 
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table class="table table-hover table-striped">
                     <thead>
                         <tr>
                             <th wire:click="sortBy('nama_lengkap')" style="cursor: pointer;">

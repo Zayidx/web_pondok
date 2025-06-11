@@ -35,14 +35,7 @@
                             <option value="selesai">Selesai</option>
                         </select>
                     </div>
-                    <div class="col-md-1">
-                        <select wire:model="perPage" class="form-select">
-                            <option value="10">10</option>
-                            <option value="25">25</option>
-                            <option value="50">50</option>
-                            <option value="100">100</option>
-                        </select>
-                    </div>
+                    
                     <div class="col-md-3">
                         <div class="d-flex gap-2">
                             <button wire:click="create" data-bs-toggle="modal" data-bs-target="#createUjianModal" class="btn btn-primary">
@@ -58,7 +51,7 @@
                 
 
                 <div class="table-responsive">
-                    <table class="table table-hover">
+                    <table class="table table-hover table-striped">
                     <thead>
                         <tr>
                                 <th wire:click="sortBy('id')" style="cursor: pointer;">

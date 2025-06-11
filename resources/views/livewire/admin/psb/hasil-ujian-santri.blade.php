@@ -18,9 +18,7 @@
 
     {{-- Kartu Utama dengan Filter dan Tabel --}}
     <div class="card">
-        <div class="card-header">
-            <h4>Daftar Santri</h4>
-        </div>
+      
         <div class="card-body">
             {{-- Bagian Filter dan Pencarian --}}
             <div class="row mb-4 g-2">
@@ -42,16 +40,10 @@
                         <option value="lowest">Nilai Terendah</option>
                     </select>
                 </div>
-                <div class="col-md-1">
-                    <select wire:model.live="perPage" class="form-select">
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                    </select>
-                </div>
+                
                 <div class="col-md-2">
-                    <button wire:click="resetFilters" class="btn btn-secondary w-100">
-                        <i class="bi bi-x-circle"></i> Reset
+                    <button wire:click="resetFilters" class="btn btn-secondary  ">
+                        <i class="bi bi-x-circle"></i> Reset Filter
                     </button>
                 </div>
             </div>

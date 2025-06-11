@@ -15,11 +15,14 @@
             </div>
     @endif
     </div>
-
-    <div class="card">
-        <div class="card-header">
-            <h4>Daftar Pendaftaran Santri</h4>
+{{-- Judul Halaman --}}
+<div class="page-title">
+        <div class="row">
+        <p class="text-subtitle text-muted">Daftar santri yang menampilkan seluruh santri baru yang telah mendaftar.</p>
         </div>
+    </div>
+    <div class="card">
+        
         <div class="card-body">
             <div class="row mb-4">
                 <div class="col-md-3">
@@ -44,23 +47,16 @@
                         @endforeach
                     </select>
                 </div>
-                <div class="col-md-1">
-                    <select wire:model.live="perPage" class="form-select">
-                        <option value="10">10</option>
-                        <option value="25">25</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                    </select>
-                </div>
+        
                 <div class="col-md-2">
                     <button wire:click="resetFilters" class="btn btn-secondary">
-                        <i class="bi bi-x-circle"></i>Reset Filter
+                        <i class="bi bi-x-circle"></i> Reset Filter
                     </button>
                 </div>
             </div>
 
             <div class="table-responsive">
-                <table class="table table-hover">
+                <table class="table table-hover table-striped">
                     <thead>
                         <tr>
                             <th wire:click="sortBy('nama_lengkap')" style="cursor: pointer;">
