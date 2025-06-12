@@ -9,8 +9,8 @@
                     </div>
 
                     {{-- Penjelasan Timer: 
-                        - `wire:poll.1s="tick"`: Ini adalah perintah Livewire untuk memanggil metode `tick()` di backend setiap 1 detik.
-                        - `$this->waktuMundurFormatted`: Menampilkan sisa waktu yang sudah diformat dari backend (HH:MM:SS).
+                        - `wire:poll.1s="tick"`: This is a Livewire command to call the `tick()` method in the backend every 1 second.
+                        - `$this->waktuMundurFormatted`: Displays the formatted remaining time from the backend (HH:MM:SS).
                     --}}
                     <div class="bg-red-100 px-4 py-2 rounded-lg" wire:poll.1s="tick">
                         <div class="text-center">
@@ -29,7 +29,7 @@
                     <span class="text-sm text-gray-500">{{ $soalDijawab }} dari {{ $jumlahSoal }} soal</span>
                 </div>
                 <div class="w-full bg-gray-200 rounded-full h-2">
-                    {{-- Penjelasan Progress: Lebar (width) dari div ini dihitung secara dinamis berdasarkan persentase soal yang sudah dijawab. --}}
+                    {{-- Penjelasan Progress: The width of this div is dynamically calculated based on the percentage of answered questions. --}}
                     <div class="bg-primary h-2 rounded-full transition-all duration-300"
                         style="width: {{ $jumlahSoal > 0 ? ($soalDijawab / $jumlahSoal) * 100 : 0 }}%">
                     </div>
@@ -70,8 +70,8 @@
                         <h3 class="text-lg font-semibold text-gray-900 mb-4">Navigasi Soal</h3>
                         <div class="grid grid-cols-5 gap-2" wire:key="navigasi-soal">
                             {{-- Penjelasan Navigasi:
-                                - Looping sebanyak jumlah soal.
-                                - Warna tombol berubah secara dinamis: biru untuk soal aktif, hijau untuk soal terjawab, abu-abu untuk soal belum dijawab.
+                                - Loops through the number of questions.
+                                - Button colors change dynamically: blue for active question, green for answered questions, gray for unanswered questions.
                             --}}
                             @if($soals)
                             @foreach($soals as $index => $soal)
@@ -98,23 +98,22 @@
                                     <p class="text-lg text-gray-800 mb-6 leading-relaxed">{!! $currentSoal->pertanyaan !!}</p>
 
                                     {{-- Penjelasan Blok Soal:
-                                        - Menggunakan @if untuk menampilkan format yang berbeda untuk soal Pilihan Ganda (pg) dan Essay.
+                                        - Uses @if to display different formats for Multiple Choice (pg) and Essay questions.
                                     --}}
                                     @if ($currentSoal->tipe_soal === 'pg')
                                     <div class="space-y-3" wire:key="soal-{{ $currentSoal->id }}-pg">
                                         {{-- Penjelasan Perulangan Opsi:
-                                                - Kode @foreach yang hilang kini sudah dikembalikan.
-                                                - Looping ini akan menampilkan semua opsi jawaban untuk soal saat ini.
+                                                - This loop will display all answer options for the current question.
                                             --}}
                                         @foreach ($currentSoal->opsi as $key => $opsi)
                                         <label class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-600 hover:bg-blue-50 cursor-pointer transition duration-200 group"
                                             wire:key="opsi-{{ $currentSoal->id }}-{{ $key }}">
 
-                                            {{-- Penjelasan Input Radio (FIX PALING PENTING):
-                                                        - `wire:model` TELAH DIHAPUS untuk menghilangkan konflik.
-                                                        - `x-on:click`: Satu-satunya yang bertanggung jawab memanggil backend.
-                                                        - Logika `if-else` di dalamnya: jika radio yang sama diklik lagi, panggil `hapusJawaban`. Jika radio baru diklik, panggil `simpanJawaban`.
-                                                        - `{{ ... ? 'checked' : '' }}`: Untuk memastikan pilihan yang sudah disimpan tetap ter-centang saat pindah soal.
+                                            {{-- Penjelasan Input Radio (PENTING):
+                                                - `wire:model` is removed to prevent conflicts.
+                                                - `x-on:click`: Solely responsible for calling the backend.
+                                                - The `if-else` logic within: if the same radio is clicked again, call `hapusJawaban`. If a new radio is clicked, call `simpanJawaban`.
+                                                - `{{ ... ? 'checked' : '' }}`: To ensure previously saved selections remain checked when navigating between questions.
                                             --}}
                                             <input type="radio"
                                                 name="question_{{ $currentSoal->id }}"
@@ -127,7 +126,7 @@
                                                            } else { 
                                                                @this.call('simpanJawaban', soalId, key); 
                                                            }"
-                                                {{ !empty($jawabanSiswa[$currentSoal->id]) && $jawabanSiswa[$currentSoal->id] === $key ? 'checked' : '' }}>
+                                                {{ !empty($jawabanSiswa[$currentSoal->id]) && (string)$jawabanSiswa[$currentSoal->id] === (string)$key ? 'checked' : '' }}>
 
                                             <div class="ml-4 flex-1">
                                                 <span class="text-gray-800 group-hover:text-blue-600">
@@ -139,10 +138,10 @@
                                         @endforeach
                                     </div>
                                     @else
-    <h6 class="mb-2">Jawaban Anda:</h6> {{-- Ubah "Jawaban Santri" menjadi "Jawaban Anda" --}}
+    <h6 class="mb-2">Jawaban Anda:</h6> {{-- Changed "Jawaban Santri" to "Jawaban Anda" --}}
     <div class="mb-3">
         <textarea 
-            wire:model.lazy="jawabanSiswa.{{ $currentSoal->id }}" {{-- Input untuk jawaban esai --}}
+            wire:model.lazy="jawabanSiswa.{{ $currentSoal->id }}" {{-- Input for essay answer --}}
             class="form-control w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" 
             rows="6" 
             placeholder="Tulis jawaban Anda di sini...">{{ $jawabanSiswa[$currentSoal->id] ?? '' }}</textarea>
@@ -203,9 +202,9 @@
     </div>
 
     {{-- Penjelasan Javascript:
-        - `show/hideModal`: Fungsi untuk menampilkan dan menyembunyikan modal konfirmasi.
-        - `window.addEventListener`: Mendengarkan event dari backend Livewire untuk memicu fungsi `show/hideModal`.
-        - `Livewire.on('jawaban-updated', ...)`: Event listener untuk menghapus centang pada radio button jika jawaban dihapus.
+        - `show/hideModal`: Functions to show and hide the confirmation modal.
+        - `window.addEventListener`: Listens for events from the Livewire backend to trigger `show/hideModal` functions.
+        - `Livewire.on('jawaban-updated', ...)`: Event listener to uncheck radio buttons if the answer is cleared.
     --}}
     @push('scripts')
     <script>
@@ -233,15 +232,13 @@
         window.addEventListener('hide-modal', () => {
             hideModal();
         });
-        window.addEventListener('livewire:load', () => {
-            Livewire.on('jawaban-updated', ({
-                soalId
-            }) => {
-                document.querySelectorAll(`input[name='question_${soalId}']`).forEach(input => {
-                    input.checked = false;
-                });
-            });
-        });
+        // Remove the old 'jawaban-updated' listener as it's no longer needed for radio buttons
+        // since x-on:click handles persistence directly.
+        // Livewire.on('jawaban-updated', ({ soalId }) => {
+        //     document.querySelectorAll(`input[name='question_${soalId}']`).forEach(input => {
+        //         input.checked = false;
+        //     });
+        // });
     </script>
     @endpush
 </div>

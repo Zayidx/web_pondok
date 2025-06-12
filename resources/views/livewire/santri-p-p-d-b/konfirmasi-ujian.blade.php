@@ -26,7 +26,7 @@
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="font-medium text-gray-700">Jenis Ujian</span>
-                        <span class="text-gray-900">{{ $ujian->nama_ujian }}</span>
+                        <span class="text-gray-900">{{ $ujian->jenis_ujian }}</span>
                     </div>
                     <div class="flex justify-between items-center">
                         <span class="font-medium text-gray-700">Tanggal</span>
@@ -99,17 +99,16 @@
                 <a href="{{ route('santri.dashboard-ujian') }}" class="px-8 py-3 border-2 border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition duration-300">
                     Kembali ke Dashboard
                 </a>
-                {{-- Tombol Mulai Ujian: Akan dinonaktifkan jika ujian sudah berakhir --}}
-                <button wire:click="mulaiUjian"
+                <button wire:click="mulaiUjian" 
                     @class([
                         'px-8 py-3 rounded-lg font-medium transition duration-300 shadow-lg',
-                        'bg-primary text-white hover:bg-primary-dark' => !$examHasEnded && $checklist['alat_tulis'] && $checklist['koneksi'] && $checklist['petunjuk'] && $checklist['siap'],
-                        'bg-gray-300 text-gray-500 cursor-not-allowed' => $examHasEnded || !$checklist['alat_tulis'] || !$checklist['koneksi'] || !$checklist['petunjuk'] || !$checklist['siap']
+                        'bg-primary text-white hover:bg-primary-dark' => $checklist['alat_tulis'] && $checklist['koneksi'] && $checklist['petunjuk'] && $checklist['siap'],
+                        'bg-gray-300 text-gray-500 cursor-not-allowed' => !$checklist['alat_tulis'] || !$checklist['koneksi'] || !$checklist['petunjuk'] || !$checklist['siap']
                     ])
-                    @if($examHasEnded || !$checklist['alat_tulis'] || !$checklist['koneksi'] || !$checklist['petunjuk'] || !$checklist['siap']) disabled @endif>
+                    @if(!$checklist['alat_tulis'] || !$checklist['koneksi'] || !$checklist['petunjuk'] || !$checklist['siap']) disabled @endif>
                     Mulai Ujian Sekarang
                 </button>
             </div>
         </div>
     </div>
-</div>
+</div> 
