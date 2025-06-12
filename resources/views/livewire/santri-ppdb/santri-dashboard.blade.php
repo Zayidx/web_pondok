@@ -24,6 +24,7 @@
                                     <th>Nama Ujian</th>
                                     <th>Mata Pelajaran</th>
                                     <th>Tanggal Ujian</th>
+                                    <th>Nilai</th> {{-- Menambahkan kolom Nilai --}}
                                     <th>Status</th>
                                 </tr>
                             </thead>
@@ -34,10 +35,19 @@
                                     <td>{{ $hasil->ujian->mata_pelajaran }}</td>
                                     <td>{{ $hasil->ujian->tanggal_ujian }}</td>
                                     <td>
+                                        @if($hasil->nilai_akhir !== null) {{-- Menggunakan nilai_akhir --}}
+                                            {{ number_format($hasil->nilai_akhir, 2) }}
+                                        @else
+                                            Belum Dinilai
+                                        @endif
+                                    </td>
+                                    <td>
                                         @if($hasil->status == 'lulus')
                                             <span class="badge bg-success">Lulus</span>
                                         @elseif($hasil->status == 'tidak_lulus')
                                             <span class="badge bg-danger">Tidak Lulus</span>
+                                        @elseif($hasil->status == 'menunggu_penilaian')
+                                            <span class="badge bg-info">Menunggu Penilaian Esai</span>
                                         @else
                                             <span class="badge bg-warning">Menunggu</span>
                                         @endif
@@ -45,7 +55,7 @@
                                 </tr>
                                 @empty
                                 <tr>
-                                    <td colspan="4" class="text-center">Belum ada hasil ujian</td>
+                                    <td colspan="5" class="text-center">Belum ada hasil ujian</td> {{-- Menyesuaikan colspan --}}
                                 </tr>
                                 @endforelse
                             </tbody>

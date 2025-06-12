@@ -19,7 +19,8 @@ class HasilUjian extends Model
         'waktu_mulai',
         'waktu_selesai',
         'status',
-        'nilai',
+        'nilai', // Ini kemungkinan adalah total_skor_pg awal
+        'nilai_akhir', // Ini akan menyimpan total nilai keseluruhan (PG + Esai)
     ];
 
     protected $casts = [

@@ -193,40 +193,29 @@ class MulaiUjian extends Component
                                          ->get();
  
             // 2. Hitung total poin dari jawaban PG yang benar untuk ujian ini
-$totalPoinUjianIni = 0;
-foreach ($semuaJawaban as $jawaban) {
-    // Hanya hitung soal Pilihan Ganda (PG)
-    if ($jawaban->soal && $jawaban->soal->tipe_soal === 'pg') {
-        if ($jawaban->jawaban === $jawaban->soal->kunci_jawaban) {
-            $totalPoinUjianIni += $jawaban->soal->poin;
-        }
-    }
-}
+            $totalPoinUjianIni = 0;
+            foreach ($semuaJawaban as $jawaban) {
+                // Hanya hitung soal Pilihan Ganda (PG)
+                if ($jawaban->soal && $jawaban->soal->tipe_soal === 'pg') {
+                    if ($jawaban->jawaban === $jawaban->soal->kunci_jawaban) {
+                        $totalPoinUjianIni += $jawaban->soal->poin;
+                    }
+                }
+            }
 
-// 3. Update record hasil ujian dengan status, waktu selesai, dan nilai akhir
-$this->hasilUjian->update([
-    'waktu_selesai' => now(),
-    'status'        => 'selesai',
-    'nilai_akhir'   => $totalPoinUjianIni, // Nilai ini sudah tersimpan
-]);
+            // 3. Update record hasil ujian dengan status, waktu selesai, dan nilai akhir (hanya PG)
+            $this->hasilUjian->update([
+                'waktu_selesai' => now(),
+                'status'        => 'menunggu_penilaian', // Ubah status menjadi menunggu penilaian
+                'nilai_akhir'   => $totalPoinUjianIni, // Nilai ini sudah tersimpan
+            ]);
 
-// ... (lanjut ke perhitungan total dan rata-rata) ...
-
-// 4. Hitung ulang nilai rata-rata dari SEMUA ujian yang telah selesai
-//    DAN TOTAL NILAI KESELURUHAN UJIAN
-$semuaHasilUjianSelesai = HasilUjian::where('santri_id', $this->santri->id)
-                                    ->where('status', 'selesai')
-                                    ->get();
-
-$rataRataBaru = $semuaHasilUjianSelesai->avg('nilai_akhir') ?? 0;
-$totalNilaiKeseluruhan = $semuaHasilUjianSelesai->sum('nilai_akhir'); // Ini adalah total nilai SEMUA ujian
-
-// 5. Update status santri dan nilai rata-rata ujiannya
-$this->santri->update([
-    'status_santri'           => 'menunggu',
-    'rata_rata_ujian'         => $rataRataBaru,
-    'total_nilai_semua_ujian' => $totalNilaiKeseluruhan, // Ini yang disimpan ke kolom baru
-]);
+            // 4. Update status santri menjadi 'menunggu_hasil_ujian'
+            //    Nilai rata-rata dan total nilai semua ujian di PendaftaranSantri
+            //    akan diupdate SETELAH admin selesai menilai esai di `DetailSoalSantri.php`.
+            $this->santri->update([
+                'status_santri'           => 'menunggu_hasil_ujian',
+            ]);
              
              // =================================================================
              // **LOGIKA BARU SELESAI**
@@ -234,7 +223,7 @@ $this->santri->update([
  
              DB::commit(); // Konfirmasi semua perubahan jika tidak ada error
  
-             session()->flash('message', 'Ujian berhasil dikumpulkan!');
+             session()->flash('success', 'Ujian berhasil dikumpulkan!');
              return redirect()->route('santri.selesai-ujian', ['ujianId' => $this->ujian->id]);
  
          } catch (\Exception $e) {
@@ -283,7 +272,7 @@ $this->santri->update([
             'soals' => $soals,
             'currentSoal' => $currentSoal,
             'jawabanSiswa' => $this->jawabanSiswa,
-            'durasi' => $this->durasi 
+            'durasi' => $this->durasi
         ]);
     }
 }

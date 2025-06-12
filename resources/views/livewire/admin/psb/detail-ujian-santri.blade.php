@@ -85,13 +85,13 @@
                                     </td>
                                    {{-- resources/views/livewire/admin/psb/detail-ujian-santri.blade.php --}}
 
-<td class="text-center">
+                                   <td class="text-center">
     {{-- Kode ini memeriksa apakah status ujian sudah 'selesai' --}}
     @if($hasilUjian && $status === 'selesai')
 
         {{-- Jika ya, maka ia akan menampilkan nilai dari array
              yang sudah kita siapkan di komponen. --}}
-        {{ $totalNilaiPerUjian[$ujian->id] ?? 'Belum dinilai' }}
+        {{ number_format($totalNilaiPerUjian[$ujian->id], 2) }}
 
     @else
         {{-- Jika belum selesai, tampilkan strip (-) --}}

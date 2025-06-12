@@ -1,16 +1,14 @@
 <?php
-// routes/web.php
-
-use App\Http\Controllers\CertificateController; // Ini bisa dihapus jika controllernya dihapus
 use App\Livewire\Auth;
 use App\Livewire\StudentExam;
+use App\Livewire\TestButton;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return redirect('/auth/login');
 });
-
+Route::get('/test-livewire-button', TestButton::class);
 Route::prefix('auth')->group(function () {
     Route::get('/login', Auth\Login::class)->name('login');
     Route::get('/login-santri', Auth\LoginSantri::class)->name('login-santri');
@@ -34,30 +32,6 @@ Route::get('/generate', function () {
     echo 'ok';
 });
 
-// >>>>>> INI ADALAH DEFINISI RUTE YANG PERLU DIHAPUS ATAU DIKOMENTARI <<<<<<
-// Karena sekarang unduhan ditangani langsung oleh komponen Livewire PSB/CetakPenerimaanSurat
-// Route::post('/download-certificate-pdf', [CertificateController::class, 'download'])->name('download-certificate-pdf');
-
-// >>>>>> KODE DI BAWAH INI HARUS DIHAPUS ATAU DIKOMENTARI (Sudah dikomentari sebelumnya) <<<<<<
-/*
-Route::post('/download-certificate-pdf', function (Request $request) {
-    $htmlContent = $request->input('html_content');
-    $fileName = $request->input('file_name', 'sertifikat.pdf'); // Default filename
-
-    // Perbaiki URL CDN di dalam HTML jika ada
-    $htmlContent = str_replace(
-        ['[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)', '[https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap](https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap)'],
-        ['https://cdn.tailwindcss.com', 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap'],
-        $htmlContent
-    );
-
-    $pdf = Pdf::loadHtml($htmlContent);
-
-    // Mengembalikan PDF sebagai unduhan
-    return $pdf->download($fileName);
-})->name('download-certificate-pdf');
-*/
-// >>>>>> BATAS KODE YANG HARUS DIHAPUS/DIKOMENTARI <<<<<<
 
 // Route redirect
 require __DIR__ . '/superadmin.php';

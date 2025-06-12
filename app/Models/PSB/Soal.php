@@ -22,7 +22,7 @@ class Soal extends Model
 
     protected $casts = [
         'opsi' => 'array',
-        'kunci_jawaban' => 'integer',
+        'kunci_jawaban' => 'string', // Ubah dari 'integer' menjadi 'string'
         'poin' => 'integer',
     ];
 

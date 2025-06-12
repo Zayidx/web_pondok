@@ -16,8 +16,9 @@ class JawabanUjian extends Model
         'hasil_ujian_id',
         'soal_id',
         'jawaban',
-        // Pastikan 'nilai' juga ada di sini jika Anda menggunakannya untuk esai
-        'nilai'
+        // Pastikan 'nilai' dan 'komentar' ada di sini
+        'nilai',
+        'komentar' // Pastikan ini juga ada di dalam fillable
     ];
 
     public function hasilUjian(): BelongsTo // Explicit return type

@@ -3,13 +3,17 @@
 namespace App\Livewire\SantriPPDB;
 
 use Livewire\Component;
-use App\Models\Ujian;
-use App\Models\HasilUjian;
+use App\Models\PSB\Ujian; // Perbarui import menjadi model di namespace PSB
+use App\Models\PSB\HasilUjian; // Perbarui import menjadi model di namespace PSB
 use App\Models\PSB\PendaftaranSantri;
+use App\Models\PSB\JawabanUjian; // Tambahkan import model JawabanUjian
+use App\Models\PSB\Soal; // Tambahkan import model Soal
 use Illuminate\Support\Facades\Auth;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\On;
+use Illuminate\Support\Facades\DB; // Tambahkan import DB
+use Illuminate\Support\Collection; // Pastikan ini sudah ada
 
 class SoalUjian extends Component
 {
@@ -19,17 +23,15 @@ class SoalUjian extends Component
     public $ujian;
     public $santri;
     public $hasilUjian;
-    public $currentSoal = 0;
-    public $jawaban = [];
+    public $currentSoalIndex = 0; // Menggunakan index, bukan $currentSoal
+    public $jawaban = []; // Array untuk menyimpan jawaban santri, key: soal_id, value: jawaban_santri
     public $waktuMulai;
     public $waktuSelesai;
     public $sisa_waktu;
+    public $soals; // Properti untuk menyimpan koleksi soal ujian
+    public $belumDijawab; // Properti untuk menampilkan jumlah soal yang belum dijawab
 
-    #[On('timeUp')]
-    public function handleTimeUp()
-    {
-        $this->selesaiUjian();
-    }
+    protected $listeners = ['timeUp' => 'handleTimeUp']; // Perbarui listener untuk Livewire 3
 
     public function mount($ujianId)
     {
@@ -43,204 +45,178 @@ class SoalUjian extends Component
             return redirect()->route('login-ppdb-santri')->with('error', 'Anda tidak memiliki akses ke halaman ujian.');
         }
 
-        $this->ujian = Ujian::findOrFail($ujianId);
+        $this->ujian = Ujian::with('soals')->findOrFail($ujianId); // Muat relasi soals
+        $this->soals = $this->ujian->soals->sortBy('id')->values(); // Pastikan soal terurut dan dijadikan koleksi bernomor
         
-        // Check if exam is active
-        if ($this->ujian->status_ujian !== 'aktif') {
-            return redirect()->route('santri.dashboard-ujian')->with('error', 'Ujian tidak tersedia.');
-        }
-
-        // Check if exam is already completed
-        $existingHasil = HasilUjian::where('santri_id', $this->santri->id)
-            ->where('ujian_id', $this->ujian->id)
-            ->where('status', 'selesai')
-            ->first();
-
-        if ($existingHasil) {
-            return redirect()->route('santri.selesai-ujian', ['ujianId' => $ujianId]);
-        }
-
-        // Get or create hasil ujian
+        // Memuat hasil ujian yang sudah ada atau membuat yang baru
         $this->hasilUjian = HasilUjian::firstOrCreate(
-            [
-                'santri_id' => $this->santri->id,
-                'ujian_id' => $this->ujian->id,
-                'status' => 'sedang_ujian'
-            ],
+            ['santri_id' => $this->santri->id, 'ujian_id' => $this->ujian->id],
             [
                 'waktu_mulai' => now(),
-                'waktu_selesai' => null
+                'status' => 'dimulai'
             ]
         );
 
+        // Inisialisasi jawaban yang sudah ada dari database jika santri sebelumnya sudah menjawab
+        $existingJawaban = JawabanUjian::where('hasil_ujian_id', $this->hasilUjian->id)
+                                        ->get()
+                                        ->keyBy('soal_id');
+        foreach ($this->soals as $soal) {
+            if ($existingJawaban->has($soal->id)) {
+                $this->jawaban[$soal->id] = $existingJawaban[$soal->id]->jawaban;
+            } else {
+                $this->jawaban[$soal->id] = null; // Inisialisasi jawaban kosong
+            }
+        }
+
         $this->waktuMulai = $this->hasilUjian->waktu_mulai;
         $this->waktuSelesai = $this->waktuMulai->addMinutes($this->ujian->durasi);
-        $this->sisa_waktu = now()->diffInSeconds($this->waktuSelesai);
-
-        // Load saved answers if any
-        $this->loadJawaban();
+        $this->hitungSisaWaktu();
+        $this->updateUnansweredCount(); // Hitung soal yang belum dijawab saat mount
     }
 
+    // Metode untuk memperbarui jawaban santri
+    public function updateJawaban($soalId, $jawaban)
+    {
+        $this->jawaban[$soalId] = $jawaban;
+        // Opsional: simpan jawaban ke database setiap kali diubah (realtime save)
+        // Jika tidak, penyimpanan akan dilakukan saat submitUjian
+        JawabanUjian::updateOrCreate(
+            [
+                'hasil_ujian_id' => $this->hasilUjian->id,
+                'soal_id' => $soalId,
+            ],
+            [
+                'jawaban' => $jawaban,
+                'nilai' => null, // Nilai akan dihitung saat submit atau dinilai manual untuk essay
+                'komentar' => null,
+            ]
+        );
+        $this->updateUnansweredCount();
+    }
+
+    // Metode untuk menghitung mundur waktu
+    public function hitungSisaWaktu()
+    {
+        $sekarang = now();
+        if ($sekarang->greaterThanOrEqualTo($this->waktuSelesai)) {
+            $this->sisa_waktu = 0;
+            $this->handleTimeUp();
+        } else {
+            $diffSeconds = $this->waktuSelesai->diffInSeconds($sekarang);
+            $this->sisa_waktu = $diffSeconds;
+            // dispatch event setiap detik untuk update timer di frontend (opsional, tergantung implementasi timer)
+            $this->dispatch('update-timer', $this->sisa_waktu);
+        }
+    }
+
+    // Metode untuk pindah ke soal berikutnya
     public function nextSoal()
     {
-        if ($this->currentSoal < $this->ujian->jumlah_soal - 1) {
-            $this->currentSoal++;
+        if ($this->currentSoalIndex < $this->soals->count() - 1) {
+            $this->currentSoalIndex++;
         }
     }
 
+    // Metode untuk kembali ke soal sebelumnya
     public function prevSoal()
     {
-        if ($this->currentSoal > 0) {
-            $this->currentSoal--;
+        if ($this->currentSoalIndex > 0) {
+            $this->currentSoalIndex--;
         }
     }
 
-    public function saveJawaban($jawaban)
+    // Metode untuk langsung menuju soal tertentu
+    public function goToSoal($index)
     {
-        $this->jawaban[$this->currentSoal] = $jawaban;
-        // Save to database
-    }
-
-    public function loadJawaban()
-    {
-        // Load jawaban from database
-    }
-
-    public function selesaiUjian()
-    {
-        // Calculate score
-        $totalSkor = 0;
-        $nilai = 0;
-        
-        // Update hasil ujian
-        $this->hasilUjian->update([
-            'waktu_selesai' => now(),
-            'total_skor' => $totalSkor,
-            'nilai' => $nilai,
-            'status' => 'selesai'
-        ]);
-
-        return redirect()->route('santri.selesai-ujian', ['ujianId' => $this->ujian->id]);
-    }
-
-    public function render()
-    {
-        return view('livewire.santri-p-p-d-b.soal-ujian');
-    }
-} 
-        // Jika jawaban yang dikirim sama dengan jawaban yang sudah ada, berarti user ingin menghapus jawaban
-        if (isset($this->jawaban[$this->currentSoal]) && $this->jawaban[$this->currentSoal] === $jawaban) {
-            unset($this->jawaban[$this->currentSoal]);
-            
-            // Hapus jawaban dari database
-            JawabanUjian::where([
-                'hasil_ujian_id' => $this->hasilUjian->id,
-                'soal_id' => $currentSoalObj->id
-            ])->delete();
-        } else {
-            $this->saveJawaban($currentSoalObj->id, $jawaban);
-        }
-
-        $this->updateBelumDijawab();
-    }
-
-    public function saveJawaban($soalId, $jawaban)
-    {
-        try {
-            JawabanUjian::updateOrCreate(
-                [
-                    'hasil_ujian_id' => $this->hasilUjian->id,
-                    'soal_id' => $soalId,
-                ],
-                ['jawaban' => $jawaban]
-            );
-
-            $this->jawaban[$soalId] = $jawaban;
-            $this->belumDijawab = $this->ujian->soals->count() - count($this->jawaban);
-            
-            session()->flash('success', 'Jawaban berhasil disimpan');
-        } catch (\Exception $e) {
-            session()->flash('error', 'Gagal menyimpan jawaban: ' . $e->getMessage());
+        if ($index >= 0 && $index < $this->soals->count()) {
+            $this->currentSoalIndex = $index;
         }
     }
 
-    public function handleAutoSave()
+    // Metode untuk menghitung jumlah soal yang belum dijawab
+    public function updateUnansweredCount()
     {
-        if (isset($this->jawaban[$this->currentSoal])) {
-            $this->saveJawaban($this->ujian->soals[$this->currentSoal]->id, $this->jawaban[$this->currentSoal]);
-            $this->lastAutoSave = now();
-            $this->dispatch('auto-save');
-        }
-    }
-
-    public function loadJawaban()
-    {
-        $jawabanUjians = JawabanUjian::where('hasil_ujian_id', $this->hasilUjian->id)->get();
-        foreach ($jawabanUjians as $jawaban) {
-            $soalIndex = $this->ujian->soals->search(function($soal) use ($jawaban) {
-                return $soal->id === $jawaban->soal_id;
-            });
-            if ($soalIndex !== false && !empty(trim($jawaban->jawaban))) {
-                $this->jawaban[$soalIndex] = $jawaban->jawaban;
-            }
-        }
-    }
-
-    public function updateBelumDijawab()
-    {
-        $totalSoal = $this->ujian->soals->count();
+        $totalSoal = $this->soals->count();
         $soalDijawab = 0;
-
-        foreach ($this->ujian->soals as $index => $soal) {
-            if (isset($this->jawaban[$index])) {
-                if ($soal->tipe_soal === 'essay') {
-                    // Untuk soal essay, cek apakah jawabannya tidak kosong
-                    if (!empty(trim($this->jawaban[$index]))) {
-                        $soalDijawab++;
-                    }
-                } else {
-                    // Untuk soal PG, cukup ada jawabannya
-                    $soalDijawab++;
-                }
+        foreach ($this->soals as $soal) {
+            // Jika ada jawaban dan tidak kosong
+            if (isset($this->jawaban[$soal->id]) && $this->jawaban[$soal->id] !== null && $this->jawaban[$soal->id] !== '') {
+                $soalDijawab++;
             }
         }
-
         $this->belumDijawab = $totalSoal - $soalDijawab;
     }
 
+    // Metode untuk memeriksa apakah ada soal yang belum dijawab sebelum submit
     public function checkUnfinishedQuestions()
     {
-        $belumDijawab = $this->ujian->soals->count() - count($this->jawaban);
-        
-        if ($belumDijawab > 0) {
-            session()->flash('warning', "Masih ada {$belumDijawab} soal yang belum dijawab. Yakin ingin menyelesaikan ujian?");
-            return;
+        $this->updateUnansweredCount(); // Pastikan hitungan terbaru
+        if ($this->belumDijawab > 0) {
+            // Menggunakan Livewire dispatch untuk menampilkan konfirmasi di frontend
+            $this->dispatch('show-confirm-finish', $this->belumDijawab);
+        } else {
+            $this->submitUjian();
         }
-        
-        $this->submitUjian();
     }
 
+    // Metode utama untuk menyelesaikan ujian dan menyimpan semua data
     public function submitUjian()
     {
         try {
-            // Update waktu selesai
-            $this->hasilUjian->update([
-                'waktu_selesai' => now(),
-                'status' => 'selesai'
-            ]);
+            DB::transaction(function () {
+                $totalSkorPG = 0;
+                $totalSoalUjian = $this->soals->count();
 
-            // Update status santri
-            if ($this->santri->status_santri === 'sedang_ujian') {
-                $this->santri->update(['status_santri' => 'menunggu']);
-            }
+                foreach ($this->soals as $soal) {
+                    $jawabanSantri = $this->jawaban[$soal->id] ?? null;
+                    $skorSoal = 0;
 
-            return redirect()->route('santri.selesai-ujian', ['ujianId' => $this->ujian->id]);
+                    if ($soal->tipe_soal === Soal::TIPE_PG) {
+                        // Jika soal pilihan ganda, cek jawaban dan hitung skor
+                        if ($jawabanSantri == $soal->kunci_jawaban) {
+                            $skorSoal = $soal->poin;
+                            $totalSkorPG += $soal->poin; // Akumulasi skor PG
+                        }
+                    }
+                    // Untuk essay, skor awal adalah 0, akan dinilai oleh admin
+                    // Simpan atau perbarui jawaban santri
+                    JawabanUjian::updateOrCreate(
+                        [
+                            'hasil_ujian_id' => $this->hasilUjian->id,
+                            'soal_id' => $soal->id,
+                        ],
+                        [
+                            'jawaban' => $jawabanSantri,
+                            'nilai' => $skorSoal, // Skor awal (hanya untuk PG), essay 0
+                            'komentar' => null,
+                        ]
+                    );
+                }
+
+                // Perbarui HasilUjian
+                $this->hasilUjian->update([
+                    'waktu_selesai' => now(),
+                    'status' => 'selesai', // Ubah status menjadi 'selesai' setelah semua jawaban tersimpan
+                    'nilai' => $totalSkorPG, // Total nilai PG
+                    'nilai_akhir' => $totalSkorPG, // Nilai akhir awal sama dengan PG, akan diperbarui admin
+                ]);
+
+                // Update status santri
+                $this->santri->update(['status_santri' => 'menunggu_hasil_ujian']);
+
+                // Setelah berhasil menyimpan semua, redirect
+                session()->flash('success', 'Ujian Anda telah berhasil diselesaikan!');
+                return redirect()->route('santri.selesai-ujian', ['ujianId' => $this->ujian->id]);
+            });
         } catch (\Exception $e) {
             session()->flash('error', 'Terjadi kesalahan saat menyelesaikan ujian: ' . $e->getMessage());
+            // Log the error for debugging
+            \Log::error('Error submitting exam: ' . $e->getMessage(), ['exception' => $e]);
         }
-
     }
 
+    // Dipanggil saat waktu habis
     public function handleTimeUp()
     {
         $this->submitUjian();
@@ -248,8 +224,9 @@ class SoalUjian extends Component
 
     public function render()
     {
-        return view('livewire.santri-ppdb.soal-ujian', [
-            'soals' => $this->ujian->soals,
+        $currentSoal = $this->soals->get($this->currentSoalIndex);
+        return view('livewire.santri-p-p-d-b.soal-ujian', [
+            'currentSoal' => $currentSoal,
         ]);
     }
-} 
+}

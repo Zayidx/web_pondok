@@ -18,7 +18,8 @@ use App\Livewire\Admin\PSB\DetailUjianSantri;
 use App\Http\Controllers\Auth\SantriAuthController;
 use App\Livewire\Guest\CetakPenerimaanSurat;
 use Illuminate\Support\Facades\Route;
-
+use Illuminate\Support\Facades\Log; // Tambahkan ini jika belum ada
+use Illuminate\Support\Facades\Auth; // Tambahkan ini jika belum ada
 // Rute untuk tamu (tanpa autentikasi)
 Route::middleware('guest:santri')->group(function () {
     Route::get('/registerppdb', RegisterSantri::class)->name('register-santri');
@@ -28,7 +29,7 @@ Route::middleware('guest:santri')->group(function () {
     Route::get('/pendaftaran-santri', PsbPage::class)->name('psb-page');
     // Rute BARU untuk halaman cetak penerimaan surat
     // {registrationId} adalah parameter yang akan diteruskan ke metode mount() komponen Livewire
-    Route::get('/psb/cetak-penerimaan/{registrationId}', CetakPenerimaanSurat::class)->name('psb.cetak-penerimaan');
+    // Route::get('/psb/cetak-penerimaan/{registrationId}', CetakPenerimaanSurat::class)->name('psb.cetak-penerimaan');
     
 });
 
@@ -97,3 +98,38 @@ Route::middleware(['auth:santri'])->group(function () {
     Route::get('/daftar-ulang', \App\Livewire\SantriPPDB\PendaftaranUlang::class)->name('santri.daftar-ulang');
 });
 
+// Rute untuk mengunduh PDF secara langsung (akan dipanggil dari JavaScript)
+
+// Rute untuk mengunduh PDF secara langsung (akan dipanggil dari JavaScript)
+Route::get('/psb/download-penerimaan-pdf/{santriId}', function ($santriId) {
+    Log::info("Route /psb/download-penerimaan-pdf/{$santriId} hit.");
+
+    // Buat instance komponen Livewire secara manual
+    $component = new CheckStatus();
+    
+    // Secara manual panggil mount untuk inisialisasi data santri
+    // Penting: mount() harus dipanggil sebelum data santri dapat diakses di komponen.
+    // Kita perlu "mengisi" session santri_id agar mount() bekerja.
+    $originalSantriIdInSession = session('santri_id'); // Simpan dulu nilai aslinya
+    session(['santri_id' => $santriId]); // Set santriId dari URL ke session untuk mount()
+    
+    $component->mount(); 
+    
+    // Kembalikan santri_id di session ke nilai semula setelah mount()
+    if ($originalSantriIdInSession !== null) {
+        session(['santri_id' => $originalSantriIdInSession]);
+    } else {
+        session()->forget('santri_id');
+    }
+
+    // Pastikan santri yang dimuat di mount sesuai dengan santriId di URL
+    // dan pastikan santri berstatus 'diterima'
+    if (!$component->santri || $component->santri->id != $santriId || $component->santri->status_santri !== 'diterima') {
+        Log::warning("Direct PDF download denied: Santri {$santriId} not found or not accepted.");
+        abort(403, 'Akses tidak diizinkan atau santri tidak ditemukan/diterima.');
+    }
+
+    Log::info("Calling downloadCertificatePdfDirect for santri ID: {$santriId}");
+    // Panggil metode yang menghasilkan PDF secara langsung
+    return $component->downloadCertificatePdfDirect();
+})->name('psb.download-penerimaan-pdf');

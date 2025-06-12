@@ -1,3 +1,4 @@
+{{-- Ujian/livewire/guest/check-status.blade.php --}}
 @extends('components.layouts.check-status')
 
 @section('content')
@@ -7,7 +8,7 @@
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <img class="h-10 w-10" src="https://via.placeholder.com/40x40/1e40af/ffffff?text=SMA" alt="Logo SMA" />
+                        <img class="h-10 w-10" src="{{ asset('dist/assets/compiled/jpg/1.jpg') }}" alt="Logo SMA" />
                     </div>
                     <div class="ml-3">
                         <h1 class="text-xl font-bold text-primary">SMA Bina Prestasi</h1>
@@ -69,11 +70,9 @@
                 <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Dashboard Penerimaan Siswa Baru</h1>
                 <p class="text-lg text-gray-600 mb-6">Pantau status pendaftaran dan perkembangan seleksi Anda</p>
                 <div class="bg-white p-4 rounded-lg shadow-md inline-block">
-                    <div class="flex items-center justify-center">
-                        <div class="text-center">
-                            <p class="text-sm text-gray-600">Nomor Pendaftaran</p>
-                            <p class="text-xl font-bold text-primary">{{ $santri->no_pendaftaran ?? 'PPDB2025001234' }}</p>
-                        </div>
+                    <div class="text-center">
+                        <p class="text-sm text-gray-600">Nomor Pendaftaran</p>
+                        <p class="text-xl font-bold text-primary">{{ $santri->id ?? 'PPDB2025001234' }}</p>
                     </div>
                 </div>
             </div>
@@ -380,12 +379,10 @@
                     <h3 class="text-xl font-bold text-gray-900 mb-2">Selamat! Anda Diterima</h3>
                     <p class="text-gray-600 mb-4">Anda dinyatakan LULUS dan diterima di SMA Bina Prestasi. Silakan Download bukti penerimaan di bawah ini.</p>
                     
-                    {{-- Ganti button wire:click dengan link ke komponen Livewire baru --}}
-                    <a href="{{ route('psb.cetak-penerimaan', ['registrationId' => $santri->id]) }}"
-                       target="_blank" {{-- Buka di tab baru --}}
-                       class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 transform hover:scale-105">
+                    {{-- Tombol untuk langsung mengunduh PDF --}}
+                    <button wire:click="triggerDownloadPdf" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 transform hover:scale-105">
                         <i class="fas fa-file-pdf mr-3"></i> Unduh Surat Penerimaan (PDF)
-                    </a>
+                    </button>
                     
                     <div class="bg-green-50 p-4 rounded-lg mt-4">
                         <p class="text-sm text-green-800 font-medium">
@@ -453,7 +450,7 @@
                             </p>
                         </div>
                     @endif
-                @endif {{-- Ini adalah penutup untuk @if($santri->status_santri == 'daftar_ulang') --}}
+                @endif
             </div>
         </div>
     </section>
@@ -521,7 +518,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center">
                 <div class="flex items-center justify-center mb-4">
-                    <img class="h-10 w-10 mr-3" src="https://via.placeholder.com/40x40/1e40af/ffffff?text=SMA" alt="Logo SMA" />
+                    <img class="h-10 w-10 mr-3" src="{{ asset('dist/assets/compiled/jpg/1.jpg') }}" alt="Logo SMA" />
                     <h3 class="text-xl font-bold">SMA Bina Prestasi</h3>
                 </div>
                 <p class="text-gray-400 mb-4">Dashboard Penerimaan Siswa Baru Tahun Ajaran 2025/2026</p>
@@ -529,47 +526,31 @@
             </div>
         </div>
     </footer>
-
-
 </div>
 
 @endsection
 
-{{-- Hapus atau Komentar bagian JavaScript ini karena sudah tidak relevan dengan alur baru --}}
-{{--
 @push('scripts')
 <script>
-    Livewire.on('downloadPdf', (data) => {
-        const htmlContent = data.html;
-        const fileName = data.fileName;
+    // Livewire event listener to trigger PDF download
+    document.addEventListener('livewire:initialized', () => {
+        Livewire.on('openPdfInNewTab', (data) => {
+            console.log('openPdfInNewTab event received:', data);
+            try {
+                const url = data[0].url; // Access data correctly from array
+                window.open(url, '_blank'); // Open URL in a new tab
+                console.log('PDF download initiated in new tab for URL:', url);
+            } catch (error) {
+                console.error('Error opening PDF in new tab:', error);
+                // Optionally dispatch another Livewire event to show a frontend error message
+                Livewire.dispatch('showError', { message: 'Gagal mengunduh PDF. Silakan coba lagi.' });
+            }
+        });
 
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '{{ route('download-certificate-pdf') }}';
-        form.target = '_blank';
-
-        const csrfToken = document.createElement('input');
-        csrfToken.type = 'hidden';
-        csrfToken.name = '_token';
-        csrfToken.value = '{{ csrf_token() }}';
-        form.appendChild(csrfToken);
-
-        const htmlInput = document.createElement('input');
-        htmlInput.type = 'hidden';
-        htmlInput.name = 'html_content';
-        htmlInput.value = htmlContent;
-        form.appendChild(htmlInput);
-
-        const fileNameInput = document.createElement('input');
-        fileNameInput.type = 'hidden';
-        fileNameInput.name = 'file_name';
-        fileNameInput.value = fileName;
-        form.appendChild(fileNameInput);
-
-        document.body.appendChild(form);
-        form.submit();
-        document.body.removeChild(form);
+        // Optional: Livewire event for showing general error messages on frontend
+        Livewire.on('showError', (data) => {
+            alert(data.message); // Simple alert, replace with your preferred notification system
+        });
     });
 </script>
 @endpush
---}}

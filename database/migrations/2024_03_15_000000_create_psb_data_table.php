@@ -162,10 +162,11 @@ return new class extends Migration
             $table->foreignId('hasil_ujian_id')->constrained('hasil_ujians')->onDelete('cascade');
             $table->foreignId('soal_id')->constrained('soals')->onDelete('cascade');
             $table->text('jawaban')->nullable();
-            $table->integer('nilai')->nullable();
-            $table->text('komentar')->nullable();
+            $table->integer('nilai')->nullable(); 
+            $table->text('komentar')->nullable(); 
             $table->timestamps();
         });
+
 
         // 9. Create wawancara_schedules table
         Schema::create('wawancara_schedules', function (Blueprint $table) {

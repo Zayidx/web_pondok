@@ -9,6 +9,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Computed;
 
 class HasilUjianSantri extends Component
 {
@@ -21,7 +22,8 @@ class HasilUjianSantri extends Component
     public $searchAlamat = '';
     public $filters = [
         'tipe' => '',
-        'nilai' => ''
+        'nilai' => '',
+        // Filter statusUjian dan statusPendaftaran dihapus karena fokus hanya pada 'sedang_ujian'
     ];
     public $sortField = 'created_at';
     public $sortDirection = 'desc';
@@ -30,6 +32,7 @@ class HasilUjianSantri extends Component
     protected $queryString = [
         'search' => ['except' => ''],
         'searchAlamat' => ['except' => ''],
+        // Query string diperbarui untuk hanya menyertakan filter yang tersisa
         'filters' => ['except' => ['tipe' => '', 'nilai' => '']],
         'perPage' => ['except' => 10],
         'sortField' => ['except' => 'created_at'],
@@ -77,11 +80,17 @@ class HasilUjianSantri extends Component
         ]);
     }
 
+    // Computed properties untuk opsi status ujian dan pendaftaran dihapus
+    // karena filter utama sekarang ditetapkan secara langsung pada query.
+
     public function getSantriList()
     {
+        // Perubahan: Hanya menampilkan santri dengan status_santri 'sedang_ujian'
+        // Filter ini bersifat mutlak dan tidak dapat diubah oleh dropdown lain di halaman ini.
         $query = PendaftaranSantri::where('status_santri', 'sedang_ujian')
             ->with(['hasilUjians' => function($query) {
-                $query->select('id', 'santri_id', 'nilai_akhir', 'ujian_id');
+                // Memuat hasil ujian yang relevan dan menyertakan status
+                $query->select('id', 'santri_id', 'nilai_akhir', 'ujian_id', 'status');
             }])
             ->when($this->search, function($query) {
                 $query->where(function($q) {
@@ -98,19 +107,15 @@ class HasilUjianSantri extends Component
             ->when($this->filters['tipe'], function($query) {
                 $query->where('tipe_pendaftaran', $this->filters['tipe']);
             });
+            // Filter statusUjian dan statusPendaftaran dihapus dari logika query ini
 
-        // =================================================================
-        // PERUBAHAN DI SINI: MENGAMBIL total_nilai_semua_ujian BUKAN RATA-RATA
-        // =================================================================
+        // Menambahkan kolom computed total_nilai_keseluruhan dari semua ujian yang sudah selesai
         $query->addSelect([
             'total_nilai_keseluruhan' => HasilUjian::selectRaw('COALESCE(SUM(nilai_akhir), 0)')
                                                 ->whereColumn('santri_id', 'psb_pendaftaran_santri.id')
-                                                ->where('status', 'selesai') // Hanya hitung yang sudah selesai
+                                                ->where('status', 'selesai') // Hanya hitung yang sudah selesai dinilai admin
         ]);
 
-        // =================================================================
-        // SESUAIKAN PENGURUTAN UNTUK TOTAL NILAI
-        // =================================================================
         if ($this->filters['nilai'] === 'highest') {
             $query->orderBy('total_nilai_keseluruhan', 'desc');
         } elseif ($this->filters['nilai'] === 'lowest') {
@@ -122,21 +127,11 @@ class HasilUjianSantri extends Component
         return $query->paginate($this->perPage);
     }
 
-    // Metode ini tidak relevan lagi jika Anda menampilkan total, bukan rata-rata
-    // public function getTotalNilai($santri)
-    // {
-    //     if ($santri->hasilUjians->isEmpty()) {
-    //         return 0;
-    //     }
-    //     return round($santri->hasilUjians->avg('nilai_akhir'), 2);
-    // }
-
     public function terimaSantri($id)
     {
         $santri = PendaftaranSantri::findOrFail($id);
         $santri->update([
-            'status' => 'diterima',
-            'status_santri' => 'daftar_ulang'
+            'status_santri' => 'diterima'
         ]);
         session()->flash('success', 'Santri berhasil diterima dan akan melakukan pendaftaran ulang');
     }
@@ -145,12 +140,12 @@ class HasilUjianSantri extends Component
     {
         $santri = PendaftaranSantri::findOrFail($id);
         $santri->update([
-            'status' => 'ditolak',
             'status_santri' => 'ditolak'
         ]);
         session()->flash('success', 'Santri berhasil ditolak');
     }
 
+    // getTipeOptions tetap ada karena masih digunakan oleh filter 'tipe'
     public function getTipeOptions()
     {
         return [
@@ -164,7 +159,8 @@ class HasilUjianSantri extends Component
     {
         return view('livewire.admin.psb.hasil-ujian-santri', [
             'santriList' => $this->getSantriList(),
-            'tipeOptions' => $this->getTipeOptions()
+            'tipeOptions' => $this->getTipeOptions(),
+            // statusUjianOptions dan statusPendaftaranOptions tidak lagi diteruskan ke view
         ]);
     }
 }

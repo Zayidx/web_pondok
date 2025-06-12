@@ -2,7 +2,8 @@
 
 namespace App\Livewire\SantriPPDB;
 
-use App\Models\HasilUjian;
+use App\Models\PSB\HasilUjian; // Menggunakan model HasilUjian dari namespace PSB
+use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
 use Livewire\WithPagination;
@@ -17,10 +18,12 @@ class SantriDashboard extends Component
     #[Computed]
     public function listHasilUjian()
     {
+        // Memuat ujian dengan select hanya kolom yang diperlukan
         return HasilUjian::where('santri_id', auth()->guard('santri')->user()->id)
             ->with(['ujian' => function ($query) {
                 $query->select('id', 'nama_ujian', 'mata_pelajaran', 'tanggal_ujian');
             }])
+            ->orderBy('created_at', 'desc') // Tambahkan pengurutan terbaru
             ->paginate(10);
     }
 

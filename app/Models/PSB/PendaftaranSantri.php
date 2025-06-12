@@ -85,8 +85,8 @@ class PendaftaranSantri extends Authenticatable
         'bukti_pembayaran',
         'status_pembayaran',
         'catatan_verifikasi',
-    'rata_rata_ujian',         // <-- Pastikan ini ada!
-    'total_nilai_semua_ujian'  // <-- Pastikan ini ada!
+        'rata_rata_ujian',         // <-- Pastikan ini ada!
+        'total_nilai_semua_ujian'  // <-- Pastikan ini ada!
     ];
 
     /**
