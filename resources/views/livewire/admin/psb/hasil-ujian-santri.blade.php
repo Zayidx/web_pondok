@@ -13,7 +13,6 @@
     <div class="page-title">
         <div class="row">
             <div class="col-12 col-md-6 order-md-1 order-last">
-                <h3>Hasil Ujian Santri</h3>
                 <p class="text-subtitle text-muted">Daftar santri yang sedang mengikuti ujian.</p>
             </div>
         </div>
@@ -91,12 +90,23 @@
                                         </td>
                                         <td>{{ number_format($santri->total_nilai_semua_ujian, 2) }}</td>
                                         <td>{{ number_format($santri->rata_rata_ujian, 2) }}</td>
-                                        <td>
-                                            <a href="{{ route('admin.psb.ujian.detail', ['id' => $santri->id]) }}" 
-                                               class="btn btn-sm btn-primary">
-                                                <i class="bi bi-eye"></i> Detail
-                                            </a>
-                                        </td>
+                                        <td class="text-nowrap">
+                                    <a href="{{ route('admin.psb.ujian.detail', ['id' => $santri->id]) }}" 
+                                       class="btn btn-sm btn-primary me-1" wire:navigate>
+                                        <i class="bi bi-eye"></i> Detail Ujian
+                                    </a>
+                                    <button wire:click="terimaSantri({{ $santri->id }})"
+                                            wire:confirm="Anda yakin ingin MELULUSKAN santri ini?"
+                                            class="btn btn-sm btn-success me-1">
+                                        <i class="bi bi-check-circle"></i> Luluskan
+                                    </button>
+                                    <button wire:click="tolakSantri({{ $santri->id }})" 
+                                            wire:confirm="Anda yakin ingin TIDAK MELULUSKAN santri ini?"
+                                            class="btn btn-sm btn-danger me-1">
+                                        <i class="bi bi-x-circle"></i> Tolak
+                                    </button>
+                                </td>
+                                        
                                     </tr>
                                 @empty
                                     <tr>

@@ -107,7 +107,7 @@ class HasilUjianSantri extends Component
     {
         $santri = PendaftaranSantri::findOrFail($id);
         $santri->update([
-            'status_santri' => 'diterima'
+            'status_santri' => 'daftar_ulang'
         ]);
         session()->flash('success', 'Santri berhasil diterima dan akan melakukan pendaftaran ulang');
     }

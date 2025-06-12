@@ -15,6 +15,8 @@ use Livewire\WithPagination;
 use Livewire\Attributes\Title;
 // Mengimpor atribut `Title` dari Livewire. Ini adalah fitur baru di Livewire 3 untuk mengatur judul halaman secara deklaratif.
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Layout;
+
 // Mengimpor atribut `Computed` dari Livewire. Ini digunakan untuk mendefinisikan properti yang nilainya dihitung dan di-cache, hanya dihitung ulang jika dependensi berubah.
 
 #[Title('Dashboard Daftar Ulang')]
@@ -24,6 +26,7 @@ class DashboardDaftarUlang extends Component
 {
     use WithPagination; // Enables pagination functionality for the component
     // Menggunakan trait `WithPagination`. Ini menyediakan metode-metode seperti `paginate` dan `resetPage` untuk manajemen paginasi.
+    #[Layout ('components.layouts.app')]
 
     // Public properties for filters, search, and pagination settings
     // Properti publik di Livewire secara otomatis tersedia di view dan dapat diikat (bind) ke elemen input HTML.
