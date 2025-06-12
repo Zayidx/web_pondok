@@ -16,11 +16,9 @@
         </div>
     </div>
 
-    {{-- Kartu Utama dengan Filter dan Tabel --}}
     <div class="card">
-      
-        <div class="card-body">
-            {{-- Bagian Filter dan Pencarian --}}
+    <div class="card-body">
+        <{{-- Bagian Filter dan Pencarian --}}
             <div class="row mb-4 g-2">
                 <div class="col-md-3">
                     <input type="text" wire:model.live.debounce.300ms="search" class="form-control" placeholder="Cari Nama/NISN/Sekolah...">
@@ -34,11 +32,11 @@
                     </select>
                 </div>
                 <div class="col-md-2">
-                    <select wire:model.live="filters.nilai" class="form-select">
-                        <option value="">Urutkan Nilai</option>
-                        <option value="highest">Nilai Tertinggi</option>
-                        <option value="lowest">Nilai Terendah</option>
-                    </select>
+                <select wire:model.live="filters.nilai" class="form-select">
+                    <option value="">Urutkan Nilai</option>
+                    <option value="highest">Total Nilai Tertinggi</option> {{-- Perbarui teks --}}
+                    <option value="lowest">Total Nilai Terendah</option> {{-- Perbarui teks --}}
+                </select>
                 </div>
                 
                 <div class="col-md-2">
@@ -48,64 +46,60 @@
                 </div>
             </div>
 
-            {{-- Tabel Hasil Ujian --}}
-            <div class="table-responsive">
-                <table class="table table-hover table-striped">
-                    <thead>
+        <div class="table-responsive">
+            <table class="table table-hover table-striped">
+                <thead>
+                    <tr>
+                        <th wire:click="sortBy('nama_lengkap')" style="cursor: pointer;">
+                            Nama Lengkap <i class="bi bi-sort-alpha-down"></i>
+                        </th>
+                        <th>NISN</th>
+                        <th>Asal Sekolah</th>
+                        <th wire:click="sortBy('total_nilai_keseluruhan')" style="cursor: pointer;"> {{-- Sesuaikan sortBy --}}
+                            Total Nilai Ujian <i class="bi bi-sort-numeric-down"></i> {{-- Perbarui teks --}}
+                        </th>
+                        <th>Status</th>
+                        <th style="width: 250px;">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse ($santriList as $santri)
                         <tr>
-                            <th wire:click="sortBy('nama_lengkap')" style="cursor: pointer;">
-                                Nama Lengkap <i class="bi bi-sort-alpha-down"></i>
-                            </th>
-                            <th>NISN</th>
-                            <th>Asal Sekolah</th>
-                            <th wire:click="sortBy('rata_nilai')" style="cursor: pointer;">
-                                Rata-rata Nilai <i class="bi bi-sort-numeric-down"></i>
-                            </th>
-                            <th>Status</th>
-                            <th style="width: 250px;">Aksi</th>
+                            <td>{{ $santri->nama_lengkap }}</td>
+                            <td>{{ $santri->nisn }}</td>
+                            <td>{{ $santri->asal_sekolah }}</td>
+                            <td class="fw-bold">{{ number_format($santri->total_nilai_keseluruhan, 2) }}</td> {{-- Ambil dari kolom computed --}}
+                            <td>
+                                <span class="badge bg-warning">Menunggu Hasil</span>
+                            </td>
+                            <td class="text-nowrap">
+                                <a href="{{ route('admin.psb.ujian.detail', ['id' => $santri->id]) }}" 
+                                   class="btn btn-sm btn-primary me-1" wire:navigate>
+                                    <i class="bi bi-eye"></i> Detail Ujian
+                                </a>
+                                <button wire:click="terimaSantri({{ $santri->id }})"
+                                        wire:confirm="Anda yakin ingin MELULUSKAN santri ini?"
+                                        class="btn btn-sm btn-success me-1">
+                                    <i class="bi bi-check-circle"></i> Luluskan
+                                </button>
+                                <button wire:click="tolakSantri({{ $santri->id }})" 
+                                        wire:confirm="Anda yakin ingin TIDAK MELULUSKAN santri ini?"
+                                        class="btn btn-sm btn-danger me-1">
+                                    <i class="bi bi-x-circle"></i> Tolak
+                                </button>
+                            </td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @forelse ($santriList as $santri)
-                            <tr>
-                                <td>{{ $santri->nama_lengkap }}</td>
-                                <td>{{ $santri->nisn }}</td>
-                                <td>{{ $santri->asal_sekolah }}</td>
-                                <td class="fw-bold">{{ number_format($santri->rata_nilai, 2) }}</td>
-                                <td>
-                                    {{-- Status santri saat ini di halaman ini adalah 'sedang_ujian', yang berarti menunggu hasil. --}}
-                                    <span class="badge bg-warning">Menunggu Hasil</span>
-                                </td>
-                                <td class="text-nowrap">
-                                    <a href="{{ route('admin.psb.ujian.detail', ['id' => $santri->id]) }}" 
-                                       class="btn btn-sm btn-info me-1" wire:navigate>
-                                        <i class="bi bi-eye"></i> Detail Ujian
-                                    </a>
-                                    <button wire:click="terimaSantri({{ $santri->id }})"
-                                            wire:confirm="Anda yakin ingin MELULUSKAN santri ini?"
-                                            class="btn btn-sm btn-success me-1">
-                                        <i class="bi bi-check-circle"></i> Luluskan
-                                    </button>
-                                    <button wire:click="tolakSantri({{ $santri->id }})" 
-                                            wire:confirm="Anda yakin ingin TIDAK MELULUSKAN santri ini?"
-                                            class="btn btn-sm btn-danger me-1">
-                                        <i class="bi bi-x-circle"></i> Tolak
-                                    </button>
-                                </td>
-                            </tr>
-                        @empty
-                            <tr>
-                                <td colspan="6" class="text-center">Tidak ada data santri yang cocok dengan filter.</td>
-                            </tr>
-                        @endforelse
-                    </tbody>
-                </table>
-            </div>
+                    @empty
+                        <tr>
+                            <td colspan="6" class="text-center">Tidak ada data santri yang cocok dengan filter.</td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
 
-            {{-- Link Pagination --}}
-            <div class="mt-4">
-                {{ $santriList->links() }}
-            </div>
+        <div class="mt-4">
+            {{ $santriList->links() }}
         </div>
     </div>
 </div>

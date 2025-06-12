@@ -12,7 +12,12 @@ use Carbon\Carbon;
 use Livewire\Attributes\Layout;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Computed;
-use Barryvdh\Debugbar\Facades\Debugbar;
+// use Barryvdh\Debugbar\Facades\Debugbar; // This line might not be needed in production
+
+// --- ADD THESE USE STATEMENTS ---
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log; // Added for explicit logging
+// --- END ADDITIONS ---
 
 class MulaiUjian extends Component
 {
@@ -161,7 +166,6 @@ class MulaiUjian extends Component
         }
     }
 
-     // ... (Computed properties dan metode lain sebelum submitUjian tetap sama) ...
      public function confirmSubmit()
      {
          $this->checkUnansweredQuestions();
@@ -188,36 +192,41 @@ class MulaiUjian extends Component
                                          ->with('soal') // Eager load data soal untuk akses poin dan kunci jawaban
                                          ->get();
  
-             // 2. Hitung total poin dari jawaban PG yang benar
-             $totalPoinUjianIni = 0;
-             foreach ($semuaJawaban as $jawaban) {
-                 // Hanya hitung soal Pilihan Ganda (PG)
-                 if ($jawaban->soal && $jawaban->soal->tipe_soal === 'pg') {
-                     if ($jawaban->jawaban === $jawaban->soal->kunci_jawaban) {
-                         $totalPoinUjianIni += $jawaban->soal->poin;
-                     }
-                 }
-             }
- 
-             // 3. Update record hasil ujian dengan status, waktu selesai, dan nilai akhir
-             $this->hasilUjian->update([
-                 'waktu_selesai' => now(),
-                 'status'        => 'selesai',
-                 'nilai_akhir'   => $totalPoinUjianIni,
-             ]);
- 
-             // 4. Hitung ulang nilai rata-rata dari SEMUA ujian yang telah selesai
-             $semuaHasilUjianSelesai = HasilUjian::where('santri_id', $this->santri->id)
-                                                 ->where('status', 'selesai')
-                                                 ->get();
-             
-             $rataRataBaru = $semuaHasilUjianSelesai->avg('nilai_akhir') ?? 0;
- 
-             // 5. Update status santri dan nilai rata-rata ujiannya
-             $this->santri->update([
-                 'status_santri'   => 'menunggu',
-                 'rata_rata_ujian' => $rataRataBaru,
-             ]);
+            // 2. Hitung total poin dari jawaban PG yang benar untuk ujian ini
+$totalPoinUjianIni = 0;
+foreach ($semuaJawaban as $jawaban) {
+    // Hanya hitung soal Pilihan Ganda (PG)
+    if ($jawaban->soal && $jawaban->soal->tipe_soal === 'pg') {
+        if ($jawaban->jawaban === $jawaban->soal->kunci_jawaban) {
+            $totalPoinUjianIni += $jawaban->soal->poin;
+        }
+    }
+}
+
+// 3. Update record hasil ujian dengan status, waktu selesai, dan nilai akhir
+$this->hasilUjian->update([
+    'waktu_selesai' => now(),
+    'status'        => 'selesai',
+    'nilai_akhir'   => $totalPoinUjianIni, // Nilai ini sudah tersimpan
+]);
+
+// ... (lanjut ke perhitungan total dan rata-rata) ...
+
+// 4. Hitung ulang nilai rata-rata dari SEMUA ujian yang telah selesai
+//    DAN TOTAL NILAI KESELURUHAN UJIAN
+$semuaHasilUjianSelesai = HasilUjian::where('santri_id', $this->santri->id)
+                                    ->where('status', 'selesai')
+                                    ->get();
+
+$rataRataBaru = $semuaHasilUjianSelesai->avg('nilai_akhir') ?? 0;
+$totalNilaiKeseluruhan = $semuaHasilUjianSelesai->sum('nilai_akhir'); // Ini adalah total nilai SEMUA ujian
+
+// 5. Update status santri dan nilai rata-rata ujiannya
+$this->santri->update([
+    'status_santri'           => 'menunggu',
+    'rata_rata_ujian'         => $rataRataBaru,
+    'total_nilai_semua_ujian' => $totalNilaiKeseluruhan, // Ini yang disimpan ke kolom baru
+]);
              
              // =================================================================
              // **LOGIKA BARU SELESAI**
@@ -232,7 +241,7 @@ class MulaiUjian extends Component
              DB::rollback(); // Batalkan semua perubahan jika terjadi error
  
              // Log error untuk developer
-             // Log::error('Error saat submit ujian: ' . $e->getMessage()); 
+             Log::error('Error saat submit ujian: ' . $e->getMessage()); // Using the imported Log facade
              
              session()->flash('error', 'Terjadi kesalahan saat mengumpulkan ujian. Silakan coba lagi.');
              $this->isFinished = false; // Set kembali agar bisa mencoba submit lagi

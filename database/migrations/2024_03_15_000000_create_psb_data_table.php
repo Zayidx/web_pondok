@@ -64,11 +64,18 @@ return new class extends Migration
             $table->string('bukti_pembayaran')->nullable();
             $table->enum('status_pembayaran', ['pending', 'verified', 'rejected'])->nullable();
 
+           
             // =================================================================
-            // PENAMBAHAN KOLOM BARU UNTUK NILAI RATA-RATA
+            // PENAMBAHAN KOLOM BARU UNTUK NILAI RATA-RATA (SUDAH ADA)
             // =================================================================
             $table->decimal('rata_rata_ujian', 5, 2)->nullable()->comment('Menyimpan nilai rata-rata dari semua ujian');
             
+            // =================================================================
+            // PENAMBAHAN KOLOM BARU UNTUK TOTAL NILAI KESELURUHAN UJIAN (BARU)
+            // =================================================================
+            $table->decimal('total_nilai_semua_ujian', 8, 2)->default(0)->comment('Menyimpan total nilai dari semua ujian yang telah diselesaikan');
+
+
             $table->foreignId('verified_by')->nullable()->constrained('users');
             $table->timestamp('verified_at')->nullable();
             $table->text('catatan_verifikasi')->nullable();
@@ -205,6 +212,7 @@ return new class extends Migration
 
     public function down()
     {
+        
         Schema::dropIfExists('wawancara_schedules');
         Schema::dropIfExists('jawaban_ujians');
         Schema::dropIfExists('hasil_ujians');

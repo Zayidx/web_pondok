@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\PSB;
+namespace App\Livewire\Admin\PSB;
 
 use Livewire\Component;
 use App\Models\PSB\Soal;
@@ -8,8 +8,10 @@ use App\Models\PSB\JawabanUjian;
 use App\Models\PSB\PendaftaranSantri;
 use App\Models\PSB\HasilUjian;
 use App\Models\PSB\Ujian;
-use Illuminate\Support\Facades\DB; // Import DB untuk Transaction
+use Illuminate\Support\Facades\DB;
 use Livewire\Attributes\Title;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Collection; // <-- Add this use statement
 
 #[Title('Detail & Penilaian Ujian Santri')]
 class DetailSoalSantri extends Component
@@ -19,7 +21,7 @@ class DetailSoalSantri extends Component
     public $ujian;
     public $santri;
     public $soalUjian;
-    public $jawabanUjian;
+    public Collection $jawabanUjian; // <-- Type-hint as Collection for clarity and safety
     public $hasilUjian;
     public $poinEssay = [];
     public $totalPoin = 0;
@@ -38,6 +40,7 @@ class DetailSoalSantri extends Component
         $this->soalUjian = Soal::where('ujian_id', $this->ujianId)->orderBy('id', 'asc')->get();
         $this->hasilUjian = HasilUjian::where(['santri_id' => $this->santriId, 'ujian_id' => $this->ujianId])->first();
 
+        // Initialize $jawabanUjian as an empty collection if hasilUjian is null
         if ($this->hasilUjian) {
             $this->jawabanUjian = JawabanUjian::where('hasil_ujian_id', $this->hasilUjian->id)->get()->keyBy('soal_id');
             foreach ($this->soalUjian as $soal) {
@@ -45,6 +48,8 @@ class DetailSoalSantri extends Component
                     $this->poinEssay[$soal->id] = $this->jawabanUjian[$soal->id]->nilai ?? 0;
                 }
             }
+        } else {
+            $this->jawabanUjian = new Collection(); // Initialize as an empty collection
         }
         $this->calculateTotalPoin();
     }
@@ -52,18 +57,21 @@ class DetailSoalSantri extends Component
     public function calculateTotalPoin()
     {
         $this->totalPoin = 0;
-        if (!$this->jawabanUjian) return;
+        // No need for if (!$this->jawabanUjian) return; because it's always a Collection now
+        // if (!$this->jawabanUjian) return; // This line can be removed
 
         foreach ($this->soalUjian as $soal) {
             $jawabanSantri = $this->jawabanUjian->get($soal->id);
             if ($jawabanSantri) {
                 if ($soal->tipe_soal === 'pg') {
                     $jawabanSantriHuruf = is_numeric($jawabanSantri->jawaban) ? chr((int)$jawabanSantri->jawaban + 65) : $jawabanSantri->jawaban;
-                    if ($jawabanSantriHuruf === $soal->kunci_jawaban) {
+                    $kunciJawabanHuruf = is_numeric($soal->kunci_jawaban) ? chr((int)$soal->kunci_jawaban + 65) : $soal->kunci_jawaban;
+
+                    if ($jawabanSantriHuruf === $kunciJawabanHuruf) {
                         $this->totalPoin += $soal->poin;
                     }
                 } else {
-                    $this->totalPoin += (int)($this->poinEssay[$soal->id] ?? 0);
+                    $this->totalPoin += (float)($this->poinEssay[$soal->id] ?? 0);
                 }
             }
         }
@@ -77,53 +85,52 @@ class DetailSoalSantri extends Component
     public function saveNilai()
     {
         if (!$this->hasilUjian) {
-            session()->flash('error', 'Data hasil ujian tidak ditemukan.');
+            session()->flash('error', 'Data hasil ujian tidak ditemukan. Tidak dapat menyimpan nilai.');
             return;
         }
 
         DB::transaction(function () {
-            // 1. Simpan nilai per soal essay
+            Log::info('Attempting to save essay points for hasil_ujian_id: ' . $this->hasilUjian->id);
             foreach ($this->poinEssay as $soalId => $poin) {
+                // Ensure $poin is cast to a number (float) before saving
                 JawabanUjian::updateOrCreate(
                     ['hasil_ujian_id' => $this->hasilUjian->id, 'soal_id' => $soalId],
-                    ['nilai' => $poin, 'jawaban' => $this->jawabanUjian->get($soalId)?->jawaban ?? '']
+                    ['nilai' => (float)$poin, 'jawaban' => $this->jawabanUjian->get($soalId)?->jawaban ?? '']
                 );
+                Log::info("Saved soal_id {$soalId} with nilai {$poin}");
             }
-            
-            // Muat ulang data jawaban untuk kalkulasi final
+    
+            // Re-fetch answers to ensure the most up-to-date 'nilai' is used for total calculation
             $this->jawabanUjian = JawabanUjian::where('hasil_ujian_id', $this->hasilUjian->id)->get()->keyBy('soal_id');
             $this->calculateTotalPoin();
-            
-            // 2. Simpan nilai akhir untuk ujian INI
+    
+            Log::info('Updating HasilUjian nilai_akhir: ' . $this->totalPoin);
             $this->hasilUjian->update(['nilai_akhir' => $this->totalPoin]);
-            
-            // =================================================================
-            // **LOGIKA BARU DIMULAI DI SINI**
-            // =================================================================
-            // 3. Ambil SEMUA hasil ujian santri yang sudah selesai
-            $semuaHasilUjian = HasilUjian::where('santri_id', $this->santriId)
+    
+            $semuaHasilUjianSelesai = HasilUjian::where('santri_id', $this->santriId)
                                           ->where('status', 'selesai')
                                           ->get();
 
-            // 4. Hitung nilai rata-rata baru
-            $rataRataBaru = $semuaHasilUjian->avg('nilai_akhir') ?? 0;
-
-            // 5. Simpan nilai rata-rata ke tabel pendaftaran santri
-            $this->santri->update(['rata_rata_ujian' => $rataRataBaru]);
-            // =================================================================
-            // **LOGIKA BARU SELESAI**
-            // =================================================================
-
+            $rataRataBaru = $semuaHasilUjianSelesai->avg('nilai_akhir') ?? 0;
+            $totalNilaiKeseluruhan = $semuaHasilUjianSelesai->sum('nilai_akhir'); 
+            
+            Log::info('Updating Santri rata_rata_ujian: ' . $rataRataBaru . ' and total_nilai_semua_ujian: ' . $totalNilaiKeseluruhan);
+            $this->santri->update([
+                'rata_rata_ujian'         => $rataRataBaru,
+                'total_nilai_semua_ujian' => $totalNilaiKeseluruhan,
+            ]);
+    
+            Log::info('Transaction committed successfully.');
         });
 
         session()->flash('success', 'Semua nilai berhasil disimpan!');
         $this->dispatch('nilai-tersimpan');
-        // Muat ulang data santri untuk me-refresh tampilan rata-rata
         $this->santri->refresh();
+        $this->hasilUjian->refresh();
     }
 
     public function render()
     {
-        return view('livewire.psb.detail-soal-santri');
+        return view('livewire.admin.psb.detail-soal-santri');
     }
 }

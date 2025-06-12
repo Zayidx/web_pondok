@@ -106,7 +106,7 @@
                                 <td class="text-nowrap">
                                     <a href="{{ route('admin.master-psb.detail-registration', ['santriId' => $registration->id]) }}" 
                                        class="btn btn-sm btn-primary me-1">
-                                        <i class="bi bi-eye"></i> Detail
+                                        <i class="bi bi-eye"></i> Detail Santri
                                     </a>
                                     <a href="{{ route('admin.master-psb.edit-registration', ['santriId' => $registration->id]) }}" 
                                        class="btn btn-sm btn-warning me-1">

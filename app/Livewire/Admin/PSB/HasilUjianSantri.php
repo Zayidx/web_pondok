@@ -99,18 +99,22 @@ class HasilUjianSantri extends Component
                 $query->where('tipe_pendaftaran', $this->filters['tipe']);
             });
 
-        // Add subquery for average score
+        // =================================================================
+        // PERUBAHAN DI SINI: MENGAMBIL total_nilai_semua_ujian BUKAN RATA-RATA
+        // =================================================================
         $query->addSelect([
-            'rata_nilai' => HasilUjian::selectRaw('COALESCE(AVG(nilai_akhir), 0)')
-            ->whereColumn('santri_id', 'psb_pendaftaran_santri.id')
-
+            'total_nilai_keseluruhan' => HasilUjian::selectRaw('COALESCE(SUM(nilai_akhir), 0)')
+                                                ->whereColumn('santri_id', 'psb_pendaftaran_santri.id')
+                                                ->where('status', 'selesai') // Hanya hitung yang sudah selesai
         ]);
 
-        // Apply score sorting if selected
+        // =================================================================
+        // SESUAIKAN PENGURUTAN UNTUK TOTAL NILAI
+        // =================================================================
         if ($this->filters['nilai'] === 'highest') {
-            $query->orderBy('rata_nilai', 'desc');
+            $query->orderBy('total_nilai_keseluruhan', 'desc');
         } elseif ($this->filters['nilai'] === 'lowest') {
-            $query->orderBy('rata_nilai', 'asc');
+            $query->orderBy('total_nilai_keseluruhan', 'asc');
         } else {
             $query->orderBy($this->sortField, $this->sortDirection);
         }
@@ -118,22 +122,14 @@ class HasilUjianSantri extends Component
         return $query->paginate($this->perPage);
     }
 
-    public function getNilaiMapel($santri)
-    {
-        $nilaiPerMapel = [];
-        foreach ($santri->hasilUjians as $hasil) {
-            $nilaiPerMapel[$hasil->ujian->mata_pelajaran] = $hasil->nilai_akhir;
-        }
-        return $nilaiPerMapel;
-    }
-
-    public function getTotalNilai($santri)
-    {
-        if ($santri->hasilUjians->isEmpty()) {
-            return 0;
-        }
-        return round($santri->hasilUjians->avg('nilai_akhir'), 2);
-    }
+    // Metode ini tidak relevan lagi jika Anda menampilkan total, bukan rata-rata
+    // public function getTotalNilai($santri)
+    // {
+    //     if ($santri->hasilUjians->isEmpty()) {
+    //         return 0;
+    //     }
+    //     return round($santri->hasilUjians->avg('nilai_akhir'), 2);
+    // }
 
     public function terimaSantri($id)
     {
@@ -171,9 +167,4 @@ class HasilUjianSantri extends Component
             'tipeOptions' => $this->getTipeOptions()
         ]);
     }
-} 
- 
- 
- 
- 
- 
+}

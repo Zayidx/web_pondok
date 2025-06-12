@@ -10,6 +10,7 @@ use App\Models\PSB\Soal;
 use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Title;
+use Illuminate\Support\Facades\Log; // Pastikan ini di-import di atas
 
 class DetailUjianSantri extends Component
 {
@@ -32,16 +33,19 @@ class DetailUjianSantri extends Component
     public function loadUjianList()
     {
         $this->ujianList = Ujian::with(['hasilUjians' => function($query) {
-            $query->where('santri_id',
-    $this->santriId);
+            $query->where('santri_id', $this->santriId);
         }])->get();
     
         foreach ($this->ujianList as $ujian) {
             $hasilUjian = $ujian->hasilUjians->first();
     
-            // Baris ini adalah kuncinya:
-            // Jika ujian sudah 'selesai', ambil nilai dari kolom 'nilai_akhir',
-            // jika tidak, nilainya dianggap 0.
+            // Tambahkan logging di sini
+            if ($hasilUjian) {
+                Log::info("Ujian ID: {$ujian->id}, HasilUjian Status: {$hasilUjian->status}, Nilai Akhir: {$hasilUjian->nilai_akhir}");
+            } else {
+                Log::info("Ujian ID: {$ujian->id}, Tidak ada HasilUjian ditemukan.");
+            }
+    
             $this->totalNilaiPerUjian[$ujian->id] = $hasilUjian && $hasilUjian->status === 'selesai'
                 ? ($hasilUjian->nilai_akhir ?? 0)
                 : 0;
