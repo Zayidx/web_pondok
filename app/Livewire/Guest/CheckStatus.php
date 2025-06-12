@@ -11,6 +11,8 @@ use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\File;
+use App\Models\SertifikatTemplate;
+use App\Models\Periode;
 
 class CheckStatus extends Component
 {
@@ -93,7 +95,7 @@ class CheckStatus extends Component
         ];
 
         $this->timelineStatus['wawancara'] = [
-            'completed' => in_array($this->santri->status_santri, ['sedang_ujian', 'diterima', 'ditolak']),
+            'completed' => in_array($this->santri->status_santri, ['sedang_ujian', 'diterima', 'ditolak', 'daftar_ulang']),
             'current' => $this->santri->status_santri == 'wawancara',
             'date' => $this->santri->tanggal_wawancara ? Carbon::parse($this->santri->tanggal_wawancara)->format('d F Y') : null,
             'time' => $this->santri->tanggal_wawancara ? Carbon::parse($this->santri->tanggal_wawancara)->format('H:i') : null,
@@ -102,24 +104,24 @@ class CheckStatus extends Component
         ];
 
         $this->timelineStatus['ujian'] = [
-            'completed' => in_array($this->santri->status_santri, ['diterima', 'ditolak']),
+            'completed' => in_array($this->santri->status_santri, ['diterima', 'ditolak', 'daftar_ulang']),
             'current' => $this->santri->status_santri == 'sedang_ujian',
-            'date' => $this->santri->updated_at && in_array($this->santri->status_santri, ['diterima', 'ditolak'])
+            'date' => $this->santri->updated_at && in_array($this->santri->status_santri, ['diterima', 'ditolak', 'daftar_ulang'])
                 ? $this->santri->updated_at->format('d F Y')
                 : null,
         ];
 
         $this->timelineStatus['pengumuman_hasil'] = [
-            'completed' => in_array($this->santri->status_santri, ['diterima', 'ditolak']),
+            'completed' => in_array($this->santri->status_santri, ['diterima', 'ditolak', 'daftar_ulang']),
             'current' => false,
-            'status' => in_array($this->santri->status_santri, ['diterima', 'ditolak']) ? $this->santri->status_santri : null,
-            'date' => $this->santri->updated_at && in_array($this->santri->status_santri, ['diterima', 'ditolak'])
+            'status' => in_array($this->santri->status_santri, ['diterima', 'ditolak', 'daftar_ulang']) ? $this->santri->status_santri : null,
+            'date' => $this->santri->updated_at && in_array($this->santri->status_santri, ['diterima', 'ditolak', 'daftar_ulang'])
                 ? $this->santri->updated_at->format('d F Y')
                 : null,
         ];
 
         $this->timelineStatus['daftar_ulang'] = [
-            'completed' => $this->santri->status_santri === 'diterima',
+            'completed' => $this->santri->status_santri === 'daftar_ulang' && $this->santri->status_pembayaran === 'verified',
             'current' => $this->santri->status_santri === 'daftar_ulang',
             'date' => $this->santri->tanggal_pembayaran ? Carbon::parse($this->santri->tanggal_pembayaran)->format('d F Y') : null
         ];
@@ -172,14 +174,14 @@ class CheckStatus extends Component
 
             Log::info('Logout successful, redirecting to login page');
 
-            $this->dispatch('redirect', url: route('login-ppdb-santri'));
+            return $this->redirect(route('login-ppdb-santri'), navigate: true);
         } catch (\Exception $e) {
             Log::error('Error during logout', [
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
 
-            $this->dispatch('redirect', url: route('login-ppdb-santri'));
+            return $this->redirect(route('login-ppdb-santri'), navigate: true);
         }
     }
 
@@ -193,63 +195,64 @@ class CheckStatus extends Component
             return;
         }
 
-        // URL untuk mengunduh PDF langsung dari Laravel Route
-        // Gunakan $this->santri->id yang sudah tersedia
-        $downloadUrl = route('psb.download-penerimaan-pdf', ['santriId' => $this->santri->id]);
-        
-        Log::info('Dispatching openPdfInNewTab event with URL: ' . $downloadUrl);
-        // Dispatch event ke JavaScript untuk membuka URL ini di tab baru
-        $this->dispatch('openPdfInNewTab', ['url' => $downloadUrl]);
-
-        session()->flash('message', 'Unduhan PDF dimulai di tab baru.');
-    }
-
-    // Metode untuk menghasilkan PDF yang akan dipanggil oleh rute langsung
-    public function downloadCertificatePdfDirect()
-    {
-        Log::info('downloadCertificatePdfDirect method called directly from route.');
-
-        // Pada titik ini, $this->santri sudah diinisialisasi oleh mount()
-        // karena rute secara manual memanggil mount() sebelum memanggil metode ini.
-        if (!$this->santri || $this->santri->status_santri !== 'diterima') {
-            Log::warning('Direct PDF download denied: Santri not found or not accepted for santri ID (from component): ' . ($this->santri->id ?? 'N/A'));
-            // Jika santri tidak diterima, arahkan ke login atau tampilkan error
-            abort(403, 'Akses tidak diizinkan atau santri tidak ditemukan/diterima.');
-        }
-
-        $santriName = $this->santri->nama_lengkap;
-        $acceptanceDate = $this->santri->updated_at ? $this->santri->updated_at->translatedFormat('d F Y') : Carbon::now()->translatedFormat('d F Y');
-        $issueDate = Carbon::now()->translatedFormat('d F Y');
-        $certificateNumber = 'CERT/' . date('Y') . '/' . str_pad(rand(1, 999999), 6, '0', STR_PAD_LEFT);
-
-        $logoPath = public_path('assets/compiled/jpg/1.jpg');
-        $logoBase64 = '';
-
-        if (File::exists($logoPath)) {
-            $logoBase64 = 'data:image/' . File::extension($logoPath) . ';base64,' . base64_encode(File::get($logoPath));
-        } else {
-            Log::error("Logo file not found at: " . $logoPath);
-        }
-
-        $data = [
-            'santri' => $this->santri,
-            'tanggal_cetak' => Carbon::now()->translatedFormat('d F Y'),
-            'jenjang_diterima' => $this->santri->nama_jenjang ?? 'SMA',
-            'periode_pendaftaran' => $this->santri->periode->nama_periode ?? 'Tahun Ajaran 2025/2026',
-            'acceptanceDate' => $acceptanceDate,
-            'issueDate' => $issueDate,
-            'certificateNumber' => $certificateNumber,
-            'logoBase64' => $logoBase64,
-        ];
-
         try {
+            $template = SertifikatTemplate::first();
+            if (!$template) {
+                session()->flash('error', 'Template sertifikat belum dikonfigurasi.');
+                return;
+            }
+
+            $periode = Periode::where('tipe_periode', 'pendaftaran_baru')
+                ->where('status_periode', 'active')
+                ->first();
+
+            $santriName = $this->santri->nama_lengkap;
+            $acceptanceDate = $this->santri->updated_at ? $this->santri->updated_at->translatedFormat('d F Y') : Carbon::now()->translatedFormat('d F Y');
+            $issueDate = Carbon::now()->translatedFormat('d F Y');
+            $certificateNumber = 'CERT/' . date('Y') . '/' . str_pad($this->santri->id, 6, '0', STR_PAD_LEFT);
+
+            $logoPath = public_path('assets/compiled/jpg/1.jpg');
+            $logoBase64 = '';
+
+            if (File::exists($logoPath)) {
+                $logoBase64 = 'data:image/' . File::extension($logoPath) . ';base64,' . base64_encode(File::get($logoPath));
+            } else {
+                Log::error("Logo file not found at: " . $logoPath);
+            }
+
+            $data = [
+                'santri' => $this->santri,
+                'template' => $template,
+                'periode' => $periode,
+                'tanggal_cetak' => Carbon::now()->translatedFormat('d F Y'),
+                'acceptanceDate' => $acceptanceDate,
+                'issueDate' => $issueDate,
+                'certificateNumber' => $certificateNumber,
+                'logoBase64' => $logoBase64,
+            ];
+
             $pdf = Pdf::loadView('psb.surat-penerimaan-pdf', $data);
             $fileName = 'Surat_Penerimaan_' . str_replace(' ', '_', $santriName) . '.pdf';
-            return $pdf->download($fileName);
+            
+            return response()->streamDownload(function() use ($pdf) {
+                echo $pdf->output();
+            }, $fileName);
+            
         } catch (\Exception $e) {
-            Log::error("Error generating PDF directly: " . $e->getMessage() . " on line " . $e->getLine() . " in file " . $e->getFile());
-            abort(500, 'Terjadi kesalahan internal saat membuat PDF.');
+            Log::error("Error generating PDF: " . $e->getMessage());
+            session()->flash('error', 'Terjadi kesalahan saat membuat PDF. Silakan coba lagi.');
         }
+    }
+
+    public function viewPaymentProof($id)
+    {
+        $this->santri = PendaftaranSantri::findOrFail($id);
+        $this->dispatch('open-modal');
+    }
+
+    public function closePaymentProof()
+    {
+        $this->dispatch('close-modal');
     }
 
     public function render()

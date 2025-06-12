@@ -32,6 +32,9 @@ Route::get('/generate', function () {
     echo 'ok';
 });
 
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/admin/psb/sertifikat', App\Livewire\Admin\PSB\SertifikatPenerimaan::class)->name('admin.psb.sertifikat');
+});
 
 // Route redirect
 require __DIR__ . '/superadmin.php';
@@ -41,3 +44,54 @@ require __DIR__ . '/e-santri.php';
 require __DIR__ . '/e-cashless/petugas-e-cashless.php';
 require __DIR__ . '/e-cashless/petugas-laundry.php';
 require __DIR__ . '/e-cashless/petugas-warung.php';
+
+Route::post('/ppdb/logout', function () {
+    \Illuminate\Support\Facades\Auth::guard('pendaftaran_santri')->logout();
+    session()->forget(['santri_id', 'login_time']);
+    return redirect()->route('login-ppdb-santri');
+})->name('logout-ppdb-santri');
+
+Route::get('/ppdb/download-penerimaan-pdf/{santriId}', function ($santriId) {
+    $santri = \App\Models\PSB\PendaftaranSantri::findOrFail($santriId);
+    
+    if ($santri->status_santri !== 'diterima') {
+        abort(403, 'Surat penerimaan hanya dapat diunduh untuk santri yang diterima.');
+    }
+
+    $template = \App\Models\PSB\SertifikatTemplate::first();
+    if (!$template) {
+        abort(500, 'Template sertifikat belum dikonfigurasi.');
+    }
+
+    $periode = \App\Models\PSB\Periode::where('tipe_periode', 'pendaftaran_baru')
+        ->where('status_periode', 'active')
+        ->first();
+
+    $santriName = $santri->nama_lengkap;
+    $acceptanceDate = $santri->updated_at ? $santri->updated_at->translatedFormat('d F Y') : \Carbon\Carbon::now()->translatedFormat('d F Y');
+    $issueDate = \Carbon\Carbon::now()->translatedFormat('d F Y');
+    $certificateNumber = 'CERT/' . date('Y') . '/' . str_pad($santri->id, 6, '0', STR_PAD_LEFT);
+
+    $logoPath = public_path('assets/compiled/jpg/1.jpg');
+    $logoBase64 = '';
+
+    if (\Illuminate\Support\Facades\File::exists($logoPath)) {
+        $logoBase64 = 'data:image/' . \Illuminate\Support\Facades\File::extension($logoPath) . ';base64,' . base64_encode(\Illuminate\Support\Facades\File::get($logoPath));
+    }
+
+    $data = [
+        'santri' => $santri,
+        'template' => $template,
+        'periode' => $periode,
+        'tanggal_cetak' => \Carbon\Carbon::now()->translatedFormat('d F Y'),
+        'acceptanceDate' => $acceptanceDate,
+        'issueDate' => $issueDate,
+        'certificateNumber' => $certificateNumber,
+        'logoBase64' => $logoBase64,
+    ];
+
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('psb.surat-penerimaan-pdf', $data);
+    $fileName = 'Surat_Penerimaan_' . str_replace(' ', '_', $santriName) . '.pdf';
+    
+    return $pdf->download($fileName);
+})->name('psb.download-penerimaan-pdf');

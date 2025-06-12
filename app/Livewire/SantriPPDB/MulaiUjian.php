@@ -314,41 +314,54 @@ class MulaiUjian extends Component
       */
       public function submitUjian()
       {
-          // Memanggil fungsi saveAnswer() untuk menyimpan jawaban terakhir dari santri.
-          $this->saveAnswer();
-          // Memanggil fungsi checkJawaban() untuk menghitung total skor dari jawaban pilihan ganda.
-          $this->checkJawaban();
-      
-          // Memeriksa apakah data ujian santri ditemukan.
-          if ($this->ujianSantri) {
-              // PERBAIKAN YANG DISARANKAN:
-              // Seharusnya status diubah menjadi 'menunggu_penilaian' jika ada soal esai,
-              // dan 'selesai' jika hanya pilihan ganda. Kode di bawah ini langsung mengubahnya menjadi 'selesai'.
-              $this->ujianSantri->update([
-                  'status_ujian' => 'selesai'
-              ]);
+          // Save all answers first
+          foreach ($this->jawabanSiswa as $soalId => $jawaban) {
+              $this->simpanJawaban($soalId, $jawaban);
           }
-          
-          // Mencari data santri berdasarkan ID yang sedang login.
-          $this->santri = PendaftaranSantri::find($this->sada->id);
-          // Memeriksa apakah data santri ditemukan.
-          if ($this->ujianSantri) {
-            // Memeriksa apakah ujian ini memiliki soal dengan jenis 'essay'.
-            $hasEssay = $this->ujian->soals()->where('jenis_soal', 'essay')->exists();
-        
-            // Menentukan status ujian berdasarkan keberadaan soal esai.
-            // Jika ada esai, statusnya 'menunggu_penilaian', jika tidak 'selesai'.
-            $status = $hasEssay ? 'menunggu_penilaian' : 'selesai';
-        
-            // Memperbarui status ujian santri dengan status yang sudah ditentukan.
-            $this->ujianSantri->update([
-                'status_ujian' => $status,
-            ]);
-        }
-      
-      
-          // Mengarahkan santri ke halaman selesai ujian.
-          return redirect()->route('santri.selesai-ujian', ['ujian_id' => $this->ujian_id]);
+
+          // Calculate total score
+          $totalScore = 0;
+          $soals = $this->ujian->soals;
+          foreach ($soals as $soal) {
+              $jawaban = $this->jawabanSiswa[$soal->id] ?? null;
+              
+              if ($soal->tipe_soal === 'pg') {
+                  // For multiple choice, check if answer matches key
+                  if ($jawaban === $soal->kunci_jawaban) {
+                      $totalScore += $soal->poin;
+                  }
+              }
+              // For essay questions, we'll set initial score to 0
+              // The admin will grade these later
+          }
+
+          // Update hasil ujian
+          $this->hasilUjian->update([
+              'nilai_akhir' => $totalScore,
+              'status' => 'selesai',
+              'waktu_selesai' => now()
+          ]);
+
+          // Update student status
+          $this->santri->update([
+              'status_santri' => 'sedang_ujian'
+          ]);
+
+          // Calculate and update total score for all exams
+          $semuaHasilUjian = HasilUjian::where('santri_id', $this->santri->id)
+              ->where('status', 'selesai')
+              ->get();
+
+          $totalNilaiSemuaUjian = $semuaHasilUjian->sum('nilai_akhir');
+          $rataRataUjian = $semuaHasilUjian->avg('nilai_akhir');
+
+          $this->santri->update([
+              'total_nilai_semua_ujian' => $totalNilaiSemuaUjian,
+              'rata_rata_ujian' => $rataRataUjian
+          ]);
+
+          // Redirect to selesai ujian page
+          return redirect()->route('santri.selesai-ujian', ['ujianId' => $this->ujian->id]);
       }
 
     /**

@@ -209,11 +209,27 @@ return new class extends Migration
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
+
+        // Create psb_sertifikat_templates table
+        Schema::create('psb_sertifikat_templates', function (Blueprint $table) {
+            $table->id();
+            $table->string('nama_pesantren');
+            $table->string('nama_yayasan');
+            $table->text('alamat_pesantren');
+            $table->string('nomor_telepon');
+            $table->string('email_pesantren');
+            $table->text('catatan_penting');
+            $table->string('nama_direktur');
+            $table->string('nip_direktur');
+            $table->string('nama_kepala_admin');
+            $table->string('nip_kepala_admin');
+            $table->timestamps();
+        });
     }
 
     public function down()
     {
-        
+        Schema::dropIfExists('psb_sertifikat_templates');
         Schema::dropIfExists('wawancara_schedules');
         Schema::dropIfExists('jawaban_ujians');
         Schema::dropIfExists('hasil_ujians');

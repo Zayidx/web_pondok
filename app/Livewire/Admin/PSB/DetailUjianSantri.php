@@ -12,16 +12,17 @@ use Livewire\WithPagination;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\Log;
 
+#[Title('Detail Ujian Santri')]
 class DetailUjianSantri extends Component
 {
     use WithPagination;
 
-    #[Title('Detail Ujian Santri')]
-
     public $santriId;
     public $santri;
     public $ujianList;
-    public $totalNilaiPerUjian = []; // Array untuk menyimpan total nilai per ujian
+    public $search = '';
+    public $sortField = 'tanggal_ujian';
+    public $sortDirection = 'desc';
 
     public function mount($id)
     {
@@ -32,28 +33,42 @@ class DetailUjianSantri extends Component
 
     public function loadUjianList()
     {
-        // Mengambil semua ujian dan hasil ujian terkait untuk santri ini
-        $this->ujianList = Ujian::with(['hasilUjians' => function($query) {
-            $query->where('santri_id', $this->santriId);
-        }])->get();
-    
-        foreach ($this->ujianList as $ujian) {
-            $hasilUjian = $ujian->hasilUjians->first();
+        $query = Ujian::query()
+            ->with(['hasilUjians' => function ($query) {
+                $query->where('santri_id', $this->santriId);
+            }])
+            ->when($this->search, function ($query) {
+                $query->where('nama_ujian', 'like', '%' . $this->search . '%')
+                    ->orWhere('mata_pelajaran', 'like', '%' . $this->search . '%');
+            })
+            ->orderBy($this->sortField, $this->sortDirection);
 
-            // Mengisi totalNilaiPerUjian dengan nilai_akhir dari HasilUjian
-            // Nilai akan ditampilkan jika statusnya 'selesai' atau 'menunggu_penilaian_essay'
-            // Anda bisa menyesuaikan kondisi ini sesuai kebutuhan tampilan.
-            $this->totalNilaiPerUjian[$ujian->id] = $hasilUjian
-                ? ($hasilUjian->nilai_akhir ?? 0)
-                : 0;
-            
-            // Opsional: Anda bisa juga menampilkan status ujian di sini
-            $this->totalNilaiPerUjian[$ujian->id . '_status'] = $hasilUjian ? $hasilUjian->status : 'Belum Ujian';
+        $this->ujianList = $query->get();
+    }
+
+    public function updatingSearch()
+    {
+        $this->loadUjianList();
+    }
+
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortField = $field;
+            $this->sortDirection = 'asc';
         }
+        $this->loadUjianList();
     }
 
     public function render()
     {
-        return view('livewire.admin.psb.detail-ujian-santri');
+        return view('livewire.admin.psb.detail-ujian-santri', [
+            'santri' => $this->santri,
+            'ujianList' => $this->ujianList,
+            'totalNilai' => $this->santri->total_nilai_semua_ujian,
+            'rataRata' => $this->santri->rata_rata_ujian
+        ]);
     }
 }

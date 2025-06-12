@@ -20,11 +20,19 @@
                         <a href="{{ route('santri.dashboard-ujian') }}" class="text-primary px-3 py-2 rounded-md text-sm font-medium bg-blue-50">Dashboard Ujian</a>
                         <a href="#" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition duration-300">Profil</a>
                         <a href="#" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition duration-300">Bantuan</a>
-                        <button type="button" wire:click="logout" wire:loading.attr="disabled" class="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-600 transition duration-300">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span wire:loading.remove>Keluar</span>
-                            <span wire:loading>Memproses...</span>
-                        </button>
+                        <div class="flex items-center gap-4">
+                            <a href="{{ route('santri.dashboard-ujian') }}" class="btn btn-primary">
+                                <i class="bi bi-grid-fill me-2"></i>
+                                Dashboard
+                            </a>
+                            <form action="{{ route('logout-ppdb-santri') }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="bi bi-box-arrow-right me-2"></i>
+                                    Logout
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
                 <div class="md:hidden">
@@ -379,10 +387,13 @@
                     <h3 class="text-xl font-bold text-gray-900 mb-2">Selamat! Anda Diterima</h3>
                     <p class="text-gray-600 mb-4">Anda dinyatakan LULUS dan diterima di SMA Bina Prestasi. Silakan Download bukti penerimaan di bawah ini.</p>
                     
-                    {{-- Tombol untuk langsung mengunduh PDF --}}
-                    <button wire:click="triggerDownloadPdf" class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 transform hover:scale-105">
-                        <i class="fas fa-file-pdf mr-3"></i> Unduh Surat Penerimaan (PDF)
-                    </button>
+                    <form action="{{ route('psb.download-penerimaan-pdf', ['santriId' => $santri->id]) }}" method="GET" class="inline">
+                        <button type="submit" 
+                                class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-file-pdf mr-3"></i>
+                            Unduh Surat Penerimaan (PDF)
+                        </button>
+                    </form>
                     
                     <div class="bg-green-50 p-4 rounded-lg mt-4">
                         <p class="text-sm text-green-800 font-medium">
@@ -417,6 +428,11 @@
                                 <i class="fas fa-clock text-yellow-600 text-2xl"></i>
                             </div>
                             <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">Menunggu Verifikasi</span>
+                        @elseif($santri->status_pembayaran === 'verified')
+                            <div class="bg-green-100 p-3 rounded-full">
+                                <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+                            </div>
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">Terverifikasi</span>
                         @else
                             <div class="bg-blue-100 p-3 rounded-full">
                                 <i class="fas fa-clipboard-list text-blue-600 text-2xl"></i>
@@ -449,6 +465,40 @@
                                 Kami akan menginformasikan hasil verifikasi melalui email dan WhatsApp.
                             </p>
                         </div>
+                        @if($santri->bukti_pembayaran)
+                            <button wire:click="viewPaymentProof({{ $santri->id }})" class="mt-4 inline-block px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300">
+                                <i class="fas fa-eye mr-2"></i>
+                                Lihat Bukti Pembayaran
+                            </button>
+                        @endif
+                    @elseif($santri->status_pembayaran === 'verified')
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Pembayaran Terverifikasi</h3>
+                        <p class="text-gray-600 mb-4">Selamat! Pembayaran Anda telah diverifikasi. Anda telah resmi menjadi siswa SMA Bina Prestasi.</p>
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <p class="text-sm text-green-800 font-medium">
+                                <i class="fas fa-check-circle mr-2"></i>
+                                Informasi selanjutnya akan dikirimkan melalui email dan WhatsApp.
+                            </p>
+                        </div>
+                        @if($santri->bukti_pembayaran)
+                            <button wire:click="viewPaymentProof({{ $santri->id }})" class="mt-4 inline-block px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300">
+                                <i class="fas fa-eye mr-2"></i>
+                                Lihat Bukti Pembayaran
+                            </button>
+                        @endif
+                    @else
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Daftar Ulang</h3>
+                        <p class="text-gray-600 mb-4">Silakan lakukan pembayaran sesuai dengan rincian biaya yang telah ditentukan.</p>
+                        <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                            <p class="text-sm text-blue-800 font-medium">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                Setelah melakukan pembayaran, silakan upload bukti pembayaran Anda.
+                            </p>
+                        </div>
+                        <a href="{{ route('santri.daftar-ulang') }}" class="inline-block px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition duration-300">
+                            <i class="fas fa-money-bill-wave mr-2"></i>
+                            Melakukan Pembayaran
+                        </a>
                     @endif
                 @endif
             </div>
@@ -526,30 +576,79 @@
             </div>
         </div>
     </footer>
+
+    <!-- Payment Proof Modal -->
+    <div x-data="{ show: false }" 
+         x-show="show" 
+         x-on:open-modal.window="show = true"
+         x-on:close-modal.window="show = false"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-50 overflow-y-auto" 
+         style="display: none;">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                                Bukti Pembayaran
+                            </h3>
+                            @if($santri && $santri->bukti_pembayaran)
+                                <div class="mt-2">
+                                    <img src="{{ Storage::url($santri->bukti_pembayaran) }}" 
+                                         alt="Bukti Pembayaran" 
+                                         class="w-full h-auto rounded-lg">
+                                </div>
+                            @else
+                                <p class="text-gray-500">Bukti pembayaran tidak tersedia</p>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" 
+                            @click="show = false"
+                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @endsection
 
 @push('scripts')
 <script>
-    // Livewire event listener to trigger PDF download
     document.addEventListener('livewire:initialized', () => {
         Livewire.on('openPdfInNewTab', (data) => {
             console.log('openPdfInNewTab event received:', data);
             try {
-                const url = data[0].url; // Access data correctly from array
-                window.open(url, '_blank'); // Open URL in a new tab
+                const url = data[0].url;
+                window.open(url, '_blank');
                 console.log('PDF download initiated in new tab for URL:', url);
             } catch (error) {
                 console.error('Error opening PDF in new tab:', error);
-                // Optionally dispatch another Livewire event to show a frontend error message
                 Livewire.dispatch('showError', { message: 'Gagal mengunduh PDF. Silakan coba lagi.' });
             }
         });
 
-        // Optional: Livewire event for showing general error messages on frontend
         Livewire.on('showError', (data) => {
-            alert(data.message); // Simple alert, replace with your preferred notification system
+            alert(data.message);
+        });
+
+        Livewire.on('redirect', (data) => {
+            window.location.href = data.url;
         });
     });
 </script>

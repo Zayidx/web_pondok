@@ -34,7 +34,11 @@ Route::middleware('guest:santri')->group(function () {
 });
 
 // Logout route for santri
-Route::post('/logout-santri', [SantriAuthController::class, 'logout'])->name('logout-santri');
+Route::post('/logout-santri', function () {
+    \Illuminate\Support\Facades\Auth::guard('pendaftaran_santri')->logout();
+    session()->forget(['santri_id', 'login_time']);
+    return redirect()->route('login-ppdb-santri');
+})->name('logout-ppdb-santri');
 
 // Rute untuk admin PSB
 Route::prefix('ppdb')->middleware('auth')->group(function () {
@@ -47,6 +51,7 @@ Route::prefix('ppdb')->middleware('auth')->group(function () {
         Route::get('/list-santri-baru/{santriId}/edit', \App\Livewire\Admin\PSB\EditRegistration::class)->name('admin.master-psb.edit-registration');
         Route::get('/list-wawancara-santri', InterviewList::class)->name('admin.master-psb.interview-list');
         Route::get('/list-wawancara', InterviewList::class)->name('master-psb.list-wawancara');
+        Route::get('/sertifikat', \App\Livewire\Admin\PSB\SertifikatPenerimaan::class)->name('admin.master-psb.sertifikat');
     });
     
     Route::prefix('master-periode')->group(function () {
@@ -98,38 +103,53 @@ Route::middleware(['auth:santri'])->group(function () {
     Route::get('/daftar-ulang', \App\Livewire\SantriPPDB\PendaftaranUlang::class)->name('santri.daftar-ulang');
 });
 
-// Rute untuk mengunduh PDF secara langsung (akan dipanggil dari JavaScript)
-
-// Rute untuk mengunduh PDF secara langsung (akan dipanggil dari JavaScript)
+// Rute untuk mengunduh PDF secara langsung
 Route::get('/psb/download-penerimaan-pdf/{santriId}', function ($santriId) {
-    Log::info("Route /psb/download-penerimaan-pdf/{$santriId} hit.");
-
-    // Buat instance komponen Livewire secara manual
-    $component = new CheckStatus();
+    $santri = \App\Models\PSB\PendaftaranSantri::findOrFail($santriId);
     
-    // Secara manual panggil mount untuk inisialisasi data santri
-    // Penting: mount() harus dipanggil sebelum data santri dapat diakses di komponen.
-    // Kita perlu "mengisi" session santri_id agar mount() bekerja.
-    $originalSantriIdInSession = session('santri_id'); // Simpan dulu nilai aslinya
-    session(['santri_id' => $santriId]); // Set santriId dari URL ke session untuk mount()
-    
-    $component->mount(); 
-    
-    // Kembalikan santri_id di session ke nilai semula setelah mount()
-    if ($originalSantriIdInSession !== null) {
-        session(['santri_id' => $originalSantriIdInSession]);
-    } else {
-        session()->forget('santri_id');
+    if ($santri->status_santri !== 'diterima') {
+        abort(403, 'Surat penerimaan hanya dapat diunduh untuk santri yang diterima.');
     }
 
-    // Pastikan santri yang dimuat di mount sesuai dengan santriId di URL
-    // dan pastikan santri berstatus 'diterima'
-    if (!$component->santri || $component->santri->id != $santriId || $component->santri->status_santri !== 'diterima') {
-        Log::warning("Direct PDF download denied: Santri {$santriId} not found or not accepted.");
-        abort(403, 'Akses tidak diizinkan atau santri tidak ditemukan/diterima.');
+    $template = \App\Models\PSB\SertifikatTemplate::first();
+    if (!$template) {
+        abort(500, 'Template sertifikat belum dikonfigurasi.');
     }
 
-    Log::info("Calling downloadCertificatePdfDirect for santri ID: {$santriId}");
-    // Panggil metode yang menghasilkan PDF secara langsung
-    return $component->downloadCertificatePdfDirect();
+    // Pastikan catatan_penting adalah array
+    if (!is_array($template->catatan_penting)) {
+        $template->catatan_penting = [$template->catatan_penting];
+    }
+
+    $periode = \App\Models\PSB\Periode::where('tipe_periode', 'pendaftaran_baru')
+        ->where('status_periode', 'active')
+        ->first();
+
+    $santriName = $santri->nama_lengkap;
+    $acceptanceDate = $santri->updated_at ? $santri->updated_at->translatedFormat('d F Y') : \Carbon\Carbon::now()->translatedFormat('d F Y');
+    $issueDate = \Carbon\Carbon::now()->translatedFormat('d F Y');
+    $certificateNumber = 'CERT/' . date('Y') . '/' . str_pad($santri->id, 6, '0', STR_PAD_LEFT);
+
+    $logoPath = public_path('assets/compiled/jpg/1.jpg');
+    $logoBase64 = '';
+
+    if (\Illuminate\Support\Facades\File::exists($logoPath)) {
+        $logoBase64 = 'data:image/' . \Illuminate\Support\Facades\File::extension($logoPath) . ';base64,' . base64_encode(\Illuminate\Support\Facades\File::get($logoPath));
+    }
+
+    $data = [
+        'santri' => $santri,
+        'template' => $template,
+        'periode' => $periode,
+        'tanggal_cetak' => \Carbon\Carbon::now()->translatedFormat('d F Y'),
+        'acceptanceDate' => $acceptanceDate,
+        'issueDate' => $issueDate,
+        'certificateNumber' => $certificateNumber,
+        'logoBase64' => $logoBase64,
+    ];
+
+    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('psb.surat-penerimaan-pdf', $data);
+    $fileName = 'Surat_Penerimaan_' . str_replace(' ', '_', $santriName) . '.pdf';
+    
+    return $pdf->download($fileName);
 })->name('psb.download-penerimaan-pdf');

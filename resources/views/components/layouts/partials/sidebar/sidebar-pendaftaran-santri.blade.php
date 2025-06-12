@@ -49,4 +49,11 @@
             <span>Hasil Ujian Santri</span>
         </a>
     </li>
+
+    <li class="sidebar-item {{ Request::routeIs('admin.master-psb.sertifikat') ? 'active' : '' }}">
+        <a href="{{ route('admin.master-psb.sertifikat') }}" wire:navigate class='sidebar-link'>
+            <i class="bi bi-file-earmark-text"></i>
+            <span>Template Sertifikat</span>
+        </a>
+    </li>
 </ul>

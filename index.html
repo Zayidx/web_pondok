@@ -112,18 +112,7 @@
     </style>
 </head>
 <body class="bg-gray-100 p-4">
-    <!-- Print Button -->
-    <div class="no-print text-center mb-4">
-        <button onclick="window.print()" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-blue-700 transition duration-300 shadow-lg">
-            <svg class="w-5 h-5 inline mr-2" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M5 4v3H4a2 2 0 00-2 2v3a2 2 0 002 2h1v2a2 2 0 002 2h6a2 2 0 002-2v-2h1a2 2 0 002-2V9a2 2 0 00-2-2h-1V4a2 2 0 00-2-2H7a2 2 0 00-2 2zm8 0H7v3h6V4zm0 8H7v4h6v-4z" clip-rule="evenodd"/>
-            </svg>
-            Cetak Sertifikat
-        </button>
-        <button onclick="window.location.href='dashboard-ujian.html'" class="ml-4 bg-gray-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-700 transition duration-300">
-            Kembali ke Dashboard
-        </button>
-    </div>
+   
 
     <!-- A4 Certificate Page -->
     <div class="a4-page certificate-bg">
@@ -148,17 +137,17 @@
                         </svg>
                     </div>
                     <div class="text-left">
-                        <h1 class="text-2xl font-bold text-gray-800">PESANTREN AL-HIKMAH</h1>
-                        <p class="text-lg text-gray-600">Yayasan Pendidikan Islam Terpadu</p>
-                        <p class="text-sm text-gray-500">Jl. Pendidikan No. 123, Jakarta Selatan 12345</p>
-                        <p class="text-sm text-gray-500">Telp: (021) 1234-5678 | Email: info@alhikmah.ac.id</p>
+                        <h1 class="text-2xl font-bold text-gray-800">Nama Pesantren
+                        <p class="text-lg text-gray-600">Nama Yayasan
+                        <p class="text-sm text-gray-500">Alamat Pesantren
+                        <p class="text-sm text-gray-500">Nomor telepon pesantren | gmail pesantren
                     </div>
                 </div>
 
                 <!-- Certificate Title -->
                 <div class="border-ornament rounded-lg p-6 mb-8 bg-white shadow-lg">
                     <h2 class="text-4xl font-bold text-blue-600 mb-2">SERTIFIKAT PENERIMAAN</h2>
-                    <p class="text-xl text-gray-600">SANTRI BARU TAHUN AJARAN 2024/2025</p>
+                    <p class="text-xl text-gray-600">SANTRI BARU PERIODE PENDAFTARAN</p>
                 </div>
             </div>
 
@@ -170,124 +159,29 @@
                     
                     <!-- Student Name -->
                     <div class="bg-white rounded-lg p-6 shadow-lg border-2 border-blue-200 mb-6">
-                        <h3 class="text-3xl font-bold text-blue-800 mb-2">AHMAD FAUZI</h3>
+                        <h3 class="text-3xl font-bold text-blue-800 mb-2">Nama Santri</h3>
+                        <p>NISN : nomor NISN santri</p>
                         <p class="text-lg text-gray-600">Telah diterima sebagai Santri Baru</p>
                     </div>
 
                     <p class="text-lg text-gray-700 mb-6">
                         Telah <span class="font-bold text-green-600">DITERIMA</span> dan terdaftar sebagai santri baru di 
-                        <span class="font-bold text-blue-600">Pesantren Al-Hikmah</span> untuk mengikuti pendidikan 
-                        pada Tahun Ajaran <span class="font-bold">2024/2025</span>
+                        <span class="font-bold text-blue-600">Nama Pesantren</span> untuk mengikuti pendidikan 
+                        pada Tahun nama periode
                     </p>
                 </div>
 
-                <!-- Student Information -->
-                <div class="bg-white rounded-lg p-6 shadow-lg border border-gray-200 mb-8">
-                    <h4 class="text-xl font-bold text-gray-800 mb-4 text-center border-b-2 border-blue-600 pb-2">
-                        DATA SANTRI
-                    </h4>
-                    <div class="grid grid-cols-2 gap-6">
-                        <div class="space-y-3">
-                            <div class="flex">
-                                <span class="font-semibold text-gray-700 w-32">Nama Lengkap</span>
-                                <span class="text-gray-600">: Ahmad Fauzi</span>
-                            </div>
-                            <div class="flex">
-                                <span class="font-semibold text-gray-700 w-32">NIS</span>
-                                <span class="text-gray-600">: 2024001234</span>
-                            </div>
-                            <div class="flex">
-                                <span class="font-semibold text-gray-700 w-32">Tempat Lahir</span>
-                                <span class="text-gray-600">: Jakarta</span>
-                            </div>
-                            <div class="flex">
-                                <span class="font-semibold text-gray-700 w-32">Tanggal Lahir</span>
-                                <span class="text-gray-600">: 15 Januari 2008</span>
-                            </div>
-                            <div class="flex">
-                                <span class="font-semibold text-gray-700 w-32">Jenis Kelamin</span>
-                                <span class="text-gray-600">: Laki-laki</span>
-                            </div>
-                        </div>
-                        <div class="space-y-3">
-                            <div class="flex">
-                                <span class="font-semibold text-gray-700 w-32">Kelas</span>
-                                <span class="text-gray-600">: X IPA 1</span>
-                            </div>
-                            <div class="flex">
-                                <span class="font-semibold text-gray-700 w-32">Program</span>
-                                <span class="text-gray-600">: Tahfidz & Sains</span>
-                            </div>
-                            <div class="flex">
-                                <span class="font-semibold text-gray-700 w-32">Asrama</span>
-                                <span class="text-gray-600">: Al-Fatih</span>
-                            </div>
-                            <div class="flex">
-                                <span class="font-semibold text-gray-700 w-32">Wali Kelas</span>
-                                <span class="text-gray-600">: Ustadz Abdullah</span>
-                            </div>
-                            <div class="flex">
-                                <span class="font-semibold text-gray-700 w-32">Tahun Masuk</span>
-                                <span class="text-gray-600">: 2024/2025</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Parent Information -->
-                <div class="bg-white rounded-lg p-6 shadow-lg border border-gray-200 mb-8">
-                    <h4 class="text-xl font-bold text-gray-800 mb-4 text-center border-b-2 border-green-600 pb-2">
-                        DATA ORANG TUA/WALI
-                    </h4>
-                    <div class="grid grid-cols-2 gap-6">
-                        <div class="space-y-3">
-                            <div class="flex">
-                                <span class="font-semibold text-gray-700 w-32">Nama Ayah</span>
-                                <span class="text-gray-600">: Muhammad Yusuf</span>
-                            </div>
-                            <div class="flex">
-                                <span class="font-semibold text-gray-700 w-32">Pekerjaan</span>
-                                <span class="text-gray-600">: Wiraswasta</span>
-                            </div>
-                            <div class="flex">
-                                <span class="font-semibold text-gray-700 w-32">No. HP</span>
-                                <span class="text-gray-600">: 0812-3456-7890</span>
-                            </div>
-                        </div>
-                        <div class="space-y-3">
-                            <div class="flex">
-                                <span class="font-semibold text-gray-700 w-32">Nama Ibu</span>
-                                <span class="text-gray-600">: Siti Aminah</span>
-                            </div>
-                            <div class="flex">
-                                <span class="font-semibold text-gray-700 w-32">Pekerjaan</span>
-                                <span class="text-gray-600">: Ibu Rumah Tangga</span>
-                            </div>
-                            <div class="flex">
-                                <span class="font-semibold text-gray-700 w-32">Email</span>
-                                <span class="text-gray-600">: yusuf.family@email.com</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="mt-4">
-                        <div class="flex">
-                            <span class="font-semibold text-gray-700 w-32">Alamat</span>
-                            <span class="text-gray-600">: Jl. Mawar No. 45, Kelurahan Melati, Kecamatan Bunga, Jakarta Selatan 12345</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+                
             <!-- Footer with Signatures -->
             <div class="mt-8">
                 <!-- Important Notes -->
                 <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6">
                     <h5 class="font-bold text-yellow-800 mb-2">CATATAN PENTING:</h5>
                     <ul class="text-sm text-yellow-700 space-y-1">
-                        <li>• Orientasi santri baru dimulai tanggal 15 Juli 2024</li>
-                        <li>• Harap membawa sertifikat ini saat registrasi ulang</li>
-                        <li>• Pembayaran SPP semester pertama paling lambat 20 Juli 2024</li>
-                        <li>• Untuk informasi lebih lanjut hubungi bagian administrasi</li>
+                        <li>• Catatam penting 1</li>
+                        <li>• catatam penting 2</li>
+                        <li>• catatam penting 3</li>
+                        <li>• catatam penting 4</li>
                     </ul>
                 </div>
 
@@ -295,41 +189,33 @@
                 <div class="flex justify-between items-end">
                     <!-- Date and Place -->
                     <div class="text-left">
-                        <p class="text-gray-700 mb-8">Jakarta, 15 Desember 2024</p>
-                        <div class="text-center">
-                            <div class="seal mx-auto mb-4">
-                                <div class="text-white text-center">
-                                    <div class="text-xs font-bold">PESANTREN</div>
-                                    <div class="text-xs font-bold">AL-HIKMAH</div>
-                                    <div class="text-xs">2024</div>
-                                </div>
-                            </div>
-                            <p class="text-sm text-gray-600">Stempel Resmi</p>
-                        </div>
+                        <p class="text-gray-700 mb-8">Tanggal Santri Di terima</p>
+                        
+                        <img src="" alt="stempel resmi pondok">
                     </div>
 
                     <!-- Director Signature -->
                     <div class="text-center">
                         <p class="text-gray-700 mb-2">Direktur Pesantren</p>
                         <div class="signature-line mb-4"></div>
-                        <p class="font-bold text-gray-800">Dr. H. Abdul Rahman, M.Pd</p>
-                        <p class="text-sm text-gray-600">NIK: 1234567890123456</p>
+                        <p class="font-bold text-gray-800">Nama Direktur Pesantren</p>
+                        <p class="text-sm text-gray-600">NIP: Nomor NIP direktur pesantren</p>
                     </div>
 
                     <!-- Admin Signature -->
                     <div class="text-center">
                         <p class="text-gray-700 mb-2">Kepala Administrasi</p>
                         <div class="signature-line mb-4"></div>
-                        <p class="font-bold text-gray-800">Hj. Fatimah, S.Pd</p>
-                        <p class="text-sm text-gray-600">NIK: 9876543210987654</p>
+                        <p class="font-bold text-gray-800">Nama Keplaa Administrasi</p>
+                        <p class="text-sm text-gray-600">NIP : Nomor NIP kepala adainistrasi</p>
                     </div>
                 </div>
 
                 <!-- Certificate Number -->
                 <div class="text-center mt-6 pt-4 border-t border-gray-300">
                     <p class="text-sm text-gray-500">
-                        No. Sertifikat: <span class="font-mono font-bold">CERT/2024/001234</span> | 
-                        Tanggal Terbit: 15 Desember 2024
+                        No. Sertifikat: <span class="font-mono font-bold">nomer sertifikat dengan awalan tanggal tahun kelulusan di lanjut dengan nomer id siswa</span> | 
+                        Tanggal Terbit: tanggal santri diterima
                     </p>
                 </div>
             </div>
