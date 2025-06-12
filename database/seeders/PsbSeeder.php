@@ -55,7 +55,7 @@ class PsbSeeder extends Seeder
         ];
 
         $this->command->info('Membuat 1000 data santri pendaftar lengkap beserta walinya...');
-        for ($i = 0; $i < 1000; $i++) {
+        for ($i = 0; $i < 100; $i++) {
             $gender = $faker->randomElement(['L', 'P']); // Jenis kelamin acak
             $modeWawancara = $faker->randomElement(['online', 'offline']); // Mode wawancara acak
             $namaAyah = $faker->name('male');

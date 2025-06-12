@@ -312,75 +312,44 @@ class MulaiUjian extends Component
       *
       * @return \Illuminate\Http\RedirectResponse|void
       */
-     public function submitUjian()
-     {
-         if ($this->isFinished) {
-             return; // Stop if the exam is already finished.
-         }
- 
-         DB::beginTransaction(); // Start a database transaction.
-         try {
-             $this->isFinished = true; // Set exam status as finished on the frontend.
- 
-             // =================================================================
-             // **NEW LOGIC STARTS HERE**
-             // This logic calculates the final score from Multiple Choice (PG) questions
-             // and updates the exam and student statuses.
-             // =================================================================
- 
-             // 1. Retrieve all saved answers for this exam.
-             // Use eager loading to get question data associated with each answer.
-             $semuaJawaban = JawabanUjian::where('hasil_ujian_id', $this->hasilUjian->id)
-                                         ->with('soal')
-                                         ->get();
- 
-            // 2. Calculate the total points from correct Multiple Choice (PG) answers for this exam.
-            $totalPoinUjianIni = 0;
-            foreach ($semuaJawaban as $jawaban) {
-                // Ensure the question exists and its type is Multiple Choice (PG).
-                if ($jawaban->soal && $jawaban->soal->tipe_soal === 'pg') {
-                    // If the student's answer matches the question's correct answer.
-                    if ($jawaban->jawaban === $jawaban->soal->kunci_jawaban) {
-                        $totalPoinUjianIni += $jawaban->soal->poin; // Add question points.
-                    }
-                }
-            }
-
-            // 3. Update the exam result record with status, end time, and final score.
-            // The final score only includes automatically graded Multiple Choice (PG) questions.
-            $this->hasilUjian->update([
-                'waktu_selesai' => now(), // Set the exam end time.
-                'status'        => 'menunggu_penilaian', // Change exam result status to 'menunggu_penilaian' (for essay questions).
-                'nilai_akhir'   => $totalPoinUjianIni, // Store the total score from Multiple Choice (PG) questions.
+      public function submitUjian()
+      {
+          // Memanggil fungsi saveAnswer() untuk menyimpan jawaban terakhir dari santri.
+          $this->saveAnswer();
+          // Memanggil fungsi checkJawaban() untuk menghitung total skor dari jawaban pilihan ganda.
+          $this->checkJawaban();
+      
+          // Memeriksa apakah data ujian santri ditemukan.
+          if ($this->ujianSantri) {
+              // PERBAIKAN YANG DISARANKAN:
+              // Seharusnya status diubah menjadi 'menunggu_penilaian' jika ada soal esai,
+              // dan 'selesai' jika hanya pilihan ganda. Kode di bawah ini langsung mengubahnya menjadi 'selesai'.
+              $this->ujianSantri->update([
+                  'status_ujian' => 'selesai'
+              ]);
+          }
+          
+          // Mencari data santri berdasarkan ID yang sedang login.
+          $this->santri = PendaftaranSantri::find($this->sada->id);
+          // Memeriksa apakah data santri ditemukan.
+          if ($this->ujianSantri) {
+            // Memeriksa apakah ujian ini memiliki soal dengan jenis 'essay'.
+            $hasEssay = $this->ujian->soals()->where('jenis_soal', 'essay')->exists();
+        
+            // Menentukan status ujian berdasarkan keberadaan soal esai.
+            // Jika ada esai, statusnya 'menunggu_penilaian', jika tidak 'selesai'.
+            $status = $hasEssay ? 'menunggu_penilaian' : 'selesai';
+        
+            // Memperbarui status ujian santri dengan status yang sudah ditentukan.
+            $this->ujianSantri->update([
+                'status_ujian' => $status,
             ]);
-
-            // 4. Update student status to 'sedang_ujian'.
-            // Note: Average score and total score of all exams in PendaftaranSantri
-            // will be updated AFTER the admin finishes grading essays in the admin section.
-            $this->santri->update([
-                'status_santri'           => 'sedang_ujian', // Change status to 'sedang_ujian'
-            ]);
-             
-             // =================================================================
-             // **NEW LOGIC ENDS**
-             // =================================================================
- 
-             DB::commit(); // Commit all database changes if no errors.
- 
-             session()->flash('success', 'Ujian berhasil dikumpulkan!'); // Display success message.
-             // Redirect the student to the exam finished page.
-             return redirect()->route('santri.selesai-ujian', ['ujianId' => $this->ujian->id]);
- 
-         } catch (\Exception $e) {
-             DB::rollback(); // Rollback all database changes if an error occurs.
- 
-             // Log the error for debugging purposes.
-             Log::error('Error saat submit ujian: ' . $e->getMessage());
-             
-             session()->flash('error', 'Terjadi kesalahan saat mengumpulkan ujian. Silakan coba lagi.'); // Display error message.
-             $this->isFinished = false; // Reset status so the student can try to submit again.
-         }
-     }
+        }
+      
+      
+          // Mengarahkan santri ke halaman selesai ujian.
+          return redirect()->route('santri.selesai-ujian', ['ujian_id' => $this->ujian_id]);
+      }
 
     /**
      * Navigates to a specific question page.

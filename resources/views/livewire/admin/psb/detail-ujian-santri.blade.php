@@ -99,16 +99,10 @@
     @endif
 </td>
                                     <td>
-                                        @if($hasilUjian && $status === 'selesai')
-                                            <a href="{{ route('admin.psb.ujian.detail-soal', ['ujianId' => $ujian->id, 'santriId' => $santri->id]) }}" 
-                                               class="btn btn-primary btn-sm">
-                                                <i class="fas fa-eye"></i> Lihat Soal
-                                            </a>
-                                        @else
-                                            <button class="btn btn-secondary btn-sm" disabled>
-                                                <i class="fas fa-eye"></i> Lihat Soal
-                                            </button>
-                                        @endif
+                                    <a href="{{ route('admin.psb.ujian.detail-soal', ['ujianId' => $ujian->id, 'santriId' => $santri->id]) }}" class="btn btn-sm btn-info me-1" 
+   @if($santri->hasilUjians->isEmpty() || $santri->hasilUjians->first()->status === 'menunggu_penilaian') disabled @endif>
+   <i class="bi bi-eye"></i> Lihat Soal
+</a>
                                     </td>
                                 </tr>
                             @empty

@@ -36,9 +36,7 @@ return new class extends Migration
             $table->string('asal_sekolah');
             $table->string('tahun_lulus')->nullable();
             $table->enum('tipe_pendaftaran', ['reguler', 'olimpiade', 'internasional'])->nullable();
-            // --- Perbaikan di sini: Menambahkan 'menunggu_hasil_ujian' ke enum status_santri ---
-            $table->enum('status_santri', ['menunggu', 'wawancara', 'sedang_ujian', 'menunggu_hasil_ujian', 'diterima', 'ditolak', 'daftar_ulang'])->default('menunggu');
-            // --- Akhir Perbaikan ---
+            $table->enum('status_santri', ['menunggu', 'wawancara', 'sedang_ujian', 'diterima', 'ditolak', 'daftar_ulang'])->default('menunggu');
             $table->text('reason_rejected')->nullable();
             $table->date('tanggal_wawancara')->nullable();
             $table->time('jam_wawancara')->nullable();
@@ -152,7 +150,7 @@ return new class extends Migration
             $table->foreignId('ujian_id')->constrained('ujians')->onDelete('cascade');
             $table->foreignId('santri_id')->constrained('psb_pendaftaran_santri')->onDelete('cascade');
             $table->decimal('nilai_akhir', 5, 2)->default(0);
-            $table->enum('status', ['belum_mulai', 'sedang_mengerjakan', 'selesai', 'menunggu_penilaian'])->default('belum_mulai');
+            $table->enum('status', ['belum_mulai', 'sedang_mengerjakan', 'selesai'])->default('belum_mulai');
             $table->dateTime('waktu_mulai')->nullable();
             $table->dateTime('waktu_selesai')->nullable();
             $table->timestamps();
@@ -229,4 +227,4 @@ return new class extends Migration
         Schema::dropIfExists('psb_rincian_biaya');
         Schema::dropIfExists('psb_periode_daftar_ulang');
     }
-};
+}; 
