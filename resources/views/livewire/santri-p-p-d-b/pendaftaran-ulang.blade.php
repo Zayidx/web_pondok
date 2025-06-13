@@ -55,6 +55,8 @@
     </section>
 
     <!-- Form Content -->
+
+    
     <section class="py-12">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             @if($santri->status_pembayaran === 'verified')
@@ -72,6 +74,69 @@
                     </a>
                 </div>
             @else
+             <!-- Registration Info -->
+        <div class="bg-white rounded-xl card-shadow p-6 mb-8">
+            <h2 class="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+                <div class="w-2 h-8 bg-blue-600 rounded-full"></div>
+                Informasi Pendaftaran Ulang
+            </h2>
+            
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="space-y-4">
+                    <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                        <h3 class="font-semibold text-blue-800 mb-2">Biaya Pendaftaran Ulang</h3>
+                        <div class="space-y-2 text-sm text-blue-700">
+                            @foreach($biayas as $biaya)
+                                @if($biaya->is_active)
+                                    <div class="flex justify-between">
+                                        <span>{{ $biaya->nama_biaya }}</span>
+                                        <span class="font-medium">Rp {{ number_format($biaya->nominal, 0, ',', '.') }}</span>
+                                    </div>
+                                @endif
+                            @endforeach
+                            <hr class="border-blue-300">
+                            <div class="flex justify-between font-bold text-blue-800">
+                                <span>Total</span>
+                                <span>Rp {{ number_format($total_biaya, 0, ',', '.') }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <div class="bg-green-50 border border-green-200 rounded-lg p-4">
+                        <h3 class="font-semibold text-green-800 mb-2">Informasi Rekening</h3>
+                        <div class="space-y-2 text-sm text-green-700">
+                            <div>
+                                <span class="font-medium">Bank:</span> {{ $pengaturan->bank }}
+                            </div>
+                            <div>
+                                <span class="font-medium">No. Rekening:</span> {{ $pengaturan->nomor_rekening }}
+                            </div>
+                            <div>
+                                <span class="font-medium">Atas Nama:</span> {{ $pengaturan->atas_nama }}
+                            </div>
+                            <div class="mt-3 p-2 bg-green-100 rounded text-xs">
+                                <strong>Catatan:</strong> {{ $pengaturan->catatan_transfer }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4">
+                <h3 class="font-semibold text-yellow-800 mb-2 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/>
+                    </svg>
+                    Batas Waktu Pendaftaran
+                </h3>
+                <p class="text-yellow-700 text-sm">
+                    Pendaftaran ulang harus diselesaikan paling lambat <strong>{{ \Carbon\Carbon::parse($periode_daftar_ulang->periode_selesai)->format('d F Y') }}</strong>. 
+                    Setelah batas waktu tersebut, santri yang belum melakukan pendaftaran ulang akan dianggap mengundurkan diri.
+                </p>
+            </div>
+        </div>
                 <form wire:submit.prevent="submit" id="registrationForm" class="space-y-8">
                     <!-- Step 1: Data Pembayaran -->
                     <div id="step1" class="{{ $formPage == 1 ? 'block' : 'hidden' }} bg-white rounded-lg shadow-lg p-8">

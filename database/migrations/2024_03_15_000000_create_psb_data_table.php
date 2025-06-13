@@ -3,12 +3,13 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
     public function up()
     {
-        // 1. Create psb_periodes table
+        // 1. Membuat tabel psb_periodes
         Schema::create('psb_periodes', function (Blueprint $table) {
             $table->id();
             $table->string('nama_periode');
@@ -20,7 +21,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-         // 2. Create psb_pendaftaran_santri table
+         // 2. Membuat tabel psb_pendaftaran_santri
          Schema::create('psb_pendaftaran_santri', function (Blueprint $table) {
             $table->id();
             $table->string('nama_jenjang')->nullable();
@@ -83,7 +84,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 3. Create psb_wali_santri table (gabungan semua perubahan)
+        // 3. Membuat tabel psb_wali_santri (gabungan semua perubahan)
         Schema::create('psb_wali_santri', function (Blueprint $table) {
             $table->id();
             $table->foreignId('pendaftaran_santri_id')->constrained('psb_pendaftaran_santri')->onDelete('cascade');
@@ -104,7 +105,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 4. Create psb_dokumen table
+        // 4. Membuat tabel psb_dokumen
         Schema::create('psb_dokumen', function (Blueprint $table) {
             $table->id();
             $table->foreignId('santri_id')->constrained('psb_pendaftaran_santri')->onDelete('cascade');
@@ -118,10 +119,10 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 5. Create ujians table
+        // 5. Membuat tabel ujians
         Schema::create('ujians', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_ujian');
+            $table->string('nama_ujian'); 
             $table->string('mata_pelajaran');
             $table->foreignId('periode_id')->constrained('psb_periodes')->onDelete('cascade');
             $table->date('tanggal_ujian');
@@ -131,20 +132,21 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 6. Create soals table
+        // 6. Membuat tabel soals
         Schema::create('soals', function (Blueprint $table) {
             $table->id();
             $table->foreignId('ujian_id')->constrained('ujians')->onDelete('cascade');
             $table->text('pertanyaan');
             $table->enum('tipe_soal', ['pg', 'essay'])->default('pg');
-            $table->json('opsi')->nullable();
-            $table->text('kunci_jawaban')->nullable();
-            $table->integer('bobot_nilai')->default(1);
-            $table->integer('poin')->default(1);
+            $table->json('opsi')->nullable()->comment('Format: [{"teks": "Teks opsi", "bobot": 100}, ...]');
+            $table->string('kunci_jawaban')->nullable()->comment('Untuk PG: A,B,C,D');
+            $table->integer('poin')->default(100)->comment('Poin maksimal untuk soal essay');
             $table->timestamps();
         });
 
-        // 7. Create hasil_ujians table
+
+
+        // 7. Membuat tabel hasil_ujians
         Schema::create('hasil_ujians', function (Blueprint $table) {
             $table->id();
             $table->foreignId('ujian_id')->constrained('ujians')->onDelete('cascade');
@@ -156,7 +158,7 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // 8. Create jawaban_ujians table
+        // 8. Membuat tabel jawaban_ujians
         Schema::create('jawaban_ujians', function (Blueprint $table) {
             $table->id();
             $table->foreignId('hasil_ujian_id')->constrained('hasil_ujians')->onDelete('cascade');
@@ -168,7 +170,7 @@ return new class extends Migration
         });
 
 
-        // 9. Create wawancara_schedules table
+        // 9. Membuat tabel wawancara_schedules
         Schema::create('wawancara_schedules', function (Blueprint $table) {
             $table->id();
             $table->foreignId('santri_id')->constrained('psb_pendaftaran_santri')->onDelete('cascade');
@@ -178,13 +180,13 @@ return new class extends Migration
             $table->timestamps();
         });
 
-         // Tabel untuk pengaturan rekening dan biaya
-         Schema::create('psb_rekening_settings', function (Blueprint $table) {
+        // Tabel untuk pengaturan rekening dan biaya
+        Schema::create('psb_rekening_settings', function (Blueprint $table) {
             $table->id();
             $table->string('nama_bank');
             $table->string('nomor_rekening');
             $table->string('atas_nama');
-            $table->boolean('is_active')->default(true);
+            $table->boolean('is_active')->default(true); // Pastikan kolom ini ada
             $table->timestamps();
         });
 
@@ -192,8 +194,8 @@ return new class extends Migration
         Schema::create('psb_rincian_biaya', function (Blueprint $table) {
             $table->id();
             $table->string('nama_biaya');
-            $table->decimal('jumlah', 12, 2);
-            $table->string('tahun_ajaran');
+            $table->decimal('jumlah', 12, 2); // Kolom 'jumlah' bukan 'nominal'
+            $table->string('tahun_ajaran'); // Pastikan kolom ini ada
             $table->text('keterangan')->nullable();
             $table->boolean('is_active')->default(true);
             $table->timestamps();
@@ -202,34 +204,42 @@ return new class extends Migration
         // Tabel untuk periode pendaftaran ulang
         Schema::create('psb_periode_daftar_ulang', function (Blueprint $table) {
             $table->id();
-            $table->string('nama_periode');
-            $table->date('tanggal_mulai');
-            $table->date('tanggal_selesai');
-            $table->string('tahun_ajaran');
+            $table->string('nama_periode'); // Pastikan kolom ini ada
+            $table->date('tanggal_mulai'); // Pastikan kolom ini ada
+            $table->date('tanggal_selesai'); // Pastikan kolom ini ada
+            $table->string('tahun_ajaran'); // Pastikan kolom ini ada
             $table->boolean('is_active')->default(true);
             $table->timestamps();
         });
 
-        // Create psb_sertifikat_templates table
+        // Memperbarui psb_sertifikat_templates table
         Schema::create('psb_sertifikat_templates', function (Blueprint $table) {
             $table->id();
             $table->string('nama_pesantren');
             $table->string('nama_yayasan');
             $table->text('alamat_pesantren');
-            $table->string('nomor_telepon');
+            $table->string('telepon_pesantren'); // Mengubah 'nomor_telepon' menjadi 'telepon_pesantren' agar sesuai dengan seeder
             $table->string('email_pesantren');
             $table->text('catatan_penting');
             $table->string('nama_direktur');
             $table->string('nip_direktur');
             $table->string('nama_kepala_admin');
             $table->string('nip_kepala_admin');
+            // Menambahkan kolom baru yang diperlukan oleh seeder
+            $table->string('tahun_ajaran')->nullable();
+            $table->date('tanggal_orientasi')->nullable();
+            $table->date('batas_pembayaran_spp')->nullable();
             $table->timestamps();
         });
     }
 
     public function down()
     {
+        // Urutan dropIfExists penting untuk menangani foreign key constraints
         Schema::dropIfExists('psb_sertifikat_templates');
+        Schema::dropIfExists('psb_periode_daftar_ulang');
+        Schema::dropIfExists('psb_rincian_biaya');
+        Schema::dropIfExists('psb_rekening_settings');
         Schema::dropIfExists('wawancara_schedules');
         Schema::dropIfExists('jawaban_ujians');
         Schema::dropIfExists('hasil_ujians');
@@ -239,8 +249,5 @@ return new class extends Migration
         Schema::dropIfExists('psb_wali_santri');
         Schema::dropIfExists('psb_pendaftaran_santri');
         Schema::dropIfExists('psb_periodes');
-        Schema::dropIfExists('psb_rekening_settings');
-        Schema::dropIfExists('psb_rincian_biaya');
-        Schema::dropIfExists('psb_periode_daftar_ulang');
     }
-}; 
+};

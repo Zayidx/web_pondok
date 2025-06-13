@@ -170,51 +170,42 @@
                                         {{-- Menampilkan badge biru "Menunggu Verifikasi". --}}
                                     @endif
                                 </td>
-                                <td class=" text-nowrap">
-                                    {{-- Kolom aksi. `text-nowrap` mencegah tombol pecah baris di layar kecil. --}}
-                                    <button wire:click="showDetail({{ $registration->id }})" class="btn btn-primary btn-sm" title="Detail">
-                                        {{-- Tombol untuk menampilkan detail pendaftaran. --}}
-                                        {{-- `wire:click="showDetail(...)`: Memanggil metode `showDetail` di Livewire dengan ID pendaftaran. --}}
-                                        {{-- `btn btn-primary btn-sm`: Styling tombol biru kecil dari Bootstrap. --}}
-                                        {{-- `title="Detail"`: Teks yang muncul saat mouse hover (tooltip). --}}
-                                        <i class="bi bi-eye"></i> Detail Pembayaran
-                                        {{-- Ikon mata dari Bootstrap Icons. --}}
-                                    </button>
+                                <td class="text-center">
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ route('admin.psb.detail-pendaftaran', $registration->id) }}" 
+                                           class="btn btn-sm btn-info" 
+                                           title="Detail Pendaftaran">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
                                     @if($registration->bukti_pembayaran)
-                                        {{-- Tombol "Lihat Bukti" hanya ditampilkan jika ada `bukti_pembayaran`. --}}
-                                        <button wire:click="viewPaymentProof({{ $registration->id }})" class="btn btn-info btn-sm" title="Lihat Bukti Pembayaran">
-                                            {{-- Tombol untuk melihat bukti pembayaran. --}}
-                                            {{-- `wire:click="viewPaymentProof(...)`: Memanggil metode `viewPaymentProof` di Livewire. --}}
-                                            {{-- `btn btn-info btn-sm`: Styling tombol biru muda kecil. --}}
-                                            <i class="bi bi-file-earmark-image"></i> Lihat Bukti
-                                            {{-- Ikon gambar dari Bootstrap Icons. --}}
-                                        </button>
-                                        {{-- Only show action buttons if payment is pending or rejected --}}
-                                        {{-- Komentar ini menjelaskan kapan tombol aksi verifikasi/tolak akan muncul. --}}
+                                            <a href="{{ route('admin.psb.lihat-bukti', $registration->id) }}" 
+                                               class="btn btn-sm btn-info" 
+                                               title="Lihat Bukti Pembayaran"
+                                               target="_blank">
+                                                <i class="bi bi-file-earmark-image"></i>
+                                            </a>
                                         @if($registration->status_pembayaran === 'pending' || $registration->status_pembayaran === 'rejected')
-                                            {{-- Tombol 'Terima' dan 'Tolak' hanya muncul jika status pembayaran 'pending' atau 'rejected'. --}}
                                             <button wire:click="verifyRegistration({{ $registration->id }})"
                                                     wire:confirm="Anda yakin ingin memverifikasi pendaftaran ulang santri ini?"
-                                                    class="btn btn-success btn-sm" title="Terima">
-                                                {{-- Tombol untuk memverifikasi pendaftaran. --}}
-                                                {{-- `wire:confirm`: Fitur Livewire yang menampilkan pop-up konfirmasi di browser sebelum aksi dijalankan. Sangat penting untuk aksi krusial. --}}
-                                                {{-- `wire:click="verifyRegistration(...)`: Memanggil metode verifikasi di Livewire. --}}
-                                                {{-- `btn btn-success btn-sm`: Styling tombol hijau kecil. --}}
-                                                <i class="bi bi-check-lg"></i> Terima
-                                                {{-- Ikon centang dari Bootstrap Icons. --}}
+                                                        class="btn btn-sm btn-success" 
+                                                        title="Verifikasi Pembayaran">
+                                                    <i class="bi bi-check-lg"></i>
                                             </button>
                                             <button wire:click="rejectRegistration({{ $registration->id }})"
                                                     wire:confirm="Anda yakin ingin menolak bukti pembayaran ini? Santri harus mengupload ulang."
-                                                    class="btn btn-danger btn-sm" title="Tolak">
-                                                {{-- Tombol untuk menolak bukti pembayaran. --}}
-                                                {{-- `wire:confirm`: Konfirmasi sebelum menolak. --}}
-                                                {{-- `wire:click="rejectRegistration(...)`: Memanggil metode penolakan di Livewire. --}}
-                                                {{-- `btn btn-danger btn-sm`: Styling tombol merah kecil. --}}
-                                                <i class="bi bi-x-lg"></i> Tolak
-                                                {{-- Ikon silang dari Bootstrap Icons. --}}
+                                                        class="btn btn-sm btn-danger" 
+                                                        title="Tolak Pembayaran">
+                                                    <i class="bi bi-x-lg"></i>
                                             </button>
                                         @endif
                                     @endif
+                                        <button wire:click='edit("{{ $registration->id }}")' 
+                                                data-bs-toggle="modal"
+                                                data-bs-target="#editPeriode" 
+                                                class="btn btn-warning btn-sm">
+                                            <i class="bi bi-pencil-square"></i> Edit
+                                        </button>
+                                    </div>
                                 </td>
                             </tr>
                         @empty
@@ -367,6 +358,28 @@
         </div>
         <div class="modal-backdrop fade show"></div>
         {{-- Overlay gelap untuk modal bukti pembayaran. --}}
+    @endif
+
+    {{-- Modal Notifikasi Data Kosong --}}
+    @if($registrations->isEmpty())
+        <div class="modal fade show" tabindex="-1" style="display: block;">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Informasi</h5>
+                        <button type="button" class="btn-close" wire:click="$set('showEmptyModal', false)"></button>
+                    </div>
+                    <div class="modal-body text-center">
+                        <i class="bi bi-inbox text-muted display-4"></i>
+                        <p class="mt-3">Belum ada data pendaftaran ulang yang tersedia.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" wire:click="$set('showEmptyModal', false)">Tutup</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-backdrop fade show"></div>
     @endif
 </div>
 ```

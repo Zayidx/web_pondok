@@ -42,7 +42,7 @@ return [
         ],
         'santri' => [
             'driver' => 'session',
-            'provider' => 'pendaftaran_santri',
+            'provider' => 'santris',
         ],
         'pendaftaran_santri' => [
             'driver' => 'session',
@@ -72,12 +72,10 @@ return [
             'driver' => 'eloquent',
             'model' => App\Models\User::class,
         ],
-
         'santris' => [
             'driver' => 'eloquent',
-            'model' => App\Models\PSB\PendaftaranSantri::class,
+            'model' => App\Models\Santri::class,
         ],
-
         'pendaftaran_santri' => [
             'driver' => 'eloquent',
             'model' => App\Models\PSB\PendaftaranSantri::class,

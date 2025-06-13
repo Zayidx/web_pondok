@@ -138,16 +138,23 @@
                                         @endforeach
                                     </div>
                                     @else
-    <h6 class="mb-2">Jawaban Anda:</h6> {{-- Changed "Jawaban Santri" to "Jawaban Anda" --}}
+                                    <h6 class="mb-2">Jawaban Anda:</h6>
     <div class="mb-3">
         <textarea 
-            wire:model.lazy="jawabanSiswa.{{ $currentSoal->id }}" {{-- Input for essay answer --}}
+                                            wire:model.debounce.500ms="jawabanSiswa.{{ $currentSoal->id }}"
+                                            x-data
+                                            x-init="$el.addEventListener('input', () => {
+                                                if ($el.value.trim() !== '') {
+                                                    @this.simpanJawaban({{ $currentSoal->id }}, $el.value)
+                                                } else {
+                                                    @this.hapusJawaban({{ $currentSoal->id }})
+                                                }
+                                            })"
             class="form-control w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" 
             rows="6" 
             placeholder="Tulis jawaban Anda di sini...">{{ $jawabanSiswa[$currentSoal->id] ?? '' }}</textarea>
     </div>
 @endif
-
 
                                     <div class="flex justify-between items-center mt-6 w-full">
                                         <button wire:click="previousPage" @if($currentPage==1) disabled @endif class="px-4 py-2 flex items-center gap-2 bg-gray-100 text-gray-600 rounded-lg">Sebelumnya</button>

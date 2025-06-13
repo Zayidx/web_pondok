@@ -322,18 +322,94 @@ class MulaiUjian extends Component
           // Calculate total score
           $totalScore = 0;
           $soals = $this->ujian->soals;
+          
+          Log::info('Starting score calculation', [
+              'ujian_id' => $this->ujian->id,
+              'santri_id' => $this->santri->id,
+              'total_soal' => count($soals)
+          ]);
+          
           foreach ($soals as $soal) {
               $jawaban = $this->jawabanSiswa[$soal->id] ?? null;
               
-              if ($soal->tipe_soal === 'pg') {
-                  // For multiple choice, check if answer matches key
-                  if ($jawaban === $soal->kunci_jawaban) {
-                      $totalScore += $soal->poin;
+              if ($soal->tipe_soal === 'pg' && $jawaban !== null) {
+                  // Convert numeric answer (0, 1, 2, 3) to index
+                  $answerIndex = (int)$jawaban;
+                  
+                  Log::info('Processing PG answer', [
+                      'soal_id' => $soal->id,
+                      'jawaban' => $jawaban,
+                      'answerIndex' => $answerIndex,
+                      'opsi' => $soal->opsi
+                  ]);
+                  
+                  // Get the points for the selected option
+                  if (isset($soal->opsi[$answerIndex]['bobot'])) {
+                      $poinPG = (float)$soal->opsi[$answerIndex]['bobot'];
+                      $totalScore += $poinPG;
+                      
+                      Log::info('PG score calculated', [
+                          'soal_id' => $soal->id,
+                          'poinPG' => $poinPG,
+                          'totalScore' => $totalScore
+                      ]);
+                      
+                      // Update nilai in jawaban_ujian table
+                      $jawabanUjian = JawabanUjian::where([
+                          'hasil_ujian_id' => $this->hasilUjian->id,
+                          'soal_id' => $soal->id
+                      ])->first();
+
+                      if ($jawabanUjian) {
+                          $jawabanUjian->update([
+                              'nilai' => $poinPG,
+                              'jawaban' => $jawaban
+                          ]);
+                          
+                          Log::info('Jawaban updated', [
+                              'soal_id' => $soal->id,
+                              'nilai' => $poinPG,
+                              'jawaban' => $jawaban
+                          ]);
                   }
               }
-              // For essay questions, we'll set initial score to 0
-              // The admin will grade these later
+              } elseif ($soal->tipe_soal === 'essay' && $jawaban !== null) {
+                  if (isset($soal->bobot)) {
+                      $poinEssay = (float)$soal->bobot;
+                      $totalScore += $poinEssay;
+                      
+                      Log::info('Essay score calculated', [
+                          'soal_id' => $soal->id,
+                          'poinEssay' => $poinEssay,
+                          'totalScore' => $totalScore
+                      ]);
+                      
+                      // Update nilai in jawaban_ujian table
+                      $jawabanUjian = JawabanUjian::where([
+                          'hasil_ujian_id' => $this->hasilUjian->id,
+                          'soal_id' => $soal->id
+                      ])->first();
+
+                      if ($jawabanUjian) {
+                          $jawabanUjian->update([
+                              'nilai' => $poinEssay,
+                              'jawaban' => $jawaban
+                          ]);
+                          
+                          Log::info('Essay answer updated', [
+                              'soal_id' => $soal->id,
+                              'nilai' => $poinEssay,
+                              'jawaban' => $jawaban
+                          ]);
+                      }
+                  }
+              }
           }
+
+          Log::info('Final score calculation', [
+              'totalScore' => $totalScore,
+              'hasilUjianId' => $this->hasilUjian->id
+          ]);
 
           // Update hasil ujian
           $this->hasilUjian->update([

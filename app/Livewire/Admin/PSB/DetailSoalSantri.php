@@ -46,6 +46,7 @@ class DetailSoalSantri extends Component
         $this->santri = PendaftaranSantri::findOrFail($santriId);
         $this->ujian = Ujian::findOrFail($ujianId);
         $this->loadData();
+        $this->calculateTotalPoin(); // Calculate initial total
     }
 
     public function loadData()
@@ -62,28 +63,73 @@ class DetailSoalSantri extends Component
         foreach ($this->soalUjian as $soal) {
             $jawaban = $this->jawabanUjian->get($soal->id);
             if ($soal->tipe_soal === 'essay') {
-                $this->poinEssay[$soal->id] = $jawaban->nilai ?? null; // Gunakan null agar input kosong
+                $this->poinEssay[$soal->id] = $jawaban->nilai ?? null;
                 $this->komentarEssay[$soal->id] = $jawaban->komentar ?? null;
+            } elseif ($soal->tipe_soal === 'pg' && $jawaban) {
+                // Update nilai PG jika ada
+                if ($jawaban->jawaban) {
+                    $answerIndex = ord(strtoupper($jawaban->jawaban)) - 65;
+                    if (isset($soal->opsi[$answerIndex]['bobot'])) {
+                        $jawaban->update(['nilai' => (float)$soal->opsi[$answerIndex]['bobot']]);
+                    }
+                }
             }
         }
-        $this->calculateTotalPoin();
     }
 
     public function calculateTotalPoin()
     {
-        $this->totalPoin = 0;
+        $totalPG = 0;
+        $totalEssay = 0;
+
         foreach ($this->soalUjian as $soal) {
             $jawaban = $this->jawabanUjian->get($soal->id);
             if ($jawaban) {
                 if ($soal->tipe_soal === 'pg') {
-                    // Tambahkan poin PG yang sudah dihitung saat santri submit
-                    $this->totalPoin += (float)($jawaban->nilai ?? 0);
+                    if ($jawaban->jawaban) {
+                        $answerIndex = (int)$jawaban->jawaban;
+                        if (isset($soal->opsi[$answerIndex]['bobot'])) {
+                            $poinPG = (float)$soal->opsi[$answerIndex]['bobot'];
+                            $totalPG += $poinPG;
+                            $jawaban->update(['nilai' => $poinPG]);
+                        }
+                    }
                 } elseif ($soal->tipe_soal === 'essay') {
-                    // Jika soal essay, tambahkan poin dari input admin (poinEssay)
-                    $this->totalPoin += (float)($this->poinEssay[$soal->id] ?? 0);
+                    $poinEssay = (float)($this->poinEssay[$soal->id] ?? 0);
+                    $totalEssay += $poinEssay;
+                    $jawaban->update(['nilai' => $poinEssay]);
                 }
             }
         }
+
+        $this->totalPoin = $totalPG + $totalEssay;
+
+        // Update nilai_akhir in hasil_ujian
+        $this->hasilUjian->update([
+            'nilai_akhir' => $this->totalPoin,
+            'status' => 'selesai'
+        ]);
+
+        // Update santri's scores
+        $semuaHasilUjianSelesai = HasilUjian::where('santri_id', $this->santriId)
+            ->where('status', 'selesai')
+            ->get();
+
+        $rataRataBaru = $semuaHasilUjianSelesai->avg('nilai_akhir') ?? 0;
+        $totalNilaiKeseluruhan = $semuaHasilUjianSelesai->sum('nilai_akhir');
+
+        $this->santri->update([
+            'rata_rata_ujian' => $rataRataBaru,
+            'total_nilai_semua_ujian' => $totalNilaiKeseluruhan
+        ]);
+
+        Log::info('Score calculation completed', [
+            'totalPG' => $totalPG,
+            'totalEssay' => $totalEssay,
+            'totalPoin' => $this->totalPoin,
+            'rataRata' => $rataRataBaru,
+            'totalNilai' => $totalNilaiKeseluruhan
+        ]);
     }
 
     // Metode ini dipanggil saat input poin essay diubah
@@ -103,7 +149,7 @@ class DetailSoalSantri extends Component
 
     public function saveNilai()
     {
-        $this->validate(); // Validasi semua input
+        $this->validate();
 
         DB::transaction(function () {
             // Update nilai dan komentar untuk setiap jawaban
@@ -112,39 +158,45 @@ class DetailSoalSantri extends Component
                 if ($jawaban) {
                     if ($soal->tipe_soal === 'essay') {
                         $jawaban->update([
-                            'nilai' => (float)($this->poinEssay[$soal->id] ?? 0), // Simpan nilai essay dari input admin
+                            'nilai' => (float)($this->poinEssay[$soal->id] ?? 0),
                             'komentar' => $this->komentarEssay[$soal->id] ?? null,
                         ]);
+                    } elseif ($soal->tipe_soal === 'pg') {
+                        // Update nilai for PG based on the selected option's bobot
+                        $jawabanHuruf = $jawaban->jawaban;
+                        if ($jawabanHuruf) {
+                            $answerIndex = ord(strtoupper($jawabanHuruf)) - 65;
+                            if (isset($soal->opsi[$answerIndex]['bobot'])) {
+                                $nilai = (float)$soal->opsi[$answerIndex]['bobot'];
+                                $jawaban->update(['nilai' => $nilai]);
+                            }
+                        }
                     }
-                    // Jawaban PG tidak perlu diupdate nilainya karena sudah dihitung saat santri submit
                 }
             }
 
-            // Re-fetch answers to ensure the most up-to-date 'nilai' is used for total calculation
-            // Ini penting jika ada data yang diubah di transaksi lain, tapi dalam transaksi ini tidak begitu perlu
-            // $this->jawabanUjian = JawabanUjian::where('hasil_ujian_id', $this->hasilUjian->id)->get()->keyBy('soal_id');
-            $this->calculateTotalPoin(); // Hitung ulang total poin setelah update essay
+            $this->calculateTotalPoin(); // Recalculate total after updates
 
             Log::info('Updating HasilUjian nilai_akhir: ' . $this->totalPoin);
             $this->hasilUjian->update([
-                'nilai_akhir' => $this->totalPoin, // Update nilai_akhir di HasilUjian dengan total poin keseluruhan
-                'status' => 'selesai', // Ubah status menjadi 'selesai' setelah dinilai
+                'nilai_akhir' => $this->totalPoin,
+                'status' => 'selesai',
             ]);
 
-            // Mengambil semua hasil ujian santri yang sudah selesai untuk menghitung total keseluruhan
+            // Calculate and update total score for all exams
             $semuaHasilUjianSelesai = HasilUjian::where('santri_id', $this->santriId)
                                           ->where('status', 'selesai')
                                           ->get();
 
-            // Menghitung rata-rata baru dari semua ujian yang selesai
+            // Calculate new average from all completed exams
             $rataRataBaru = $semuaHasilUjianSelesai->avg('nilai_akhir') ?? 0;
-            // Menghitung total nilai keseluruhan dari semua ujian yang selesai
+            // Calculate total score from all completed exams
             $totalNilaiKeseluruhan = $semuaHasilUjianSelesai->sum('nilai_akhir');
 
             Log::info('Updating Santri rata_rata_ujian: ' . $rataRataBaru . ' and total_nilai_semua_ujian: ' . $totalNilaiKeseluruhan);
-            // Memperbarui kolom di model PendaftaranSantri
+            // Update PendaftaranSantri model columns
             $this->santri->update([
-                'rata_rata_ujian'         => $rataRataBaru,
+                'rata_rata_ujian' => $rataRataBaru,
                 'total_nilai_semua_ujian' => $totalNilaiKeseluruhan,
             ]);
 
@@ -153,12 +205,11 @@ class DetailSoalSantri extends Component
 
         session()->flash('success', 'Semua nilai berhasil disimpan!');
         $this->dispatch('nilai-tersimpan');
-        // Redirect ke halaman daftar hasil ujian santri (opsional)
-        return redirect()->route('admin.psb.ujian.hasil'); // Contoh redirect
     }
 
     public function render()
     {
+        $this->calculateTotalPoin(); // Recalculate before rendering
         return view('livewire.admin.psb.detail-soal-santri');
     }
 }

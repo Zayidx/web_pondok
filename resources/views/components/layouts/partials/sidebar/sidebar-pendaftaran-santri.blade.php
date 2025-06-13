@@ -35,6 +35,12 @@
             <span>List Daftar Ulang</span>
         </a>
     </li>
+    <li class="sidebar-item {{ Request::routeIs('ppdb.daftar-ulang-settings') ? 'active' : '' }}">
+        <a href="{{ route('ppdb.daftar-ulang-settings') }}" wire:navigate class='sidebar-link'>
+        <i class="bi bi-gear"></i>
+            <span>Pengaturan Daftar Ulang</span>
+        </a>
+    </li>
 
     
     <li class="sidebar-item {{ Request::routeIs('admin.master-ujian.dashboard') ? 'active' : '' }}">

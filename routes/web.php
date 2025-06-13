@@ -4,6 +4,7 @@ use App\Livewire\StudentExam;
 use App\Livewire\TestButton;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PSB\SuratPenerimaanController;
 
 Route::get('/', function () {
     return redirect('/auth/login');
@@ -34,6 +35,36 @@ Route::get('/generate', function () {
 
 Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('/admin/psb/sertifikat', App\Livewire\Admin\PSB\SertifikatPenerimaan::class)->name('admin.psb.sertifikat');
+    
+    // Route untuk detail pendaftaran
+    Route::get('/admin/psb/detail-pendaftaran/{id}', function($id) {
+        $registration = \App\Models\PSB\PendaftaranSantri::findOrFail($id);
+        return view('psb.detail-pendaftaran', compact('registration'));
+    })->name('admin.psb.detail-pendaftaran');
+    
+    // Route untuk lihat bukti pembayaran
+    Route::get('/admin/psb/lihat-bukti/{id}', function($id) {
+        $registration = \App\Models\PSB\PendaftaranSantri::findOrFail($id);
+        if (!$registration->bukti_pembayaran) {
+            abort(404, 'Bukti pembayaran tidak ditemukan');
+        }
+        return response()->file(storage_path('app/public/' . str_replace('public/', '', $registration->bukti_pembayaran)));
+    })->name('admin.psb.lihat-bukti');
+});
+
+// Route untuk preview dan download surat penerimaan
+Route::get('/preview-surat-penerimaan', [App\Http\Controllers\PSB\SuratPenerimaanController::class, 'preview'])
+    ->name('preview.surat-penerimaan');
+
+Route::get('/ppdb/download-penerimaan-pdf/{santriId}', [App\Http\Controllers\PSB\SuratPenerimaanController::class, 'download'])
+    ->name('psb.download-penerimaan-pdf');
+
+// Routes untuk Surat Penerimaan
+Route::prefix('psb/surat-penerimaan')->name('psb.surat-penerimaan.')->group(function () {
+    Route::get('/preview-page', [SuratPenerimaanController::class, 'previewPage'])->name('preview-page');
+    Route::get('/preview', [SuratPenerimaanController::class, 'preview'])->name('preview');
+    Route::get('/download', [SuratPenerimaanController::class, 'download'])->name('download');
+    Route::get('/print', [SuratPenerimaanController::class, 'print'])->name('print');
 });
 
 // Route redirect
@@ -51,47 +82,6 @@ Route::post('/ppdb/logout', function () {
     return redirect()->route('login-ppdb-santri');
 })->name('logout-ppdb-santri');
 
-Route::get('/ppdb/download-penerimaan-pdf/{santriId}', function ($santriId) {
-    $santri = \App\Models\PSB\PendaftaranSantri::findOrFail($santriId);
-    
-    if ($santri->status_santri !== 'diterima') {
-        abort(403, 'Surat penerimaan hanya dapat diunduh untuk santri yang diterima.');
-    }
-
-    $template = \App\Models\PSB\SertifikatTemplate::first();
-    if (!$template) {
-        abort(500, 'Template sertifikat belum dikonfigurasi.');
-    }
-
-    $periode = \App\Models\PSB\Periode::where('tipe_periode', 'pendaftaran_baru')
-        ->where('status_periode', 'active')
-        ->first();
-
-    $santriName = $santri->nama_lengkap;
-    $acceptanceDate = $santri->updated_at ? $santri->updated_at->translatedFormat('d F Y') : \Carbon\Carbon::now()->translatedFormat('d F Y');
-    $issueDate = \Carbon\Carbon::now()->translatedFormat('d F Y');
-    $certificateNumber = 'CERT/' . date('Y') . '/' . str_pad($santri->id, 6, '0', STR_PAD_LEFT);
-
-    $logoPath = public_path('assets/compiled/jpg/1.jpg');
-    $logoBase64 = '';
-
-    if (\Illuminate\Support\Facades\File::exists($logoPath)) {
-        $logoBase64 = 'data:image/' . \Illuminate\Support\Facades\File::extension($logoPath) . ';base64,' . base64_encode(\Illuminate\Support\Facades\File::get($logoPath));
-    }
-
-    $data = [
-        'santri' => $santri,
-        'template' => $template,
-        'periode' => $periode,
-        'tanggal_cetak' => \Carbon\Carbon::now()->translatedFormat('d F Y'),
-        'acceptanceDate' => $acceptanceDate,
-        'issueDate' => $issueDate,
-        'certificateNumber' => $certificateNumber,
-        'logoBase64' => $logoBase64,
-    ];
-
-    $pdf = \Barryvdh\DomPDF\Facade\Pdf::loadView('psb.surat-penerimaan-pdf', $data);
-    $fileName = 'Surat_Penerimaan_' . str_replace(' ', '_', $santriName) . '.pdf';
-    
-    return $pdf->download($fileName);
-})->name('psb.download-penerimaan-pdf');
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/psb/daftar-ulang-settings', App\Livewire\Admin\PSB\DaftarUlangSettings::class)->name('psb.daftar-ulang-settings');
+});
