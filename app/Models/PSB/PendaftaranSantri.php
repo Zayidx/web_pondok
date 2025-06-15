@@ -126,7 +126,27 @@ class PendaftaranSantri extends Authenticatable
     {
         return $this->hasOne(WaliSantri::class, 'pendaftaran_santri_id');
     }
+ /**
+     * Mendapatkan semua riwayat pembayaran untuk santri ini.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+     /**
+     * Mendapatkan SEMUA riwayat pembayaran untuk santri ini.
+     */
+    public function pembayaranHistory(): HasMany
+    {
+        return $this->hasMany(Pembayaran::class, 'santri_id');
+    }
 
+    /**
+     * Mendapatkan HANYA pembayaran TERAKHIR untuk santri ini.
+     * INI YANG PALING PENTING UNTUK DASHBOARD.
+     */
+    public function pembayaranTerbaru(): HasOne
+    {
+        return $this->hasOne(Pembayaran::class, 'santri_id')->latestOfMany();
+    }
     /**
      * Get the dokumen records associated with this pendaftaran santri.
      *

@@ -13,8 +13,6 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\File;
 use App\Models\SertifikatTemplate;
 use App\Models\Periode;
-use App\Models\PSB\Periode as PSBPeriode;
-use App\Models\PSB\SertifikatTemplate as PSBSertifikatTemplate;
 
 class CheckStatus extends Component
 {
@@ -198,13 +196,13 @@ class CheckStatus extends Component
         }
 
         try {
-            $template = PSBSertifikatTemplate::first();
+            $template = SertifikatTemplate::first();
             if (!$template) {
                 session()->flash('error', 'Template sertifikat belum dikonfigurasi.');
                 return;
             }
 
-            $periode = PSBPeriode::where('tipe_periode', 'pendaftaran_baru')
+            $periode = Periode::where('tipe_periode', 'pendaftaran_baru')
                 ->where('status_periode', 'active')
                 ->first();
 

@@ -221,11 +221,6 @@
                                 @endif
                             </div>
                         </div>
-
-<<<<<<< HEAD
-=======
-                        <!-- Step 4 - Daftar Ulang -->
->>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
                         <div class="relative flex items-center mt-8">
                             <div class="{{ $timelineStatus['daftar_ulang']['completed'] ? 'bg-green-500' : ($timelineStatus['daftar_ulang']['current'] ? 'bg-yellow-500 animate-pulse' : 'bg-gray-300') }} p-6 rounded-full text-white z-10">
                                 <i class="fas {{ $timelineStatus['daftar_ulang']['completed'] ? 'fa-check' : 'fa-clipboard-list' }} text-lg"></i>

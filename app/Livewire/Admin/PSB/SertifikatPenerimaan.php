@@ -6,11 +6,12 @@ use Livewire\Component;
 use Livewire\WithFileUploads;
 use App\Models\PSB\SuratPenerimaanSetting;
 use Illuminate\Support\Facades\Storage;
+use Livewire\Attributes\Title;
 
 class SertifikatPenerimaan extends Component
 {
     use WithFileUploads;
-
+    #[Title('Pengaturan Template Sertifikat')]
     public $settings;
     public $logo;
     public $stempel;
@@ -107,6 +108,8 @@ class SertifikatPenerimaan extends Component
 
         // Update other fields
         $this->settings->fill([
+            'logo'=>$this->$logoPath,
+            'stempel'=>$this->$stempelPath,
                 'nama_pesantren' => $this->nama_pesantren,
                 'nama_yayasan' => $this->nama_yayasan,
                 'alamat_pesantren' => $this->alamat_pesantren,

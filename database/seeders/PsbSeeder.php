@@ -47,15 +47,15 @@ class PsbSeeder extends Seeder
         ];
 
         // Daftar kemungkinan status pembayaran
-        $paymentStatuses = [
-            null, // Belum ada bukti pembayaran
-            'pending', // Bukti pembayaran sudah diunggah, menunggu verifikasi
-            'verified', // Pembayaran sudah terverifikasi
-            'rejected' // Pembayaran ditolak (misal: bukti tidak valid)
-        ];
+        // $paymentStatuses = [
+        //     null, // Belum ada bukti pembayaran
+        //     'pending', // Bukti pembayaran sudah diunggah, menunggu verifikasi
+        //     'verified', // Pembayaran sudah terverifikasi
+        //     'rejected' // Pembayaran ditolak (misal: bukti tidak valid)
+        // ];
 
         $this->command->info('Membuat 1000 data santri pendaftar lengkap beserta walinya...');
-        for ($i = 0; $i < 10; $i++) {
+        for ($i = 0; $i < 100; $i++) {
             $gender = $faker->randomElement(['L', 'P']); // Jenis kelamin acak
             $modeWawancara = $faker->randomElement(['online', 'offline']); // Mode wawancara acak
             $namaAyah = $faker->name('male');
@@ -66,15 +66,15 @@ class PsbSeeder extends Seeder
             // Pilih status santri secara acak dari array yang telah didefinisikan
             $randomSantriStatus = $faker->randomElement($santriStatuses);
             // Pilih status pembayaran secara acak
-            $randomPaymentStatus = $faker->randomElement($paymentStatuses);
+            // $randomPaymentStatus = $faker->randomElement($paymentStatuses);
 
             // Tentukan apakah ada bukti pembayaran berdasarkan status pembayaran yang dipilih
-            $buktiPembayaran = null;
-            if ($randomPaymentStatus === 'pending' || $randomPaymentStatus === 'verified' || $randomPaymentStatus === 'rejected') {
-                // Asumsi ada bukti pembayaran jika statusnya bukan null
-                // Dalam skenario nyata, ini akan menjadi path file yang sebenarnya
-                $buktiPembayaran = 'path/to/bukti_pembayaran_' . $faker->unique()->randomNumber(5) . '.jpg';
-            }
+            // $buktiPembayaran = null;
+            // if ($randomPaymentStatus === 'pending' || $randomPaymentStatus === 'verified' || $randomPaymentStatus === 'rejected') {
+            //     // Asumsi ada bukti pembayaran jika statusnya bukan null
+            //     // Dalam skenario nyata, ini akan menjadi path file yang sebenarnya
+            //     $buktiPembayaran = 'path/to/bukti_pembayaran_' . $faker->unique()->randomNumber(5) . '.jpg';
+            // }
 
             // Langkah 1: Buat data santri
             $santri = PendaftaranSantri::create([
@@ -92,8 +92,8 @@ class PsbSeeder extends Seeder
                 'tahun_lulus'     => '2025',
                 'tipe_pendaftaran' => $faker->randomElement(['reguler', 'olimpiade', 'internasional']),
                 'status_santri'   => $randomSantriStatus, // Menggunakan status acak di sini
-                'status_pembayaran' => $randomPaymentStatus, // Menggunakan status pembayaran acak
-                'bukti_pembayaran' => $buktiPembayaran, // Menambahkan bukti pembayaran jika status relevan
+                // 'status_pembayaran' => 'pending', // Menggunakan status pembayaran acak
+                // 'bukti_pembayaran' => $buktiPembayaran, // Menambahkan bukti pembayaran jika status relevan
                 'password'        => Hash::make('password'),
                 'periode_id'      => $pendaftaranPeriode->id,
                 'nama_ayah'       => $namaAyah,

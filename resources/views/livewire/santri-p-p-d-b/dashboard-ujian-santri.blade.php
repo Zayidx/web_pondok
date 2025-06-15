@@ -4,6 +4,10 @@
         <div class="bg-white rounded-xl card-shadow p-6 mb-8 hover-lift">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
+                <a href="{{ route('check-status') }}" class="inline-block px-6 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition duration-300">
+                        <i class="fas fa-arrow-left mr-2"></i>
+                        Kembali ke Status
+                    </a>
                     <h1 class="text-3xl font-bold text-gray-900 mb-2">Dashboard Ujian</h1>
                     <p class="text-lg text-gray-600">Selamat datang, {{ $santri->nama_lengkap }}</p>
                 </div>

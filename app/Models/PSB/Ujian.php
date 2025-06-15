@@ -4,47 +4,77 @@ namespace App\Models\PSB;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+// Import tambahan yang akan dibutuhkan untuk relasi
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Models\PSB\HasilUjian;
 
 class Ujian extends Model
 {
-    // Menggunakan trait HasFactory untuk pabrik model
+    // Menggunakan trait HasFactory untuk memungkinkan pembuatan data dummy (seeder).
     use HasFactory;
 
-    // Menentukan nama tabel eksplisit. Ini HARUS sesuai dengan nama tabel di migrasi (ujians).
-    // Ini adalah salah satu penyebab utama 'Column not found' jika Laravel mencoba tabel 'ujian'
-    // padahal tabel sebenarnya adalah 'ujians'.
-    protected $table = 'ujians'; 
+    /**
+     * Nama tabel yang terhubung dengan model ini.
+     * Penting untuk didefinisikan jika nama tabel tidak mengikuti konvensi Laravel
+     * (misalnya, jika model 'Ujian' tabelnya bukan 'ujians').
+     * @var string
+     */
+    protected $table = 'ujians';
 
-    // Mendefinisikan atribut yang dapat diisi secara massal.
-    // Kolom-kolom ini HARUS ada dalam daftar $fillable agar dapat diisi melalui
-    // metode seperti Model::create() atau Model::update().
+    /**
+     * Atribut yang diizinkan untuk diisi secara massal (mass assignment).
+     * Ini adalah lapisan keamanan untuk mencegah pengisian kolom yang tidak diinginkan.
+     * @var array
+     */
     protected $fillable = [
-        'nama_ujian',         // Kolom yang Anda coba masukkan
-        'mata_pelajaran',     // Kolom yang Anda coba masukkan
-        'tanggal_ujian',      // Kolom yang Anda coba masukkan
-        'waktu_mulai',        // Kolom yang Anda coba masukkan
-        'waktu_selesai',      // Kolom yang Anda coba masukkan
-        'periode_id',         // Kolom yang Anda coba masukkan
-        'status_ujian',       // Pastikan ini juga ada jika diisi di seeder
+        'ujian_id',
+        'nama_ujian',
+        'mata_pelajaran',
+        'tanggal_ujian',
+        'waktu_mulai',
+        'waktu_selesai',
+        'periode_id',
+        'status_ujian',
     ];
 
-    // Mendefinisikan casting untuk atribut tanggal dan waktu
-    // Ini membantu Laravel mengelola format data tanggal/waktu dengan benar.
+    /**
+     * Tipe data asli dari atribut-atribut model.
+     * Laravel akan secara otomatis mengubah (cast) atribut ini ke tipe yang ditentukan
+     * saat diakses, membuatnya lebih mudah untuk dimanipulasi.
+     * @var array
+     */
     protected $casts = [
-        'tanggal_ujian' => 'date',   
+        'tanggal_ujian' => 'date',
         'waktu_mulai' => 'datetime',
         'waktu_selesai' => 'datetime',
     ];
 
-    // Mendefinisikan relasi dengan model Periode
-    // Ini mengindikasikan bahwa sebuah ujian 'belongs to' satu periode.
+    /**
+     * Mendefinisikan relasi 'belongsTo' ke model Periode.
+     * Ini menandakan bahwa setiap record Ujian "milik" satu record Periode.
+     */
     public function periode()
     {
-        // Pastikan model 'Periode' berada di namespace yang benar atau diimpor.
+        // Parameter kedua ('periode_id') adalah foreign key pada tabel 'ujians'.
         return $this->belongsTo(\App\Models\PSB\Periode::class, 'periode_id');
     }
 
-    // Catatan: Relasi 'santri()' tidak relevan di model 'Ujian' ini karena
-    // 'santri_id' tidak ada di tabel 'ujians'. Relasi ini seharusnya ada
-    // di model 'HasilUjian' yang menghubungkan ujian dengan santri.
+    /**
+     * Mendefinisikan relasi 'hasMany' ke model Soal.
+     * Ini menandakan bahwa satu Ujian dapat "memiliki banyak" Soal.
+     */
+    public function soals(): HasMany
+    {
+        // Foreign key 'ujian_id' di tabel 'soals' akan digunakan untuk mencocokkan relasi.
+        return $this->hasMany(\App\Models\PSB\Soal::class, 'ujian_id');
+    }
+
+    // --- DI SINI ANDA PERLU MENAMBAHKAN RELASI YANG HILANG ---
+    // Tambahkan method hasilUjians() di bawah ini.
+    public function hasilUjians(): HasMany
+    {
+        // Laravel akan secara otomatis mencari foreign key 'ujian_id'
+        // di dalam tabel yang terhubung dengan model HasilUjian.
+        return $this->hasMany(HasilUjian::class);
+    }
 }

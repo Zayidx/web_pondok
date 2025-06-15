@@ -56,16 +56,10 @@ return new class extends Migration
             $table->enum('status', ['daftar', 'verifikasi', 'ujian', 'wawancara', 'diterima', 'ditolak'])->default('daftar');
             $table->rememberToken();
             $table->string('password')->nullable();
-            
-            // Kolom untuk pendaftaran ulang
-            $table->decimal('nominal_pembayaran', 12, 2)->nullable();
-            $table->date('tanggal_pembayaran')->nullable();
-            $table->string('bank_pengirim')->nullable();
-            $table->string('nama_pengirim')->nullable();
-            $table->string('bukti_pembayaran')->nullable();
             $table->enum('status_pembayaran', ['pending', 'verified', 'rejected'])->nullable();
+            $table->date('tanggal_pembayaran')->nullable();
 
-           
+            //  $table->enum('status_pembayaran', ['pending', 'verified', 'rejected'])->nullable();
             // =================================================================
             // PENAMBAHAN KOLOM BARU UNTUK NILAI RATA-RATA (SUDAH ADA)
             // =================================================================
@@ -83,7 +77,33 @@ return new class extends Migration
             $table->foreignId('periode_id')->constrained('psb_periodes')->onDelete('cascade');
             $table->timestamps();
         });
+        Schema::create('psb_pembayaran', function (Blueprint $table) {
+            // Kolom ID unik untuk setiap pembayaran
+            $table->id();
 
+            // Foreign key yang terhubung ke santri yang melakukan pembayaran
+            $table->foreignId('santri_id')->constrained('psb_pendaftaran_santri')->onDelete('cascade');
+
+            // Nominal yang dibayarkan, sesuai dengan 'nominal' di PendaftaranUlang.php
+            $table->decimal('nominal', 12, 2);
+
+            // Tanggal saat santri melakukan transfer
+            $table->date('tanggal_pembayaran');
+
+            // Bank asal transfer
+            $table->string('bank_pengirim');
+
+            // Nama pemilik rekening pengirim
+            $table->string('nama_pengirim');
+
+            // Path atau lokasi file bukti pembayaran yang diunggah
+            $table->string('bukti_pembayaran');
+            $table->enum('status_pembayaran', ['pending', 'verified', 'rejected'])->nullable();
+           
+            
+            // Kolom 'created_at' dan 'updated_at' standar
+            $table->timestamps();
+        });
         // 3. Membuat tabel psb_wali_santri (gabungan semua perubahan)
         Schema::create('psb_wali_santri', function (Blueprint $table) {
             $table->id();
@@ -157,7 +177,7 @@ return new class extends Migration
             $table->dateTime('waktu_selesai')->nullable();
             $table->timestamps();
         });
-
+        
         // 8. Membuat tabel jawaban_ujians
         Schema::create('jawaban_ujians', function (Blueprint $table) {
             $table->id();
@@ -186,6 +206,7 @@ return new class extends Migration
             $table->string('nama_bank');
             $table->string('nomor_rekening');
             $table->string('atas_nama');
+            $table->string('catatan_transfer');
             $table->boolean('is_active')->default(true); // Pastikan kolom ini ada
             $table->timestamps();
         });

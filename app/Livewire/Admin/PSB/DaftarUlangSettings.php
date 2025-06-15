@@ -2,17 +2,17 @@
 
 namespace App\Livewire\Admin\PSB;
 
-use App\Models\admin\Admin;
 use Livewire\Component;
 use App\Models\PSB\BiayaDaftarUlang;
 use App\Models\PSB\PengaturanDaftarUlang;
-use App\Models\PSB\PsbPeriode; // Diubah dari App\Models\PSB\Periode ke App\Models\PSB\PsbPeriode
+use App\Models\PSB\Periode;
+use App\Models\PSB\PsbPeriode;
 
 class DaftarUlangSettings extends Component
 {
     // Properties for biaya
     public $nama_biaya;
-    public $nominal; // Ini akan dipetakan ke kolom 'jumlah' di BiayaDaftarUlang
+    public $nominal;
     public $keterangan;
     public $is_active = true;
     public $biaya_id;
@@ -60,7 +60,7 @@ class DaftarUlangSettings extends Component
         ]);
 
         PengaturanDaftarUlang::updateOrCreate(
-            ['id' => 1],
+            ['id' => 1], // Selalu update record pertama
             [
                 'nama_bank' => $this->nama_bank,
                 'nomor_rekening' => $this->nomor_rekening,
@@ -70,7 +70,7 @@ class DaftarUlangSettings extends Component
             ]
         );
 
-        session()->flash('message', 'Pengaturan berhasil disimpan!');
+        session()->flash('message', 'Pengaturan rekening berhasil disimpan!');
     }
 
     public function saveBiaya()
@@ -83,32 +83,37 @@ class DaftarUlangSettings extends Component
 
         $data = [
             'nama_biaya' => $this->nama_biaya,
-            'jumlah' => $this->nominal, // Memetakan nominal ke jumlah (sesuai DB)
+            'jumlah' => $this->nominal, // Memetakan 'nominal' dari form ke kolom 'jumlah'
             'keterangan' => $this->keterangan,
             'is_active' => $this->is_active,
-            'tahun_ajaran' => '2025/2026', // Pastikan kolom ini diisi
+            'tahun_ajaran' => '2025/2026', // Ini bisa dibuat dinamis nanti
         ];
 
         if ($this->is_editing) {
             $biaya = BiayaDaftarUlang::find($this->biaya_id);
-            $biaya->update($data);
+            if ($biaya) {
+                $biaya->update($data);
+                session()->flash('message', 'Biaya berhasil diperbarui!');
+            }
         } else {
             BiayaDaftarUlang::create($data);
+            session()->flash('message', 'Biaya berhasil ditambahkan!');
         }
 
-        $this->reset(['nama_biaya', 'nominal', 'keterangan', 'is_active', 'biaya_id', 'is_editing']);
-        session()->flash('message', 'Biaya berhasil disimpan!');
+        $this->cancelEdit();
     }
 
     public function editBiaya($id)
     {
         $biaya = BiayaDaftarUlang::find($id);
-        $this->biaya_id = $biaya->id;
-        $this->nama_biaya = $biaya->nama_biaya;
-        $this->nominal = $biaya->jumlah; // Memuat dari kolom 'jumlah' (sesuai DB)
-        $this->keterangan = $biaya->keterangan;
-        $this->is_active = $biaya->is_active;
-        $this->is_editing = true;
+        if ($biaya) {
+            $this->biaya_id = $biaya->id;
+            $this->nama_biaya = $biaya->nama_biaya;
+            $this->nominal = $biaya->jumlah; // Memetakan 'jumlah' dari DB ke 'nominal' di form
+            $this->keterangan = $biaya->keterangan;
+            $this->is_active = $biaya->is_active;
+            $this->is_editing = true;
+        }
     }
 
     public function deleteBiaya($id)
@@ -126,10 +131,8 @@ class DaftarUlangSettings extends Component
     {
         return view('livewire.admin.psb.daftar-ulang-settings', [
             'biayas' => BiayaDaftarUlang::all(),
-            // getTotalBiaya() sekarang akan menjumlahkan kolom 'jumlah'
             'total_biaya' => BiayaDaftarUlang::getTotalBiaya(),
-            // Menggunakan PsbPeriode sesuai dengan nama tabel psb_periodes
-            'periode_daftar_ulang' => \App\Models\PSB\Periode::where('tipe_periode', 'daftar_ulang')
+            'periode_daftar_ulang' => Periode::where('tipe_periode', 'daftar_ulang')
                 ->where('status_periode', 'active')
                 ->first()
         ]);

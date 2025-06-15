@@ -86,19 +86,20 @@
                     <div class="bg-blue-50 border border-blue-200 rounded-lg p-4">
                         <h3 class="font-semibold text-blue-800 mb-2">Biaya Pendaftaran Ulang</h3>
                         <div class="space-y-2 text-sm text-blue-700">
-                            @foreach($biayas as $biaya)
-                                @if($biaya->is_active)
-                                    <div class="flex justify-between">
-                                        <span>{{ $biaya->nama_biaya }}</span>
-                                        <span class="font-medium">Rp {{ number_format($biaya->nominal, 0, ',', '.') }}</span>
-                                    </div>
-                                @endif
-                            @endforeach
-                            <hr class="border-blue-300">
-                            <div class="flex justify-between font-bold text-blue-800">
-                                <span>Total</span>
-                                <span>Rp {{ number_format($total_biaya, 0, ',', '.') }}</span>
-                            </div>
+                        @foreach($biayas as $biaya)
+    @if($biaya->is_active)
+        <div class="flex justify-between">
+            <span>{{ $biaya->nama_biaya }}</span>
+            <span class="font-medium">Rp {{ number_format($biaya->jumlah, 0, ',', '.') }}</span>
+        </div>
+    @endif
+@endforeach
+<hr class="border-blue-300">
+<div class="flex justify-between font-bold text-blue-800">
+    <span>Total</span>
+  {{-- PERBAIKAN: Hapus '$biaya->' --}}
+  <span>Rp {{ number_format($total_biaya, 0, ',', '.') }}</span>
+</div>
                         </div>
                     </div>
                 </div>
@@ -108,7 +109,7 @@
                         <h3 class="font-semibold text-green-800 mb-2">Informasi Rekening</h3>
                         <div class="space-y-2 text-sm text-green-700">
                             <div>
-                                <span class="font-medium">Bank:</span> {{ $pengaturan->bank }}
+                                <span class="font-medium">Nama Bank:</span> {{ $pengaturan->nama_bank }}
                             </div>
                             <div>
                                 <span class="font-medium">No. Rekening:</span> {{ $pengaturan->nomor_rekening }}
@@ -132,7 +133,7 @@
                     Batas Waktu Pendaftaran
                 </h3>
                 <p class="text-yellow-700 text-sm">
-                    Pendaftaran ulang harus diselesaikan paling lambat <strong>{{ \Carbon\Carbon::parse($periode_daftar_ulang->periode_selesai)->format('d F Y') }}</strong>. 
+                    Pendaftaran ulang harus diselesaikan paling lambat <strong>{{ \Carbon\Carbon::parse($periode_daftar_ulang->periode_selesai)->format('d F Y') }}</strong>.
                     Setelah batas waktu tersebut, santri yang belum melakukan pendaftaran ulang akan dianggap mengundurkan diri.
                 </p>
             </div>

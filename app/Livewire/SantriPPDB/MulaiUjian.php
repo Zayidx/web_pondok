@@ -3,7 +3,7 @@
 namespace App\Livewire\SantriPPDB;
 
 use Livewire\Component;
-use App\Models\PSB\Ujian; // Import the Ujian model (ensure the namespace is correct: App\Models\PSB\Ujian).
+use App\Models\Ujian; // Import the Ujian model (ensure the namespace is correct: App\Models\PSB\Ujian).
 use App\Models\PSB\HasilUjian; // Import the HasilUjian model.
 use App\Models\PSB\JawabanUjian; // Import the JawabanUjian model.
 use App\Models\PSB\PendaftaranSantri; // Import the PendaftaranSantri model.
@@ -12,7 +12,7 @@ use Carbon\Carbon; // Import the Carbon class for date and time manipulation.
 use Livewire\Attributes\Layout; // Import the Layout attribute for Blade layout.
 use Livewire\Attributes\Title; // Import the Title attribute for page title.
 use Livewire\Attributes\Computed; // Import the Computed attribute for computed properties.
-use Illuminate\Support\Facades\DB; // Import the DB facade for database transactions.
+use Illuminate\Support\Facades\DB; // Import the DB facade for database transactions
 use Illuminate\Support\Facades\Log; // Import the Log facade for logging.
 
 /**

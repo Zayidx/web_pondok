@@ -18,9 +18,9 @@
                 <div class="card-body">
                     <form wire:submit.prevent="savePengaturan">
                         <div class="mb-3">
-                            <label class="form-label">Bank</label>
-                            <input type="text" class="form-control" wire:model="bank">
-                            @error('bank') <span class="text-danger">{{ $message }}</span> @enderror
+                            <label class="form-label">Nama Bank</label>
+                            <input type="text" class="form-control" wire:model="nama_bank">
+                            @error('nama_bank') <span class="text-danger">{{ $message }}</span> @enderror
                         </div>
 
                         <div class="mb-3">
@@ -54,20 +54,20 @@
                     <h4 class="card-title">Manajemen Biaya</h4>
                 </div>
                 <div class="card-body">
-                    <form wire:submit.prevent="saveBiaya">
-                        <div class="mb-3">
-                            <label class="form-label">Nama Biaya</label>
-                            <input type="text" class="form-control" wire:model="nama_biaya">
-                            @error('nama_biaya') <span class="text-danger">{{ $message }}</span> @enderror
-                        </div>
+                        <form wire:submit.prevent="saveBiaya">
+                            <div class="mb-3">
+                                <label class="form-label">Nama Biaya</label>
+                                <input type="text" class="form-control" wire:model="nama_biaya">
+                                @error('nama_biaya') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
 
-                        <div class="mb-3">
-                            <label class="form-label">Nominal</label>
-                            <input type="number" class="form-control" wire:model="nominal">
-                            @error('nominal') <span class="text-danger">{{ $message }}</span> @enderror
-                        </div>
+                            <div class="mb-3">
+                                <label class="form-label">Nominal</label>
+                                <input type="number" class="form-control" wire:model="nominal">
+                                @error('nominal') <span class="text-danger">{{ $message }}</span> @enderror
+                            </div>
 
-                        <div class="mb-3">
+                            <div class="mb-3">
                             <label class="form-label">Keterangan</label>
                             <textarea class="form-control" wire:model="keterangan" rows="2"></textarea>
                             @error('keterangan') <span class="text-danger">{{ $message }}</span> @enderror
@@ -105,15 +105,15 @@
                             </thead>
                             <tbody>
                                 @forelse($biayas as $biaya)
-                                    <tr>
-                                        <td>{{ $biaya->nama_biaya }}</td>
-                                        <td>Rp {{ number_format($biaya->nominal, 0, ',', '.') }}</td>
-                                        <td>
-                                            <span class="badge bg-{{ $biaya->is_active ? 'success' : 'danger' }}">
-                                                {{ $biaya->is_active ? 'Aktif' : 'Nonaktif' }}
-                                            </span>
-                                        </td>
-                                        <td>
+                                     <tr>
+        <td>{{ $biaya->nama_biaya }}</td>
+        <td>Rp {{ number_format($biaya->jumlah, 0, ',', '.') }}</td>
+        <td>
+            <span class="badge bg-{{ $biaya->is_active ? 'success' : 'danger' }}">
+                {{ $biaya->is_active ? 'Aktif' : 'Nonaktif' }}
+            </span>
+        </td>
+        <td>
                                             <div class="btn-group">
                                                 <button class="btn btn-sm btn-warning" wire:click="editBiaya({{ $biaya->id }})">
                                                     <i class="bi bi-pencil"></i>
@@ -124,8 +124,8 @@
                                                 </button>
                                             </div>
                                         </td>
-                                    </tr>
-                                @empty
+        </tr>
+@empty
                                     <tr>
                                         <td colspan="4" class="text-center">Tidak ada data biaya</td>
                                     </tr>

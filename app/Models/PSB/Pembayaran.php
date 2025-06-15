@@ -15,9 +15,11 @@ class Pembayaran extends Model
 
     protected $fillable = [
         'santri_id',
-        'jumlah',
-        'tanggal_bayar',
-        'bukti_transfer',
+        'nominal',
+        'nama_pengirim',
+        'bank_pengirim',
+        'tanggal_pembayaran',
+        'bukti_pembayaran',
         'status_pembayaran',
     ];
 
