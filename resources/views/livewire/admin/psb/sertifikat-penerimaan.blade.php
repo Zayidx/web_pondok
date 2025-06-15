@@ -1,172 +1,164 @@
 <div>
+    <div class="page-title">
+        <p class="text-subtitle text-muted">Atur informasi, logo, dan stempel yang akan tampil pada surat pemberitahuan penerimaan.</p>
+    </div>
+
     <div class="card">
-        <div class="card-header">
-            <h3 class="card-title">Pengaturan Template Sertifikat Penerimaan</h3>
-        </div>
         <div class="card-body">
             @if (session()->has('message'))
-                <div class="alert alert-success">
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
                     {{ session('message') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                 </div>
             @endif
 
-            <form wire:submit.prevent="save">
-                <div class="row">
-                    <!-- Logo & Stempel Upload -->
-                    <div class="col-md-6">
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0">Logo & Stempel</h5>
-                            </div>
-                            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="form-group">
-                                            <label>Logo Pesantren</label>
-                                            <input type="file" class="form-control" wire:model="logo" accept="image/*">
-                                            @error('logo') <span class="text-danger">{{ $message }}</span> @enderror
-                                            @if($settings->logo)
-                                                <div class="mt-2">
-                                                    <img src="{{ Storage::url($settings->logo) }}" 
-                                                         alt="Logo" class="img-thumbnail" style="max-height: 100px;">
-                                                </div>
-                                            @endif
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-group">
-                                            <label>Stempel Pesantren</label>
-                                            <input type="file" class="form-control" wire:model="stempel" accept="image/*">
-                                            @error('stempel') <span class="text-danger">{{ $message }}</span> @enderror
-                                            @if($settings->stempel)
-                                                <div class="mt-2">
-                                                    <img src="{{ Storage::url($settings->stempel) }}" 
-                                                         alt="Stempel" class="img-thumbnail" style="max-height: 100px;">
-                                                </div>
-                                            @endif
-                                        </div>
-                        </div>
-                    </div>
-                        </div>
-                    </div>
-                </div>
-
-                    <!-- Basic Information -->
-                    <div class="col-md-6">
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0">Informasi Pesantren</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="form-group mb-3">
-                                    <label>Nama Pesantren</label>
-                                    <input type="text" class="form-control" wire:model="nama_pesantren">
-                                    @error('nama_pesantren') <span class="text-danger">{{ $message }}</span> @enderror
-                                </div>
-
-                                <div class="form-group mb-3">
-                                    <label>Nama Yayasan</label>
-                                    <input type="text" class="form-control" wire:model="nama_yayasan">
-                                    @error('nama_yayasan') <span class="text-danger">{{ $message }}</span> @enderror
-                                </div>
-
-                                <div class="form-group mb-3">
-                                    <label>Alamat Pesantren</label>
-                                    <textarea class="form-control" wire:model="alamat_pesantren" rows="3"></textarea>
-                                    @error('alamat_pesantren') <span class="text-danger">{{ $message }}</span> @enderror
-                        </div>
-
-                                <div class="form-group mb-3">
-                                    <label>Nomor Telepon</label>
-                                    <input type="text" class="form-control" wire:model="telepon_pesantren">
-                                    @error('telepon_pesantren') <span class="text-danger">{{ $message }}</span> @enderror
-                    </div>
-
-                                <div class="form-group mb-3">
-                                    <label>Email</label>
-                                    <input type="email" class="form-control" wire:model="email_pesantren">
-                            @error('email_pesantren') <span class="text-danger">{{ $message }}</span> @enderror
-                        </div>
-                        </div>
-                    </div>
-                </div>
-
-                    <!-- Direktur Information -->
-                    <div class="col-md-6">
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0">Informasi Direktur</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="form-group mb-3">
-                                    <label>Nama Direktur</label>
-                                    <input type="text" class="form-control" wire:model="nama_direktur">
-                            @error('nama_direktur') <span class="text-danger">{{ $message }}</span> @enderror
-                        </div>
-
-                                <div class="form-group mb-3">
-                                    <label>NIP Direktur</label>
-                                    <input type="text" class="form-control" wire:model="nip_direktur">
-                            @error('nip_direktur') <span class="text-danger">{{ $message }}</span> @enderror
-                                </div>
-                        </div>
-                    </div>
-                </div>
-
-                    <!-- Kepala Admin Information -->
-                    <div class="col-md-6">
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0">Informasi Kepala Admin</h5>
-                            </div>
-                            <div class="card-body">
-                                <div class="form-group mb-3">
-                                    <label>Nama Kepala Admin</label>
-                                    <input type="text" class="form-control" wire:model="nama_kepala_admin">
-                            @error('nama_kepala_admin') <span class="text-danger">{{ $message }}</span> @enderror
-                                </div>
-
-                                <div class="form-group mb-3">
-                                    <label>NIP Kepala Admin</label>
-                                    <input type="text" class="form-control" wire:model="nip_kepala_admin">
-                                    @error('nip_kepala_admin') <span class="text-danger">{{ $message }}</span> @enderror
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Catatan Penting -->
-                    <div class="col-12">
-                        <div class="card mb-4">
-                            <div class="card-header">
-                                <h5 class="card-title mb-0">Catatan Penting</h5>
-                            </div>
-                            <div class="card-body">
-                        <div class="form-group">
-                                    <textarea class="form-control @error('catatan') is-invalid @enderror" 
-                                              wire:model="catatan" 
-                                              rows="5" 
-                                              placeholder="Masukkan catatan penting untuk surat penerimaan. Gunakan koma (,) untuk memisahkan setiap catatan."></textarea>
-                                    @error('catatan') 
-                                        <div class="invalid-feedback">
-                                            {{ $message }}
-                                        </div>
-                                    @enderror
-                                    <small class="form-text text-muted">
-                                        Contoh format: Catatan 1, Catatan 2, Catatan 3
-                                    </small>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="text-end mt-4">
-                        <button type="submit" class="btn btn-primary">
-                        <i class="fas fa-save"></i> Simpan Pengaturan
+            <form wire:submit="save">
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="umum-tab" data-bs-toggle="tab" data-bs-target="#umum" type="button" role="tab" aria-controls="umum" aria-selected="true">
+                            <i class="bi bi-info-circle-fill me-2"></i>Informasi Umum
                         </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="pejabat-tab" data-bs-toggle="tab" data-bs-target="#pejabat" type="button" role="tab" aria-controls="pejabat" aria-selected="false">
+                            <i class="bi bi-person-badge-fill me-2"></i>Pejabat
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="catatan-tab" data-bs-toggle="tab" data-bs-target="#catatan" type="button" role="tab" aria-controls="catatan" aria-selected="false">
+                            <i class="bi bi-pencil-fill me-2"></i>Catatan Tambahan
+                        </button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="umum" role="tabpanel" aria-labelledby="umum-tab">
+                        <div class="row pt-4">
+                            <div class="col-lg-7">
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Nama Pesantren</label>
+                                    <input type="text" class="form-control" wire:model="nama_pesantren" placeholder="Contoh: Pondok Pesantren Modern">
+                                    @error('nama_pesantren') <span class="text-danger small">{{ $message }}</span> @enderror
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Nama Yayasan</label>
+                                    <input type="text" class="form-control" wire:model="nama_yayasan" placeholder="Contoh: Yayasan Pendidikan Islam">
+                                    @error('nama_yayasan') <span class="text-danger small">{{ $message }}</span> @enderror
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Alamat Pesantren</label>
+                                    <textarea class="form-control" wire:model="alamat_pesantren" rows="3" placeholder="Jl. Pendidikan No. 123, Kota..."></textarea>
+                                    @error('alamat_pesantren') <span class="text-danger small">{{ $message }}</span> @enderror
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">Nomor Telepon</label>
+                                            <input type="text" class="form-control" wire:model="telepon_pesantren" placeholder="0812-3456-7890">
+                                            @error('telepon_pesantren') <span class="text-danger small">{{ $message }}</span> @enderror
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group mb-3">
+                                            <label class="form-label">Email</label>
+                                            <input type="email" class="form-control" wire:model="email_pesantren" placeholder="info@pesantren.com">
+                                            @error('email_pesantren') <span class="text-danger small">{{ $message }}</span> @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-lg-5">
+                                <div class="form-group mb-4">
+                                    <label class="form-label mb-2">Logo Pesantren</label>
+                                    <div class="d-flex align-items-start gap-3">
+                                        @if ($logo)
+                                            <img src="{{ $logo->temporaryUrl() }}" class="img-thumbnail" style="width: 100px; height: 100px; object-fit: contain;">
+                                        @elseif($settings->logo)
+                                            <img src="{{ Storage::url($settings->logo) }}" class="img-thumbnail" style="width: 100px; height: 100px; object-fit: contain;">
+                                        @endif
+                                        <div class="w-100">
+                                            <input type="file" class="form-control" wire:model="logo" accept="image/png, image/jpeg">
+                                            <div wire:loading wire:target="logo" class="text-muted small mt-1">Mengunggah...</div>
+                                            @error('logo') <span class="text-danger small">{{ $message }}</span> @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="form-group">
+                                    <label class="form-label mb-2">Stempel Pesantren</label>
+                                    <div class="d-flex align-items-start gap-3">
+                                        @if ($stempel)
+                                            <img src="{{ $stempel->temporaryUrl() }}" class="img-thumbnail" style="width: 100px; height: 100px; object-fit: contain;">
+                                        @elseif($settings->stempel)
+                                            <img src="{{ Storage::url($settings->stempel) }}" class="img-thumbnail" style="width: 100px; height: 100px; object-fit: contain;">
+                                        @endif
+                                        <div class="w-100">
+                                            <input type="file" class="form-control" wire:model="stempel" accept="image/png, image/jpeg">
+                                            <div wire:loading wire:target="stempel" class="text-muted small mt-1">Mengunggah...</div>
+                                            @error('stempel') <span class="text-danger small">{{ $message }}</span> @enderror
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="tab-pane fade" id="pejabat" role="tabpanel" aria-labelledby="pejabat-tab">
+                        <div class="row pt-4">
+                            <div class="col-md-6">
+                                <h5 class="mb-3">Informasi Direktur</h5>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Nama Direktur</label>
+                                    <input type="text" class="form-control" wire:model="nama_direktur" placeholder="Nama lengkap direktur">
+                                    @error('nama_direktur') <span class="text-danger small">{{ $message }}</span> @enderror
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">NIP Direktur</label>
+                                    <input type="text" class="form-control" wire:model="nip_direktur" placeholder="NIP/NIK Direktur">
+                                    @error('nip_direktur') <span class="text-danger small">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <h5 class="mb-3">Informasi Kepala Admin</h5>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">Nama Kepala Admin</label>
+                                    <input type="text" class="form-control" wire:model="nama_kepala_admin" placeholder="Nama lengkap kepala administrasi">
+                                    @error('nama_kepala_admin') <span class="text-danger small">{{ $message }}</span> @enderror
+                                </div>
+                                <div class="form-group mb-3">
+                                    <label class="form-label">NIP Kepala Admin</label>
+                                    <input type="text" class="form-control" wire:model="nip_kepala_admin" placeholder="NIP/NIK Kepala Admin">
+                                    @error('nip_kepala_admin') <span class="text-danger small">{{ $message }}</span> @enderror
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane fade" id="catatan" role="tabpanel" aria-labelledby="catatan-tab">
+                         <div class="pt-4">
+                            <div class="form-group">
+                                <label class="form-label">Catatan Penting</label>
+                                <textarea class="form-control @error('catatan_penting') is-invalid @enderror" 
+                                          wire:model="catatan_penting" 
+                                          rows="5" 
+                                          placeholder="Masukkan catatan penting untuk surat penerimaan."></textarea>
+                                @error('catatan_penting') 
+                                    <div class="invalid-feedback">{{ $message }}</div>
+                                @enderror
+                                <small class="form-text text-muted">
+                                    Setiap baris akan dianggap sebagai satu poin catatan pada sertifikat.
+                                </small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer bg-white text-end mt-4 px-0">
+                    <button type="submit" class="btn btn-primary" wire:loading.attr="disabled">
+                        <span wire:loading.remove wire:target="save"><i class="bi bi-save me-2"></i>Simpan Pengaturan</span>
+                        <span wire:loading wire:target="save">Menyimpan...</span>
+                    </button>
                 </div>
             </form>
         </div>
     </div>
-</div> 
+</div>

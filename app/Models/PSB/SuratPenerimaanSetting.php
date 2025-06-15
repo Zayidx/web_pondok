@@ -1,44 +1,43 @@
 <?php
+// File: app/Models/PSB/SuratPenerimaanSetting.php
 
 namespace App\Models\PSB;
 
-use Database\Seeders\SuratPenerimaanSettingSeeder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory; // Pastikan ini ada jika Anda menggunakan factory
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class SuratPenerimaanSetting extends Model
 {
-    // Menggunakan trait HasFactory untuk pabrik model
+    // Menggunakan trait HasFactory untuk memungkinkan pembuatan model melalui factory.
     use HasFactory;
 
-    // Menentukan nama tabel eksplisit. Ini HARUS sesuai dengan nama tabel di migrasi (psb_sertifikat_templates).
+    // Menentukan nama tabel database secara eksplisit.
     protected $table = 'psb_sertifikat_templates';
 
-    // Mendefinisikan atribut yang dapat diisi secara massal (mass assignable).
-    // Kolom-kolom ini HARUS ada dalam daftar $fillable agar dapat diisi melalui
-    // metode seperti Model::create() atau Model::update().
+    // Mendefinisikan atribut yang boleh diisi secara massal (mass assignment).
+    // Ini adalah fitur keamanan untuk melindungi dari pengisian kolom yang tidak diinginkan.
     protected $fillable = [
         'nama_pesantren',
         'nama_yayasan',
         'alamat_pesantren',
-        'telepon_pesantren', // Diubah dari 'nomor_telepon' agar sesuai dengan migrasi
+        'telepon_pesantren',
         'email_pesantren',
+        'logo', // Menambahkan 'logo' ke dalam fillable.
+        'stempel', // Menambahkan 'stempel' ke dalam fillable.
         'catatan_penting',
         'nama_direktur',
         'nip_direktur',
         'nama_kepala_admin',
         'nip_kepala_admin',
-        'tahun_ajaran',         // Tambahkan kolom ini jika ada di seeder/migration
-        'tanggal_orientasi',    // Tambahkan kolom ini jika ada di seeder/migration
-        'batas_pembayaran_spp', // Tambahkan kolom ini jika ada di seeder/migration
+        'tahun_ajaran',
+        'tanggal_orientasi',
+        'batas_pembayaran_spp',
     ];
 
-    // Mendefinisikan casting untuk atribut.
-    // Karena Anda menggunakan json_encode() di seeder, casting ke 'array' akan secara otomatis
-    // mengubah string JSON menjadi array PHP ketika diambil dari database.
+    // Mendefinisikan casting tipe data otomatis untuk atribut tertentu.
     protected $casts = [
-        'catatan_penting' => 'array',
-        'tanggal_orientasi' => 'date',   // Casting untuk kolom tanggal
-        'batas_pembayaran_spp' => 'date', // Casting untuk kolom tanggal
+        // Mengonversi nilai dari kolom ini menjadi objek Carbon (tanggal) saat diambil.
+        'tanggal_orientasi' => 'date',
+        'batas_pembayaran_spp' => 'date',
     ];
 }

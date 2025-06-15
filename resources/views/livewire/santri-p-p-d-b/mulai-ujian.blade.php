@@ -130,7 +130,7 @@
 
                                             <div class="ml-4 flex-1">
                                                 <span class="text-gray-800 group-hover:text-blue-600">
-                                                    <span class="font-semibold mr-2">{{ $key }}.</span>
+                                                    <span class="font-semibold mr-2">{{ chr(65 + $key) }}.</span>
                                                     {{ $opsi['teks'] }}
                                                 </span>
                                             </div>

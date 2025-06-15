@@ -7,7 +7,7 @@ use App\Models\PSB\SuratPenerimaanSetting as SuratPenerimaanSettingModel;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
 
-class SuratPenerimaanSettingForm extends Component
+class SuratPenerimaanSetting extends Component
 {
     use WithFileUploads;
 

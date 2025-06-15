@@ -15,6 +15,7 @@ class DaftarUlangSeeder extends Seeder
             'nama_bank' => 'Bank Mandiri',  // Sesuaikan nama kolom jika berbeda
             'nomor_rekening' => '1234567890',
             'atas_nama' => 'Pondok Pesantren',
+            'catatan_transfer' => 'Mohon cantumkan nama lengkap santri pada berita transfer.', // <-- TAMBAHKAN BARIS INI
             'is_active' => true, // Tambahkan kolom ini jika ada di migration
             'created_at' => now(),
             'updated_at' => now(),

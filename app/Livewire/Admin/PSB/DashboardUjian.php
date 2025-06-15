@@ -3,11 +3,12 @@
 namespace App\Livewire\Admin\PSB;
 
 use App\Livewire\SantriPPDB\UjianForm; // Mengimpor form UjianForm (mungkin digunakan sebagai sub-komponen atau form object).
-use App\Models\Ujian; // Mengimpor model Ujian.
+use App\Models\PSB\Ujian; // Mengimpor model Ujian.
 use Livewire\Attributes\Computed; // Mengimpor atribut Computed untuk properti terkomputasi.
 use Livewire\Attributes\Title; // Mengimpor atribut Title untuk judul halaman.
 use Livewire\Component; // Mengimpor kelas dasar Livewire Component.
 use Livewire\WithPagination; // Mengimpor trait WithPagination untuk fitur paginasi.
+
 
 /**
  * Kelas Livewire DashboardUjian.
