@@ -15,6 +15,8 @@ use Livewire\WithPagination;
 use Livewire\Attributes\Title;
 // Mengimpor atribut `Title` dari Livewire. Ini adalah fitur baru di Livewire 3 untuk mengatur judul halaman secara deklaratif.
 use Livewire\Attributes\Computed;
+use Livewire\Attributes\Layout;
+
 // Mengimpor atribut `Computed` dari Livewire. Ini digunakan untuk mendefinisikan properti yang nilainya dihitung dan di-cache, hanya dihitung ulang jika dependensi berubah.
 
 #[Title('Dashboard Daftar Ulang')]
@@ -24,6 +26,7 @@ class DashboardDaftarUlang extends Component
 {
     use WithPagination; // Enables pagination functionality for the component
     // Menggunakan trait `WithPagination`. Ini menyediakan metode-metode seperti `paginate` dan `resetPage` untuk manajemen paginasi.
+    #[Layout ('components.layouts.app')]
 
     // Public properties for filters, search, and pagination settings
     // Properti publik di Livewire secara otomatis tersedia di view dan dapat diikat (bind) ke elemen input HTML.
@@ -40,18 +43,30 @@ class DashboardDaftarUlang extends Component
 
     // Public properties for modal states and selected data
     // Properti-properti ini mengontrol status modal (pop-up) dan data yang ditampilkan di dalamnya.
-    public bool $showDetailModal = false; // Controls visibility of the detail modal
-    // Mendefinisikan `$showDetailModal` sebagai boolean. Jika `true`, modal detail akan ditampilkan di view.
-    public bool $showProofModal = false; // Controls visibility of the payment proof modal
-    // Mendefinisikan `$showProofModal` sebagai boolean. Jika `true`, modal bukti pembayaran akan ditampilkan di view.
-    public ?PendaftaranSantri $selectedRegistration = null; // Holds the selected registration model for details
-    // Mendefinisikan `$selectedRegistration` sebagai properti yang dapat menampung instance model `PendaftaranSantri` atau `null`. Ini menyimpan data pendaftaran yang sedang dilihat di modal detail.
-    public ?string $proofImageUrl = null; // Stores the URL of the payment proof image
-    // Mendefinisikan `$proofImageUrl` sebagai string yang dapat bernilai `null`. Ini menyimpan URL gambar bukti pembayaran yang akan ditampilkan di modal bukti pembayaran.
-
+   // Properti untuk mengontrol modal
+    public bool $showDetailModal = false;
+    public bool $showProofModal = false;
+    public ?PendaftaranSantri $selectedRegistration = null;
+    public ?string $proofImageUrl = null;
+    public bool $showEditModal = false; // Mengontrol visibilitas modal edit
+    public ?int $editingId = null; // Menyimpan ID santri yang sedang diedit
     protected string $paginationTheme = 'bootstrap'; // Specifies the Bootstrap pagination theme
     // Mengatur tema paginasi menjadi 'bootstrap'. Ini memastikan tampilan paginasi sesuai dengan gaya Bootstrap.
-
+    public array $editForm = [
+        'nama_lengkap' => '',
+        'nisn' => '',
+        'asal_sekolah' => '',
+        'status_santri' => '',
+    ];
+    protected function rules()
+    {
+        return [
+            'editForm.nama_lengkap' => 'required|string|max:255',
+            'editForm.nisn' => 'required|string|max:20|unique:psb_pendaftaran_santri,nisn,' . $this->editingId,
+            'editForm.asal_sekolah' => 'required|string|max:255',
+            'editForm.status_santri' => 'required|in:menunggu,wawancara,sedang_ujian,diterima,ditolak,daftar_ulang',
+        ];
+    }    
     /**
      * Resets pagination to the first page when any of the specified properties change.
      * This ensures that filters and search terms are applied correctly.
@@ -116,16 +131,23 @@ class DashboardDaftarUlang extends Component
      * @param int $id The ID of the PendaftaranSantri to display.
      */
     public function showDetail(int $id): void
-    // Metode ini dipanggil ketika tombol "Detail Pembayaran" diklik.
-    // `$id` adalah ID dari data pendaftaran santri yang ingin ditampilkan detailnya.
-    {
-        // Find the registration by ID; if not found, $selectedRegistration will be null
-        $this->selectedRegistration = PendaftaranSantri::find($id);
-        // Mencari data pendaftaran santri berdasarkan `$id` menggunakan Eloquent.
-        // Hasilnya (model atau `null` jika tidak ditemukan) disimpan di properti `$selectedRegistration`.
-        $this->showDetailModal = true; // Open the detail modal
-        // Mengatur properti `$showDetailModal` menjadi `true` untuk menampilkan modal detail di view.
+{
+    // 1. Cari data pendaftaran santri
+    $registration = PendaftaranSantri::find($id);
+
+    // 2. BUAT PERCABANGAN: Periksa apakah data ditemukan
+    if ($registration) {
+        // JIKA DITEMUKAN: Lanjutkan seperti biasa
+        $this->selectedRegistration = $registration;
+        $this->showDetailModal = true;
+    } else {
+        // JIKA TIDAK DITEMUKAN:
+        // Jangan buka modal dan beri pesan error kepada admin.
+        session()->flash('error', 'Data pendaftaran dengan ID ' . $id . ' tidak dapat ditemukan.');
     }
+}
+
+
 
     /**
      * Closes the detail modal and clears the selected registration data.
@@ -145,23 +167,19 @@ class DashboardDaftarUlang extends Component
      * @param int $id The ID of the PendaftaranSantri whose payment proof is to be viewed.
      */
     public function viewPaymentProof(int $id): void
-    // Metode ini dipanggil ketika tombol "Lihat Bukti" diklik.
-    // `$id` adalah ID dari data pendaftaran yang bukti pembayarannya ingin dilihat.
     {
-        $registration = PendaftaranSantri::find($id); // Find the registration by ID
-        // Mencari data pendaftaran santri berdasarkan `$id`.
-        // Check if registration exists and has a payment proof
-        // Memeriksa apakah data pendaftaran ditemukan dan apakah ada `bukti_pembayaran` yang tersimpan.
-        if ($registration && $registration->bukti_pembayaran) {
+        // 1. Cari data santri
+        $registration = PendaftaranSantri::findOrFail($id);
+        
+        // 2. AMBIL BUKTI PEMBAYARAN DARI RELASI
+        $pembayaran = $registration->pembayaranTerbaru;
+    
+        // 3. Periksa apakah pembayaran dan path buktinya ada
+        if ($pembayaran && $pembayaran->bukti_pembayaran) {
             // Generate a public URL for the stored image
-            $this->proofImageUrl = Storage::url($registration->bukti_pembayaran);
-            // Jika bukti pembayaran ada, menghasilkan URL publik untuk file tersebut menggunakan Facade `Storage`.
-            // URL ini kemudian disimpan di properti `$proofImageUrl` untuk ditampilkan di `<img>` di view.
-            $this->showProofModal = true; // Open the payment proof modal
-            // Mengatur `$showProofModal` menjadi `true` untuk menampilkan modal bukti pembayaran.
+            $this->proofImageUrl = Storage::url($pembayaran->bukti_pembayaran);
+            $this->showProofModal = true;
         } else {
-            // Flash an error message if proof is not found
-            // Jika bukti pembayaran tidak ditemukan atau tidak ada, mengirimkan pesan error ke session sebagai flash message.
             session()->flash('error', 'Bukti pembayaran untuk santri ini tidak ditemukan.');
         }
     }
@@ -184,66 +202,118 @@ class DashboardDaftarUlang extends Component
      * @param int $id The ID of the PendaftaranSantri to verify.
      */
     public function verifyRegistration(int $id): void
-    // Metode ini dipanggil ketika tombol "Terima" diklik untuk memverifikasi pendaftaran.
-    // `$id` adalah ID pendaftaran yang akan diverifikasi.
-    {
-        // Find the registration or throw 404 if not found
-        $registration = PendaftaranSantri::findOrFail($id);
-        // Mencari data pendaftaran berdasarkan `$id`. Jika tidak ditemukan, Laravel akan secara otomatis melempar pengecualian `ModelNotFoundException` (menghasilkan error 404).
+{
+    // 1. Cari data pendaftaran santri
+    $registration = PendaftaranSantri::findOrFail($id);
 
-        // Update registration status and details
-        // Memperbarui atribut-atribut model `$registration`.
-        $registration->update([
-            'status_santri' => 'diterima', // Set santri status to 'accepted'
-            // Mengatur status santri menjadi 'diterima'.
-            'status_pembayaran' => 'verified', // Set payment status to 'verified'
-            // Mengatur status pembayaran menjadi 'verified'.
-            'verified_at' => now(), // Record verification timestamp
-            // Mencatat waktu verifikasi menggunakan helper `now()` Laravel (waktu saat ini).
-            'verified_by' => auth()->id(), // Record user who verified
-            // Mencatat ID pengguna yang melakukan verifikasi (pengguna yang sedang login).
+    // 2. TEMUKAN DATA PEMBAYARAN TERBARU YANG TERKAIT
+    $pembayaran = $registration->pembayaranTerbaru;
+
+    // 3. Jika ada data pembayaran, update statusnya
+    if ($pembayaran) {
+        $pembayaran->update([
+            'status_pembayaran' => 'verified', // Update status di tabel psb_pembayaran
         ]);
-
-        // Flash a success message
-        session()->flash('success', 'Pendaftaran ulang ' . $registration->nama_lengkap . ' telah diterima.');
-        // Mengirimkan pesan sukses ke session untuk ditampilkan di halaman selanjutnya.
-        $this->closeModal(); // Close any open modals
-        // Memanggil `closeModal()` untuk memastikan modal detail (atau modal lainnya) tertutup setelah aksi berhasil.
-        $this->dispatch('registrationVerified'); // Optional: dispatch an event for other components to listen
-        // Mengirimkan event Livewire bernama 'registrationVerified'. Komponen Livewire lain dapat mendengarkan event ini dan bereaksi. (Opsional)
     }
 
+    // 4. Update status santri di tabel pendaftaran_santri
+    $registration->update([
+        'status_santri' => 'diterima', // Atau status lain yang sesuai
+        'verified_at' => now(),
+        'verified_by' => auth()->id(),
+    ]);
+
+    session()->flash('success', 'Pendaftaran ulang ' . $registration->nama_lengkap . ' telah diterima.');
+    $this->closeModal();
+}
     /**
      * Rejects a registration's payment proof, setting status to 'rejected' and clearing the proof.
      *
      * @param int $id The ID of the PendaftaranSantri whose payment proof is to be rejected.
      */
     public function rejectRegistration(int $id): void
-    // Metode ini dipanggil ketika tombol "Tolak" diklik untuk menolak bukti pembayaran.
-    // `$id` adalah ID pendaftaran yang bukti pembayarannya akan ditolak.
     {
-        // Find the registration or throw 404 if not found
+        // 1. Cari data pendaftaran santri
         $registration = PendaftaranSantri::findOrFail($id);
-        // Mencari data pendaftaran berdasarkan `$id`.
-
-        // Update registration status to 'rejected' and clear payment proof
-        // Memperbarui atribut-atribut model `$registration`.
-        $registration->update([
-            'status_pembayaran' => 'rejected', // Set payment status to 'rejected'
-            // Mengatur status pembayaran menjadi 'rejected'.
-            'bukti_pembayaran' => null, // Clear the proof so santri can re-upload
-            // Mengatur `bukti_pembayaran` menjadi `null`. Ini bertujuan agar santri bisa mengunggah ulang bukti pembayaran yang baru.
-        ]);
-
-        // Flash a success message
+        
+        // 2. TEMUKAN DATA PEMBAYARAN TERBARU YANG TERKAIT
+        $pembayaran = $registration->pembayaranTerbaru;
+    
+        // 3. Jika ada data pembayaran, update statusnya menjadi 'rejected'
+        if ($pembayaran) {
+            $pembayaran->update([
+                'status_pembayaran' => 'rejected',
+            ]);
+    
+            // Catatan: Anda mungkin tidak ingin menghapus bukti pembayaran, 
+            // agar admin bisa melihat bukti yang ditolak.
+            // Jika tetap ingin menghapus, baris di bawah ini bisa diaktifkan:
+            // Storage::delete($pembayaran->bukti_pembayaran);
+            // $pembayaran->update(['bukti_pembayaran' => null]);
+        }
+    
         session()->flash('success', 'Bukti pembayaran ' . $registration->nama_lengkap . ' ditolak.');
-        // Mengirimkan pesan sukses ke session.
-        $this->closeModal(); // Close any open modals
-        // Memanggil `closeModal()` untuk menutup modal setelah aksi berhasil.
-        $this->dispatch('registrationRejected'); // Optional: dispatch an event
-        // Mengirimkan event Livewire bernama 'registrationRejected'. (Opsional)
+        $this->closeModal();
     }
+    
+// File: app/Livewire/Admin/PSB/DashboardDaftarUlang.php
 
+// ... (setelah method rejectRegistration)
+
+/**
+ * Mempersiapkan dan membuka modal untuk mengedit data pendaftaran.
+ *
+ * @param int $id ID dari PendaftaranSantri yang akan diedit.
+ */
+public function edit(int $id): void
+{
+    // Cari pendaftaran berdasarkan ID, jika tidak ketemu akan gagal.
+    $registration = PendaftaranSantri::findOrFail($id);
+
+    // Simpan ID yang sedang diedit
+    $this->editingId = $registration->id;
+
+    // Isi properti $editForm dengan data yang ada
+    $this->editForm['nama_lengkap'] = $registration->nama_lengkap;
+    $this->editForm['nisn'] = $registration->nisn;
+    $this->editForm['asal_sekolah'] = $registration->asal_sekolah;
+    $this->editForm['status_santri'] = $registration->status_santri;
+
+    // Tampilkan modal edit
+    $this->showEditModal = true;
+}
+
+/**
+ * Mengupdate data pendaftaran yang telah diedit.
+ */
+public function update(): void
+{
+    // Lakukan validasi data dari form edit
+    $validatedData = $this->validate();
+
+    // Cari pendaftaran yang akan diupdate
+    $registration = PendaftaranSantri::find($this->editingId);
+
+    if ($registration) {
+        // Update data pendaftaran dengan data dari form
+        $registration->update($validatedData['editForm']);
+
+        // Kirim notifikasi sukses
+        session()->flash('success', 'Data ' . $validatedData['editForm']['nama_lengkap'] . ' berhasil diperbarui.');
+
+        // Tutup modal edit
+        $this->closeEditModal();
+    }
+}
+
+/**
+ * Menutup modal edit dan mereset properti terkait.
+ */
+public function closeEditModal(): void
+{
+    $this->showEditModal = false;
+    $this->reset('editForm', 'editingId');
+}
     /**
      * Computed property that returns options for 'tipe pendaftaran' (registration type) filter.
      * This is cached and only re-evaluated if dependencies change.
@@ -293,69 +363,54 @@ class DashboardDaftarUlang extends Component
      * @return \Illuminate\Contracts\View\View
      */
     public function render()
-    // Metode `render()` adalah jantung dari setiap komponen Livewire.
-    // Metode ini bertanggung jawab untuk mengambil data dan merender tampilan (view) komponen.
     {
-        $query = PendaftaranSantri::query(); // Start with a fresh query builder instance
-        // Memulai query Eloquent untuk model `PendaftaranSantri`.
+        // Memulai query dan eager load relasi pembayaranTerbaru untuk performa
+        $query = PendaftaranSantri::with('pembayaranTerbaru');
 
-        // Filter by specific 'status_santri' (diterima or daftar_ulang)
-        // Membatasi hasil hanya untuk santri yang berstatus 'diterima' atau 'daftar_ulang'.
+        // Filter status santri seperti sebelumnya
         $query->whereIn('status_santri', ['diterima', 'daftar_ulang']);
 
-        // Apply search filter if 'search' property is not empty
-        // Menerapkan filter pencarian jika properti `$search` tidak kosong.
+        // Filter pencarian seperti sebelumnya
         $query->when($this->search, function ($q) {
-            // `when()` adalah helper Eloquent yang menjalankan callback jika kondisi pertama (`$this->search` bernilai true/tidak kosong) terpenuhi.
             $q->where(function ($subQuery) {
-                // Menggunakan sub-query `where` untuk mengelompokkan kondisi OR.
-                // Search across 'nama_lengkap' or 'nisn'
                 $subQuery->where('nama_lengkap', 'like', '%' . $this->search . '%')
-                         // Mencari nama lengkap yang mengandung `$this->search` (case-insensitive di banyak database).
                          ->orWhere('nisn', 'like', '%' . $this->search . '%');
-                         // Atau mencari NISN yang mengandung `$this->search`.
             });
         });
-
-        // Apply 'tipe_pendaftaran' filter if 'filters.tipe' is set
-        // Menerapkan filter berdasarkan 'tipe_pendaftaran' jika `filters.tipe` tidak kosong.
+        
+        // Filter tipe pendaftaran seperti sebelumnya
         $query->when($this->filters['tipe'], function ($q) {
             $q->where('tipe_pendaftaran', $this->filters['tipe']);
         });
 
-        // Apply 'status_pembayaran' filter if 'filters.status' is set
-        // Menerapkan filter berdasarkan 'status_pembayaran' jika `filters.status` tidak kosong.
-        $query->when($this->filters['status'], function ($q) {
-            if ($this->filters['status'] === 'no_proof') {
-                // Logika khusus untuk status 'no_proof' (belum ada bukti pembayaran).
-                $q->whereNull('bukti_pembayaran'); // Filter for registrations with no payment proof
-                // Menambahkan kondisi `whereNull` untuk mencari data yang kolom `bukti_pembayaran`-nya adalah NULL.
-            } else {
-                $q->where('status_pembayaran', $this->filters['status']);
-                // Untuk status pembayaran lainnya (pending, verified, rejected), filter langsung berdasarkan nilai status.
-            }
-        });
+       // INTI LOGIKA FILTER STATUS:
+    $query->when($this->filters['status'], function ($q) {
+        $status = $this->filters['status'];
 
-        // Apply ordering based on 'filters.urutan' or default sort field/direction
-        // Menerapkan pengurutan data.
+        if ($status === 'no_proof') {
+            // Cari santri yang TIDAK PUNYA data di tabel `psb_pembayaran` sama sekali.
+            $q->whereDoesntHave('pembayaranHistory');
+        } else {
+            // Cari santri yang PUNYA data pembayaran dengan status tertentu.
+            // `whereHas` akan "melirik" ke tabel relasi.
+            $q->whereHas('pembayaranTerbaru', function ($subQuery) use ($status) {
+                // Kondisi filter diterapkan pada tabel `psb_pembayaran`
+                $subQuery->where('status_pembayaran', $status);
+            });
+        }
+    });
+
+        // Logika sorting tetap sama
         if ($this->filters['urutan'] === 'terbaru') {
-            // Jika filter 'urutan' adalah 'terbaru', urutkan berdasarkan `created_at` secara descending.
             $query->orderBy('created_at', 'desc');
         } elseif ($this->filters['urutan'] === 'terlama') {
-            // Jika filter 'urutan' adalah 'terlama', urutkan berdasarkan `created_at` secara ascending.
             $query->orderBy('created_at', 'asc');
         } else {
-            // Fallback to general sortField and sortDirection
-            // Jika filter 'urutan' tidak spesifik, gunakan `$sortField` dan `$sortDirection` yang ditentukan dari sorting kolom.
             $query->orderBy($this->sortField, $this->sortDirection);
         }
 
-        // Paginate the results and pass them to the view
-        // Melakukan paginasi hasil query dengan jumlah item per halaman yang ditentukan oleh `$this->perPage`.
         return view('livewire.admin.psb.dashboard-daftar-ulang', [
-            // Mengembalikan view Blade `livewire.admin.psb.dashboard-daftar-ulang`.
             'registrations' => $query->paginate($this->perPage),
-            // Data hasil paginasi disimpan dalam variabel `registrations` yang akan tersedia di view.
         ]);
     }
 }

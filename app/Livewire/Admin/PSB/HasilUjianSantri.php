@@ -9,6 +9,7 @@ use Livewire\Component;
 use Livewire\WithPagination;
 use Livewire\Attributes\Title;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Computed;
 
 class HasilUjianSantri extends Component
 {
@@ -20,8 +21,8 @@ class HasilUjianSantri extends Component
     public $search = '';
     public $searchAlamat = '';
     public $filters = [
-        'tipe' => '',
-        'nilai' => ''
+        'status' => '',
+        'tipe_pendaftaran' => ''
     ];
     public $sortField = 'created_at';
     public $sortDirection = 'desc';
@@ -30,7 +31,7 @@ class HasilUjianSantri extends Component
     protected $queryString = [
         'search' => ['except' => ''],
         'searchAlamat' => ['except' => ''],
-        'filters' => ['except' => ['tipe' => '', 'nilai' => '']],
+        'filters' => ['except' => ['status' => '', 'tipe_pendaftaran' => '']],
         'perPage' => ['except' => 10],
         'sortField' => ['except' => 'created_at'],
         'sortDirection' => ['except' => 'desc']
@@ -38,7 +39,8 @@ class HasilUjianSantri extends Component
 
     public function mount()
     {
-        
+        // Initialize with default filter for "sedang_ujian" status
+        $this->filters['status'] = 'sedang_ujian';
     }
 
     public function updatingSearch()
@@ -68,78 +70,43 @@ class HasilUjianSantri extends Component
 
     public function resetFilters()
     {
-        $this->reset([
-            'search',
-            'searchAlamat',
-            'filters',
-            'sortField',
-            'sortDirection'
-        ]);
+        $this->search = '';
+        $this->searchAlamat = '';
+        $this->filters = [
+            'status' => 'sedang_ujian',
+            'tipe_pendaftaran' => ''
+        ];
+        $this->sortField = 'created_at';
+        $this->sortDirection = 'desc';
     }
 
     public function getSantriList()
     {
-        $query = PendaftaranSantri::where('status_santri', 'sedang_ujian')
-            ->with(['hasilUjians' => function($query) {
-                $query->select('id', 'santri_id', 'nilai_akhir', 'ujian_id');
-            }])
-            ->when($this->search, function($query) {
-                $query->where(function($q) {
+        return PendaftaranSantri::query()
+            ->when($this->search, function ($query) {
+                $query->where(function ($q) {
                     $q->where('nama_lengkap', 'like', '%' . $this->search . '%')
-                      ->orWhere('nisn', 'like', '%' . $this->search . '%')
-                      ->orWhere('asal_sekolah', 'like', '%' . $this->search . '%');
+                        ->orWhere('nisn', 'like', '%' . $this->search . '%')
+                        ->orWhere('email', 'like', '%' . $this->search . '%');
                 });
             })
-            ->when($this->searchAlamat, function($query) {
-                $query->whereHas('wali', function($q) {
-                    $q->where('alamat', 'like', '%' . $this->searchAlamat . '%');
-                });
+            ->when($this->searchAlamat, function ($query) {
+                $query->where('alamat', 'like', '%' . $this->searchAlamat . '%');
             })
-            ->when($this->filters['tipe'], function($query) {
-                $query->where('tipe_pendaftaran', $this->filters['tipe']);
-            });
-
-        // Add subquery for average score
-        $query->addSelect([
-            'rata_nilai' => HasilUjian::selectRaw('COALESCE(AVG(nilai_akhir), 0)')
-            ->whereColumn('santri_id', 'psb_pendaftaran_santri.id')
-
-        ]);
-
-        // Apply score sorting if selected
-        if ($this->filters['nilai'] === 'highest') {
-            $query->orderBy('rata_nilai', 'desc');
-        } elseif ($this->filters['nilai'] === 'lowest') {
-            $query->orderBy('rata_nilai', 'asc');
-        } else {
-            $query->orderBy($this->sortField, $this->sortDirection);
-        }
-
-        return $query->paginate($this->perPage);
-    }
-
-    public function getNilaiMapel($santri)
-    {
-        $nilaiPerMapel = [];
-        foreach ($santri->hasilUjians as $hasil) {
-            $nilaiPerMapel[$hasil->ujian->mata_pelajaran] = $hasil->nilai_akhir;
-        }
-        return $nilaiPerMapel;
-    }
-
-    public function getTotalNilai($santri)
-    {
-        if ($santri->hasilUjians->isEmpty()) {
-            return 0;
-        }
-        return round($santri->hasilUjians->avg('nilai_akhir'), 2);
+            ->when($this->filters['status'], function ($query) {
+                $query->where('status_santri', $this->filters['status']);
+            })
+            ->when($this->filters['tipe_pendaftaran'], function ($query) {
+                $query->where('tipe_pendaftaran', $this->filters['tipe_pendaftaran']);
+            })
+            ->orderBy($this->sortField, $this->sortDirection)
+            ->paginate(10);
     }
 
     public function terimaSantri($id)
     {
         $santri = PendaftaranSantri::findOrFail($id);
         $santri->update([
-            'status' => 'diterima',
             'status_santri' => 'daftar_ulang'
         ]);
         session()->flash('success', 'Santri berhasil diterima dan akan melakukan pendaftaran ulang');
@@ -149,7 +116,6 @@ class HasilUjianSantri extends Component
     {
         $santri = PendaftaranSantri::findOrFail($id);
         $santri->update([
-            'status' => 'ditolak',
             'status_santri' => 'ditolak'
         ]);
         session()->flash('success', 'Santri berhasil ditolak');
@@ -158,6 +124,7 @@ class HasilUjianSantri extends Component
     public function getTipeOptions()
     {
         return [
+            '' => 'Semua Tipe',
             'reguler' => 'Reguler',
             'olimpiade' => 'Olimpiade',
             'internasional' => 'Internasional'
@@ -171,9 +138,4 @@ class HasilUjianSantri extends Component
             'tipeOptions' => $this->getTipeOptions()
         ]);
     }
-} 
- 
- 
- 
- 
- 
+}

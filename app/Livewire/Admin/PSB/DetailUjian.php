@@ -12,8 +12,7 @@ use Livewire\WithPagination;
 
 /**
  * DetailUjian Component
- * 
- * Komponen ini menangani manajemen soal-soal dalam sebuah ujian, termasuk:
+ * * Komponen ini menangani manajemen soal-soal dalam sebuah ujian, termasuk:
  * - Menampilkan daftar soal
  * - Menambah soal baru (PG atau Essay)
  * - Mengubah soal yang sudah ada
@@ -33,8 +32,7 @@ class DetailUjian extends Component
 
     /**
      * Inisialisasi komponen saat pertama kali dimuat
-     * 
-     * @param int $ujianId ID ujian yang akan dikelola soal-soalnya
+     * * @param int $ujianId ID ujian yang akan dikelola soal-soalnya
      */
     public function mount($ujianId)
     {
@@ -47,8 +45,7 @@ class DetailUjian extends Component
     /**
      * Mengambil daftar soal untuk ujian yang sedang aktif
      * dengan pagination 10 item per halaman
-     * 
-     * @return \Illuminate\Pagination\LengthAwarePaginator
+     * * @return \Illuminate\Pagination\LengthAwarePaginator
      */
     #[Computed]
     public function listSoal()
@@ -80,8 +77,7 @@ class DetailUjian extends Component
 
     /**
      * Menghapus opsi dari soal pilihan ganda
-     * 
-     * @param int $index Index opsi yang akan dihapus
+     * * @param int $index Index opsi yang akan dihapus
      */
     public function removeOption($index)
     {
@@ -90,8 +86,7 @@ class DetailUjian extends Component
 
     /**
      * Mencari index jawaban yang benar berdasarkan bobot nilai tertinggi
-     * 
-     * @param array $options Array opsi jawaban dengan bobot nilainya
+     * * @param array $options Array opsi jawaban dengan bobot nilainya
      * @return int Index dari opsi dengan bobot tertinggi
      */
     protected function findCorrectAnswerIndex($options)
@@ -107,17 +102,15 @@ class DetailUjian extends Component
             }
         }
 
-        return $correctIndex;
+        return chr(65 + $correctIndex); // Mengembalikan huruf (A, B, C, D)
     }
 
     /**
      * Menyimpan soal baru ke database
-     * 
-     * Untuk soal PG:
+     * * Untuk soal PG:
      * - Menyimpan opsi jawaban
      * - Menentukan kunci jawaban berdasarkan bobot tertinggi
-     * 
-     * Untuk Essay:
+     * * Untuk Essay:
      * - Hanya menyimpan pertanyaan
      */
     public function createSoal()
@@ -149,8 +142,7 @@ class DetailUjian extends Component
 
     /**
      * Menyiapkan form untuk mengedit soal yang sudah ada
-     * 
-     * @param int $id ID soal yang akan diedit
+     * * @param int $id ID soal yang akan diedit
      */
     public function edit($id)
     {
@@ -167,12 +159,10 @@ class DetailUjian extends Component
 
     /**
      * Mengupdate soal yang sudah ada di database
-     * 
-     * Untuk soal PG:
+     * * Untuk soal PG:
      * - Update opsi jawaban
      * - Update kunci jawaban berdasarkan bobot tertinggi
-     * 
-     * Untuk Essay:
+     * * Untuk Essay:
      * - Hanya update pertanyaan
      * - Hapus opsi dan kunci jawaban
      */
@@ -203,8 +193,7 @@ class DetailUjian extends Component
 
     /**
      * Menghapus soal dari database
-     * 
-     * @param int $id ID soal yang akan dihapus
+     * * @param int $id ID soal yang akan dihapus
      */
     public function deleteSoal($id)
     {
@@ -228,8 +217,7 @@ class DetailUjian extends Component
 
     /**
      * Render view untuk komponen ini
-     * 
-     * @return \Illuminate\View\View
+     * * @return \Illuminate\View\View
      */
     public function render()
     {

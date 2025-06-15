@@ -7,11 +7,13 @@ use App\Models\admin\Semester;
 use App\Models\Cashless\LaundryOrder;
 use App\Models\Spp\Pembayaran;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
+use Laravel\Sanctum\HasApiTokens;
 
-class Santri extends Model
+class Santri extends Authenticatable
 {
-    use HasFactory;
+    use HasApiTokens, HasFactory, Notifiable;
 
     protected $table = 'santris';
     protected $fillable = [
@@ -38,11 +40,18 @@ class Santri extends Model
         'status_santri',
         'asal_sekolah',
         'yang_membiayai_sekolah',
+        'password',
+        'remember_token',
 
         'kelas_id',
         'kamar_id',
         'semester_id',
         'angkatan_id',
+    ];
+
+    protected $hidden = [
+        'password',
+        'remember_token',
     ];
 
     public function user()

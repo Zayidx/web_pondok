@@ -7,16 +7,15 @@ use App\Models\User;
 use Detection\MobileDetect;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Validate;
 use Livewire\Component;
-use App\Models\PSB\PendaftaranSantri;
-use Livewire\Attributes\Layout;
 
-#[Layout('components.layouts.auth')]
-#[Title('Login Santri')]
 class LoginSantri extends Component
 {
+    #[Title('Halaman Login Santri')]
+
     #[Validate('required')]
     public $nisn;
 
@@ -33,38 +32,41 @@ class LoginSantri extends Component
 
     public function login()
     {
-        $credentials = [
-            'nisn' => $this->nisn,
-            'password' => $this->password,
-        ];
+        try {
+            $this->validate();
 
-        if (Auth::guard('santri')->attempt($credentials)) {
-            session()->regenerate();
-            return redirect()->intended(route('santri.dashboard'));
+            $data = [
+                'nisn' => $this->nisn,
+                'password' => $this->password,
+            ];
+
+            Log::info('Attempting santri login', ['nisn' => $this->nisn]);
+
+            if (Auth::guard('santri')->attempt($data)) {
+                Log::info('Santri login successful', ['nisn' => $this->nisn]);
+                return to_route('santri.dashboard');
+            }
+
+            Log::warning('Santri login failed', ['nisn' => $this->nisn]);
+            return back()->withErrors(['credentials' => 'NISN atau password salah']);
+        } catch (\Throwable $th) {
+            Log::error('Santri login error', [
+                'nisn' => $this->nisn,
+                'error' => $th->getMessage()
+            ]);
+            return back()->withErrors(['credentials' => $th->getMessage()]);
         }
-
-        $this->addError('credentials', 'Login gagal, password atau NISN salah.');
-        $user = User::where('email', $this->nisn)->first();
-
-        if (!$user) {
-            $this->addError('nisn', 'NISN tidak ditemukan.');
-            return;
-        }
-
-        if (!Hash::check($this->password, $user->password)) {
-            $this->addError('password', 'Password salah, pastikan password sama dengen NISN');
-            return;
-        }
-
-        Auth::login($user);
-
-        return to_route('santri.dashboard');
     }
 
+    public function logout()
+    {
+        Auth::guard('santri')->logout();
+        return redirect('/auth/login-santri');
+    }
 
     public function render()
     {
         if ($this->is_mobile) return view('livewire.mobile.auth.login-mobile-santri')->layout('components.layouts.auth-mobile');
-        return view('livewire.auth.login-santri');
+        return view('livewire.auth.login-santri')->layout('components.layouts.auth');
     }
 }
