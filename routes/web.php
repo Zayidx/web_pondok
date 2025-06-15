@@ -1,16 +1,15 @@
 <?php
-// routes/web.php
-
-use App\Http\Controllers\CertificateController; // Ini bisa dihapus jika controllernya dihapus
 use App\Livewire\Auth;
 use App\Livewire\StudentExam;
+use App\Livewire\TestButton;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\PSB\SuratPenerimaanController;
 
 Route::get('/', function () {
     return redirect('/auth/login');
 });
-
+Route::get('/test-livewire-button', TestButton::class);
 Route::prefix('auth')->group(function () {
     Route::get('/login', Auth\Login::class)->name('login');
     Route::get('/login-santri', Auth\LoginSantri::class)->name('login-santri');
@@ -34,30 +33,39 @@ Route::get('/generate', function () {
     echo 'ok';
 });
 
-// >>>>>> INI ADALAH DEFINISI RUTE YANG PERLU DIHAPUS ATAU DIKOMENTARI <<<<<<
-// Karena sekarang unduhan ditangani langsung oleh komponen Livewire PSB/CetakPenerimaanSurat
-// Route::post('/download-certificate-pdf', [CertificateController::class, 'download'])->name('download-certificate-pdf');
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::get('/admin/psb/sertifikat', App\Livewire\Admin\PSB\SertifikatPenerimaan::class)->name('admin.psb.sertifikat');
+    
+    // Route untuk detail pendaftaran
+    Route::get('/admin/psb/detail-pendaftaran/{id}', function($id) {
+        $registration = \App\Models\PSB\PendaftaranSantri::findOrFail($id);
+        return view('psb.detail-pendaftaran', compact('registration'));
+    })->name('admin.psb.detail-pendaftaran');
+    
+    // Route untuk lihat bukti pembayaran
+    Route::get('/admin/psb/lihat-bukti/{id}', function($id) {
+        $registration = \App\Models\PSB\PendaftaranSantri::findOrFail($id);
+        if (!$registration->bukti_pembayaran) {
+            abort(404, 'Bukti pembayaran tidak ditemukan');
+        }
+        return response()->file(storage_path('app/public/' . str_replace('public/', '', $registration->bukti_pembayaran)));
+    })->name('admin.psb.lihat-bukti');
+});
 
-// >>>>>> KODE DI BAWAH INI HARUS DIHAPUS ATAU DIKOMENTARI (Sudah dikomentari sebelumnya) <<<<<<
-/*
-Route::post('/download-certificate-pdf', function (Request $request) {
-    $htmlContent = $request->input('html_content');
-    $fileName = $request->input('file_name', 'sertifikat.pdf'); // Default filename
+// Route untuk preview dan download surat penerimaan
+Route::get('/preview-surat-penerimaan', [App\Http\Controllers\PSB\SuratPenerimaanController::class, 'preview'])
+    ->name('preview.surat-penerimaan');
 
-    // Perbaiki URL CDN di dalam HTML jika ada
-    $htmlContent = str_replace(
-        ['[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)', '[https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap](https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap)'],
-        ['https://cdn.tailwindcss.com', 'https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap'],
-        $htmlContent
-    );
+Route::get('/ppdb/download-penerimaan-pdf/{santriId}', [App\Http\Controllers\PSB\SuratPenerimaanController::class, 'download'])
+    ->name('psb.download-penerimaan-pdf');
 
-    $pdf = Pdf::loadHtml($htmlContent);
-
-    // Mengembalikan PDF sebagai unduhan
-    return $pdf->download($fileName);
-})->name('download-certificate-pdf');
-*/
-// >>>>>> BATAS KODE YANG HARUS DIHAPUS/DIKOMENTARI <<<<<<
+// Routes untuk Surat Penerimaan
+Route::prefix('psb/surat-penerimaan')->name('psb.surat-penerimaan.')->group(function () {
+    Route::get('/preview-page', [SuratPenerimaanController::class, 'previewPage'])->name('preview-page');
+    Route::get('/preview', [SuratPenerimaanController::class, 'preview'])->name('preview');
+    Route::get('/download', [SuratPenerimaanController::class, 'download'])->name('download');
+    Route::get('/print', [SuratPenerimaanController::class, 'print'])->name('print');
+});
 
 // Route redirect
 require __DIR__ . '/superadmin.php';
@@ -67,3 +75,13 @@ require __DIR__ . '/e-santri.php';
 require __DIR__ . '/e-cashless/petugas-e-cashless.php';
 require __DIR__ . '/e-cashless/petugas-laundry.php';
 require __DIR__ . '/e-cashless/petugas-warung.php';
+
+Route::post('/ppdb/logout', function () {
+    \Illuminate\Support\Facades\Auth::guard('pendaftaran_santri')->logout();
+    session()->forget(['santri_id', 'login_time']);
+    return redirect()->route('login-ppdb-santri');
+})->name('logout-ppdb-santri');
+
+Route::middleware(['auth', 'role:admin'])->prefix('admin')->name('admin.')->group(function () {
+    Route::get('/psb/daftar-ulang-settings', App\Livewire\Admin\PSB\DaftarUlangSettings::class)->name('psb.daftar-ulang-settings');
+});

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4ee9a9f2ca6d10f3999064b9ef5c1b0a",
+    "content-hash": "b07e32d7665b81403348428d651f37b8",
     "packages": [
         {
             "name": "asantibanez/livewire-charts",
@@ -144,6 +144,84 @@
                 }
             ],
             "time": "2025-02-13T15:07:54+00:00"
+        },
+        {
+            "name": "barryvdh/laravel-snappy",
+            "version": "v1.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/barryvdh/laravel-snappy.git",
+                "reference": "5b8668e4a54be630973fd309b4cb1abe75a8afbb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/barryvdh/laravel-snappy/zipball/5b8668e4a54be630973fd309b4cb1abe75a8afbb",
+                "reference": "5b8668e4a54be630973fd309b4cb1abe75a8afbb",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/filesystem": "^9|^10|^11|^12",
+                "illuminate/support": "^9|^10|^11|^12",
+                "knplabs/knp-snappy": "^1.4.4",
+                "php": "^8.1"
+            },
+            "require-dev": {
+                "orchestra/testbench": "^7|^8|^9|^10"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "PDF": "Barryvdh\\Snappy\\Facades\\SnappyPdf",
+                        "SnappyImage": "Barryvdh\\Snappy\\Facades\\SnappyImage"
+                    },
+                    "providers": [
+                        "Barryvdh\\Snappy\\ServiceProvider"
+                    ]
+                },
+                "branch-alias": {
+                    "dev-master": "1.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Barryvdh\\Snappy\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Barry vd. Heuvel",
+                    "email": "barryvdh@gmail.com"
+                }
+            ],
+            "description": "Snappy PDF/Image for Laravel",
+            "keywords": [
+                "image",
+                "laravel",
+                "pdf",
+                "snappy",
+                "wkhtmltoimage",
+                "wkhtmltopdf"
+            ],
+            "support": {
+                "issues": "https://github.com/barryvdh/laravel-snappy/issues",
+                "source": "https://github.com/barryvdh/laravel-snappy/tree/v1.0.4"
+            },
+            "funding": [
+                {
+                    "url": "https://fruitcake.nl",
+                    "type": "custom"
+                },
+                {
+                    "url": "https://github.com/barryvdh",
+                    "type": "github"
+                }
+            ],
+            "time": "2025-02-24T15:20:06+00:00"
         },
         {
             "name": "brick/math",
@@ -1961,6 +2039,73 @@
             "time": "2025-02-03T10:55:03+00:00"
         },
         {
+            "name": "knplabs/knp-snappy",
+            "version": "v1.5.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/KnpLabs/snappy.git",
+                "reference": "3dd138e9e47de91cd2e056c5e6e1a0dd72547ee7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/KnpLabs/snappy/zipball/3dd138e9e47de91cd2e056c5e6e1a0dd72547ee7",
+                "reference": "3dd138e9e47de91cd2e056c5e6e1a0dd72547ee7",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1",
+                "psr/log": "^2.0||^3.0",
+                "symfony/process": "^5.0||^6.0||^7.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.0",
+                "pedrotroller/php-cs-custom-fixer": "^2.19",
+                "phpstan/phpstan": "^1.0.0",
+                "phpstan/phpstan-phpunit": "^1.0.0",
+                "phpunit/phpunit": "^8.5"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Knp\\Snappy\\": "src/Knp/Snappy"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "KNP Labs Team",
+                    "homepage": "http://knplabs.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "http://github.com/KnpLabs/snappy/contributors"
+                }
+            ],
+            "description": "PHP library allowing thumbnail, snapshot or PDF generation from a url or a html page. Wrapper for wkhtmltopdf/wkhtmltoimage.",
+            "homepage": "http://github.com/KnpLabs/snappy",
+            "keywords": [
+                "knp",
+                "knplabs",
+                "pdf",
+                "snapshot",
+                "thumbnail",
+                "wkhtmltopdf"
+            ],
+            "support": {
+                "issues": "https://github.com/KnpLabs/snappy/issues",
+                "source": "https://github.com/KnpLabs/snappy/tree/v1.5.1"
+            },
+            "time": "2025-01-06T16:53:26+00:00"
+        },
+        {
             "name": "ladumor/laravel-pwa",
             "version": "v0.0.4",
             "source": {
@@ -3011,6 +3156,18 @@
         },
         {
             "name": "maennchen/zipstream-php",
+<<<<<<< HEAD
+            "version": "3.1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/maennchen/ZipStream-PHP.git",
+                "reference": "6187e9cc4493da94b9b63eb2315821552015fca9"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/maennchen/ZipStream-PHP/zipball/6187e9cc4493da94b9b63eb2315821552015fca9",
+                "reference": "6187e9cc4493da94b9b63eb2315821552015fca9",
+=======
             "version": "3.1.2",
             "source": {
                 "type": "git",
@@ -3021,22 +3178,34 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/maennchen/ZipStream-PHP/zipball/aeadcf5c412332eb426c0f9b4485f6accba2a99f",
                 "reference": "aeadcf5c412332eb426c0f9b4485f6accba2a99f",
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
                 "shasum": ""
             },
             "require": {
                 "ext-mbstring": "*",
                 "ext-zlib": "*",
+<<<<<<< HEAD
+                "php-64bit": "^8.1"
+            },
+            "require-dev": {
+=======
                 "php-64bit": "^8.2"
             },
             "require-dev": {
                 "brianium/paratest": "^7.7",
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
                 "ext-zip": "*",
                 "friendsofphp/php-cs-fixer": "^3.16",
                 "guzzlehttp/guzzle": "^7.5",
                 "mikey179/vfsstream": "^1.6",
                 "php-coveralls/php-coveralls": "^2.5",
+<<<<<<< HEAD
+                "phpunit/phpunit": "^10.0",
+                "vimeo/psalm": "^5.0"
+=======
                 "phpunit/phpunit": "^11.0",
                 "vimeo/psalm": "^6.0"
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
             },
             "suggest": {
                 "guzzlehttp/psr7": "^2.4",
@@ -3077,7 +3246,11 @@
             ],
             "support": {
                 "issues": "https://github.com/maennchen/ZipStream-PHP/issues",
+<<<<<<< HEAD
+                "source": "https://github.com/maennchen/ZipStream-PHP/tree/3.1.1"
+=======
                 "source": "https://github.com/maennchen/ZipStream-PHP/tree/3.1.2"
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
             },
             "funding": [
                 {
@@ -3085,7 +3258,11 @@
                     "type": "github"
                 }
             ],
+<<<<<<< HEAD
+            "time": "2024-10-10T12:33:01+00:00"
+=======
             "time": "2025-01-27T12:07:53+00:00"
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
         },
         {
             "name": "markbaker/complex",
@@ -4908,6 +5085,22 @@
         },
         {
             "name": "symfony/css-selector",
+<<<<<<< HEAD
+            "version": "v6.4.13",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/css-selector.git",
+                "reference": "cb23e97813c5837a041b73a6d63a9ddff0778f5e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/css-selector/zipball/cb23e97813c5837a041b73a6d63a9ddff0778f5e",
+                "reference": "cb23e97813c5837a041b73a6d63a9ddff0778f5e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1"
+=======
             "version": "v7.3.0",
             "source": {
                 "type": "git",
@@ -4922,6 +5115,7 @@
             },
             "require": {
                 "php": ">=8.2"
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
             },
             "type": "library",
             "autoload": {
@@ -4953,7 +5147,11 @@
             "description": "Converts CSS selectors to XPath expressions",
             "homepage": "https://symfony.com",
             "support": {
+<<<<<<< HEAD
+                "source": "https://github.com/symfony/css-selector/tree/v6.4.13"
+=======
                 "source": "https://github.com/symfony/css-selector/tree/v7.3.0"
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
             },
             "funding": [
                 {
@@ -4969,7 +5167,11 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
+            "time": "2024-09-25T14:18:03+00:00"
+=======
             "time": "2024-09-25T14:21:43+00:00"
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
         },
         {
             "name": "symfony/deprecation-contracts",
@@ -5115,6 +5317,26 @@
         },
         {
             "name": "symfony/event-dispatcher",
+<<<<<<< HEAD
+            "version": "v6.4.13",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/event-dispatcher.git",
+                "reference": "0ffc48080ab3e9132ea74ef4e09d8dcf26bf897e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/event-dispatcher/zipball/0ffc48080ab3e9132ea74ef4e09d8dcf26bf897e",
+                "reference": "0ffc48080ab3e9132ea74ef4e09d8dcf26bf897e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1",
+                "symfony/event-dispatcher-contracts": "^2.5|^3"
+            },
+            "conflict": {
+                "symfony/dependency-injection": "<5.4",
+=======
             "version": "v7.3.0",
             "source": {
                 "type": "git",
@@ -5133,6 +5355,7 @@
             },
             "conflict": {
                 "symfony/dependency-injection": "<6.4",
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
                 "symfony/service-contracts": "<2.5"
             },
             "provide": {
@@ -5141,6 +5364,15 @@
             },
             "require-dev": {
                 "psr/log": "^1|^2|^3",
+<<<<<<< HEAD
+                "symfony/config": "^5.4|^6.0|^7.0",
+                "symfony/dependency-injection": "^5.4|^6.0|^7.0",
+                "symfony/error-handler": "^5.4|^6.0|^7.0",
+                "symfony/expression-language": "^5.4|^6.0|^7.0",
+                "symfony/http-foundation": "^5.4|^6.0|^7.0",
+                "symfony/service-contracts": "^2.5|^3",
+                "symfony/stopwatch": "^5.4|^6.0|^7.0"
+=======
                 "symfony/config": "^6.4|^7.0",
                 "symfony/dependency-injection": "^6.4|^7.0",
                 "symfony/error-handler": "^6.4|^7.0",
@@ -5148,6 +5380,7 @@
                 "symfony/http-foundation": "^6.4|^7.0",
                 "symfony/service-contracts": "^2.5|^3",
                 "symfony/stopwatch": "^6.4|^7.0"
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
             },
             "type": "library",
             "autoload": {
@@ -5175,7 +5408,11 @@
             "description": "Provides tools that allow your application components to communicate with each other by dispatching events and listening to them",
             "homepage": "https://symfony.com",
             "support": {
+<<<<<<< HEAD
+                "source": "https://github.com/symfony/event-dispatcher/tree/v6.4.13"
+=======
                 "source": "https://github.com/symfony/event-dispatcher/tree/v7.3.0"
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
             },
             "funding": [
                 {
@@ -5191,7 +5428,11 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
+            "time": "2024-09-25T14:18:03+00:00"
+=======
             "time": "2025-04-22T09:11:45+00:00"
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
         },
         {
             "name": "symfony/event-dispatcher-contracts",
@@ -6555,6 +6796,22 @@
         },
         {
             "name": "symfony/string",
+<<<<<<< HEAD
+            "version": "v6.4.21",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/string.git",
+                "reference": "73e2c6966a5aef1d4892873ed5322245295370c6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/string/zipball/73e2c6966a5aef1d4892873ed5322245295370c6",
+                "reference": "73e2c6966a5aef1d4892873ed5322245295370c6",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1",
+=======
             "version": "v7.3.0",
             "source": {
                 "type": "git",
@@ -6569,6 +6826,7 @@
             },
             "require": {
                 "php": ">=8.2",
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
                 "symfony/polyfill-ctype": "~1.8",
                 "symfony/polyfill-intl-grapheme": "~1.0",
                 "symfony/polyfill-intl-normalizer": "~1.0",
@@ -6578,12 +6836,20 @@
                 "symfony/translation-contracts": "<2.5"
             },
             "require-dev": {
+<<<<<<< HEAD
+                "symfony/error-handler": "^5.4|^6.0|^7.0",
+                "symfony/http-client": "^5.4|^6.0|^7.0",
+                "symfony/intl": "^6.2|^7.0",
+                "symfony/translation-contracts": "^2.5|^3.0",
+                "symfony/var-exporter": "^5.4|^6.0|^7.0"
+=======
                 "symfony/emoji": "^7.1",
                 "symfony/error-handler": "^6.4|^7.0",
                 "symfony/http-client": "^6.4|^7.0",
                 "symfony/intl": "^6.4|^7.0",
                 "symfony/translation-contracts": "^2.5|^3.0",
                 "symfony/var-exporter": "^6.4|^7.0"
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
             },
             "type": "library",
             "autoload": {
@@ -6622,7 +6888,11 @@
                 "utf8"
             ],
             "support": {
+<<<<<<< HEAD
+                "source": "https://github.com/symfony/string/tree/v6.4.21"
+=======
                 "source": "https://github.com/symfony/string/tree/v7.3.0"
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
             },
             "funding": [
                 {
@@ -6638,7 +6908,11 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
+            "time": "2025-04-18T15:23:29+00:00"
+=======
             "time": "2025-04-20T20:19:01+00:00"
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
         },
         {
             "name": "symfony/translation",
@@ -7633,16 +7907,16 @@
         },
         {
             "name": "filp/whoops",
-            "version": "2.18.1",
+            "version": "2.18.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/filp/whoops.git",
-                "reference": "8fcc6a862f2e7b94eb4221fd0819ddba3d30ab26"
+                "reference": "89dabca1490bc77dbcab41c2b20968c7e44bf7c3"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/filp/whoops/zipball/8fcc6a862f2e7b94eb4221fd0819ddba3d30ab26",
-                "reference": "8fcc6a862f2e7b94eb4221fd0819ddba3d30ab26",
+                "url": "https://api.github.com/repos/filp/whoops/zipball/89dabca1490bc77dbcab41c2b20968c7e44bf7c3",
+                "reference": "89dabca1490bc77dbcab41c2b20968c7e44bf7c3",
                 "shasum": ""
             },
             "require": {
@@ -7692,7 +7966,7 @@
             ],
             "support": {
                 "issues": "https://github.com/filp/whoops/issues",
-                "source": "https://github.com/filp/whoops/tree/2.18.1"
+                "source": "https://github.com/filp/whoops/tree/2.18.2"
             },
             "funding": [
                 {
@@ -7700,7 +7974,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2025-06-03T18:56:14+00:00"
+            "time": "2025-06-11T20:42:19+00:00"
         },
         {
             "name": "friendsofphp/php-cs-fixer",
@@ -7859,6 +8133,18 @@
         },
         {
             "name": "laravel/pint",
+<<<<<<< HEAD
+            "version": "v1.20.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/laravel/pint.git",
+                "reference": "53072e8ea22213a7ed168a8a15b96fbb8b82d44b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/laravel/pint/zipball/53072e8ea22213a7ed168a8a15b96fbb8b82d44b",
+                "reference": "53072e8ea22213a7ed168a8a15b96fbb8b82d44b",
+=======
             "version": "v1.22.1",
             "source": {
                 "type": "git",
@@ -7869,6 +8155,7 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/laravel/pint/zipball/941d1927c5ca420c22710e98420287169c7bcaf7",
                 "reference": "941d1927c5ca420c22710e98420287169c7bcaf7",
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
                 "shasum": ""
             },
             "require": {
@@ -7876,6 +8163,17 @@
                 "ext-mbstring": "*",
                 "ext-tokenizer": "*",
                 "ext-xml": "*",
+<<<<<<< HEAD
+                "php": "^8.1.0"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^3.66.0",
+                "illuminate/view": "^10.48.25",
+                "larastan/larastan": "^2.9.12",
+                "laravel-zero/framework": "^10.48.25",
+                "mockery/mockery": "^1.6.12",
+                "nunomaduro/termwind": "^1.17.0",
+=======
                 "php": "^8.2.0"
             },
             "require-dev": {
@@ -7885,6 +8183,7 @@
                 "laravel-zero/framework": "^11.36.1",
                 "mockery/mockery": "^1.6.12",
                 "nunomaduro/termwind": "^2.3.1",
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
                 "pestphp/pest": "^2.36.0"
             },
             "bin": [
@@ -7921,7 +8220,11 @@
                 "issues": "https://github.com/laravel/pint/issues",
                 "source": "https://github.com/laravel/pint"
             },
+<<<<<<< HEAD
+            "time": "2025-01-14T16:20:53+00:00"
+=======
             "time": "2025-05-08T08:38:12+00:00"
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
         },
         {
             "name": "laravel/sail",
@@ -10667,6 +10970,22 @@
         },
         {
             "name": "symfony/filesystem",
+<<<<<<< HEAD
+            "version": "v6.4.13",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/filesystem.git",
+                "reference": "4856c9cf585d5a0313d8d35afd681a526f038dd3"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/filesystem/zipball/4856c9cf585d5a0313d8d35afd681a526f038dd3",
+                "reference": "4856c9cf585d5a0313d8d35afd681a526f038dd3",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1",
+=======
             "version": "v7.3.0",
             "source": {
                 "type": "git",
@@ -10681,11 +11000,16 @@
             },
             "require": {
                 "php": ">=8.2",
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
                 "symfony/polyfill-ctype": "~1.8",
                 "symfony/polyfill-mbstring": "~1.8"
             },
             "require-dev": {
+<<<<<<< HEAD
+                "symfony/process": "^5.4|^6.4|^7.0"
+=======
                 "symfony/process": "^6.4|^7.0"
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
             },
             "type": "library",
             "autoload": {
@@ -10713,7 +11037,11 @@
             "description": "Provides basic utilities for the filesystem",
             "homepage": "https://symfony.com",
             "support": {
+<<<<<<< HEAD
+                "source": "https://github.com/symfony/filesystem/tree/v6.4.13"
+=======
                 "source": "https://github.com/symfony/filesystem/tree/v7.3.0"
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
             },
             "funding": [
                 {
@@ -10729,6 +11057,26 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
+            "time": "2024-10-25T15:07:50+00:00"
+        },
+        {
+            "name": "symfony/options-resolver",
+            "version": "v6.4.16",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/options-resolver.git",
+                "reference": "368128ad168f20e22c32159b9f761e456cec0c78"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/options-resolver/zipball/368128ad168f20e22c32159b9f761e456cec0c78",
+                "reference": "368128ad168f20e22c32159b9f761e456cec0c78",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1",
+=======
             "time": "2024-10-25T15:15:23+00:00"
         },
         {
@@ -10747,6 +11095,7 @@
             },
             "require": {
                 "php": ">=8.2",
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
                 "symfony/deprecation-contracts": "^2.5|^3"
             },
             "type": "library",
@@ -10780,7 +11129,11 @@
                 "options"
             ],
             "support": {
+<<<<<<< HEAD
+                "source": "https://github.com/symfony/options-resolver/tree/v6.4.16"
+=======
                 "source": "https://github.com/symfony/options-resolver/tree/v7.3.0"
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
             },
             "funding": [
                 {
@@ -10796,7 +11149,11 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
+            "time": "2024-11-20T10:57:02+00:00"
+=======
             "time": "2025-04-04T13:12:05+00:00"
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
         },
         {
             "name": "symfony/polyfill-php81",
@@ -10876,6 +11233,22 @@
         },
         {
             "name": "symfony/stopwatch",
+<<<<<<< HEAD
+            "version": "v6.4.19",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/stopwatch.git",
+                "reference": "dfe1481c12c06266d0c3d58c0cb4b09bd497ab9c"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/stopwatch/zipball/dfe1481c12c06266d0c3d58c0cb4b09bd497ab9c",
+                "reference": "dfe1481c12c06266d0c3d58c0cb4b09bd497ab9c",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1",
+=======
             "version": "v7.3.0",
             "source": {
                 "type": "git",
@@ -10890,6 +11263,7 @@
             },
             "require": {
                 "php": ">=8.2",
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
                 "symfony/service-contracts": "^2.5|^3"
             },
             "type": "library",
@@ -10918,7 +11292,11 @@
             "description": "Provides a way to profile code",
             "homepage": "https://symfony.com",
             "support": {
+<<<<<<< HEAD
+                "source": "https://github.com/symfony/stopwatch/tree/v6.4.19"
+=======
                 "source": "https://github.com/symfony/stopwatch/tree/v7.3.0"
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
             },
             "funding": [
                 {
@@ -10934,6 +11312,34 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
+            "time": "2025-02-21T10:06:30+00:00"
+        },
+        {
+            "name": "symfony/yaml",
+            "version": "v6.4.21",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/yaml.git",
+                "reference": "f01987f45676778b474468aa266fe2eda1f2bc7e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/yaml/zipball/f01987f45676778b474468aa266fe2eda1f2bc7e",
+                "reference": "f01987f45676778b474468aa266fe2eda1f2bc7e",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1",
+                "symfony/deprecation-contracts": "^2.5|^3",
+                "symfony/polyfill-ctype": "^1.8"
+            },
+            "conflict": {
+                "symfony/console": "<5.4"
+            },
+            "require-dev": {
+                "symfony/console": "^5.4|^6.0|^7.0"
+=======
             "time": "2025-02-24T10:49:57+00:00"
         },
         {
@@ -10960,6 +11366,7 @@
             },
             "require-dev": {
                 "symfony/console": "^6.4|^7.0"
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
             },
             "bin": [
                 "Resources/bin/yaml-lint"
@@ -10990,7 +11397,11 @@
             "description": "Loads and dumps YAML files",
             "homepage": "https://symfony.com",
             "support": {
+<<<<<<< HEAD
+                "source": "https://github.com/symfony/yaml/tree/v6.4.21"
+=======
                 "source": "https://github.com/symfony/yaml/tree/v7.3.0"
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
             },
             "funding": [
                 {
@@ -11006,7 +11417,11 @@
                     "type": "tidelift"
                 }
             ],
+<<<<<<< HEAD
+            "time": "2025-04-04T09:48:44+00:00"
+=======
             "time": "2025-04-04T10:10:33+00:00"
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
         },
         {
             "name": "theseer/tokenizer",
@@ -11061,12 +11476,21 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
+<<<<<<< HEAD
+    "stability-flags": [],
+=======
     "stability-flags": {},
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
         "php": "^8.1"
     },
+<<<<<<< HEAD
+    "platform-dev": [],
+    "plugin-api-version": "2.3.0"
+=======
     "platform-dev": {},
     "plugin-api-version": "2.6.0"
+>>>>>>> 762d1b6 (Menambahkan fitur cetak sertifikat menggunakan dompdf dan juga memperbaiki dashboard ujian)
 }

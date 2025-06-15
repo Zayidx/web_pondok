@@ -2,12 +2,13 @@
 
 @section('content')
 <div>
+    {{-- Bagian Navigasi --}}
     <nav class="bg-white shadow-lg fixed w-full top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <img class="h-10 w-10" src="https://via.placeholder.com/40x40/1e40af/ffffff?text=SMA" alt="Logo SMA" />
+                        <img class="h-10 w-10" src="{{ asset('dist/assets/compiled/jpg/1.jpg') }}" alt="Logo SMA" />
                     </div>
                     <div class="ml-3">
                         <h1 class="text-xl font-bold text-primary">SMA Bina Prestasi</h1>
@@ -19,11 +20,19 @@
                         <a href="{{ route('santri.dashboard-ujian') }}" class="text-primary px-3 py-2 rounded-md text-sm font-medium bg-blue-50">Dashboard Ujian</a>
                         <a href="#" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition duration-300">Profil</a>
                         <a href="#" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition duration-300">Bantuan</a>
-                        <button type="button" wire:click="logout" wire:loading.attr="disabled" class="flex items-center gap-2 bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-600 transition duration-300">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span wire:loading.remove>Keluar</span>
-                            <span wire:loading>Memproses...</span>
-                        </button>
+                        <div class="flex items-center gap-4">
+                            <a href="{{ route('santri.dashboard-ujian') }}" class="btn btn-primary">
+                                <i class="bi bi-grid-fill me-2"></i>
+                                Dashboard
+                            </a>
+                            <form action="{{ route('logout-ppdb-santri') }}" method="POST" class="inline">
+                                @csrf
+                                <button type="submit" class="btn btn-danger">
+                                    <i class="bi bi-box-arrow-right me-2"></i>
+                                    Logout
+                                </button>
+                            </form>
+                        </div>
                     </div>
                 </div>
                 <div class="md:hidden">
@@ -47,6 +56,7 @@
         </div>
     </nav>
 
+    {{-- Notifikasi Session --}}
     @if (session()->has('message'))
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-20">
         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
@@ -63,23 +73,23 @@
     </div>
     @endif
 
+    {{-- Header Dashboard --}}
     <section class="bg-gradient-to-br from-blue-50 to-indigo-100 pt-20 pb-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center">
                 <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">Dashboard Penerimaan Siswa Baru</h1>
                 <p class="text-lg text-gray-600 mb-6">Pantau status pendaftaran dan perkembangan seleksi Anda</p>
                 <div class="bg-white p-4 rounded-lg shadow-md inline-block">
-                    <div class="flex items-center justify-center">
-                        <div class="text-center">
-                            <p class="text-sm text-gray-600">Nomor Pendaftaran</p>
-                            <p class="text-xl font-bold text-primary">{{ $santri->no_pendaftaran ?? 'PPDB2025001234' }}</p>
-                        </div>
+                    <div class="text-center">
+                        <p class="text-sm text-gray-600">Nomor Pendaftaran</p>
+                        <p class="text-xl font-bold text-primary">{{ $santri->id ?? 'PPDB2025001234' }}</p>
                     </div>
                 </div>
             </div>
         </div>
     </section>
 
+    {{-- Informasi Siswa --}}
     <section class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
@@ -125,6 +135,7 @@
         </div>
     </section>
 
+    {{-- Timeline Seleksi --}}
     <section class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
@@ -140,6 +151,7 @@
                 <div class="relative">
                     <div class="absolute left-8 top-0 bottom-0 w-1 bg-gray-300"></div>
                     <div class="space-y-8">
+                        {{-- Tahap Pendaftaran Online --}}
                         <div class="relative flex items-center">
                             <div class="bg-green-500 p-6 rounded-full text-white z-10">
                                 <i class="fas fa-check text-lg"></i>
@@ -151,6 +163,7 @@
                             </div>
                         </div>
 
+                        {{-- Tahap Wawancara --}}
                         <div class="relative flex items-center">
                             @php
                                 $showAsCompleted = $santri->status_santri === 'daftar_ulang' || $timelineStatus['wawancara']['completed'];
@@ -186,6 +199,7 @@
                             </div>
                         </div>
 
+                        {{-- Tahap Ujian Online --}}
                         <div class="relative flex items-center">
                             @php
                                 $showAsCompleted = $santri->status_santri === 'daftar_ulang' || $timelineStatus['ujian']['completed'];
@@ -215,14 +229,55 @@
                             </div>
                         </div>
 
+                        {{-- --- BAGIAN DAFTAR ULANG YANG DIPERBAIKI --- --}}
                         <div class="relative flex items-center mt-8">
-                            <div class="{{ $timelineStatus['daftar_ulang']['completed'] ? 'bg-green-500' : ($timelineStatus['daftar_ulang']['current'] ? 'bg-yellow-500 animate-pulse' : 'bg-gray-300') }} p-6 rounded-full text-white z-10">
+                            @php
+                                $daftarUlangStatusClass = 'bg-gray-300'; // Default
+                                if ($timelineStatus['daftar_ulang']['completed']) {
+                                    $daftarUlangStatusClass = 'bg-green-500'; // Sudah selesai dan terverifikasi
+                                } elseif ($timelineStatus['daftar_ulang']['current']) {
+                                    if ($santri->status_santri === 'diterima' || ($santri->status_santri === 'daftar_ulang' && !$santri->status_pembayaran)) {
+                                        $daftarUlangStatusClass = 'bg-green-500'; // Tahap aktif (diterima) -> HIJAU
+                                    } elseif ($santri->status_pembayaran === 'pending') {
+                                        $daftarUlangStatusClass = 'bg-yellow-500 animate-pulse'; // Menunggu verifikasi -> KUNING
+                                    } elseif ($santri->status_pembayaran === 'rejected') {
+                                        $daftarUlangStatusClass = 'bg-red-500'; // Ditolak -> MERAH
+                                    }
+                                }
+                            @endphp
+                            <div class="{{ $daftarUlangStatusClass }} p-6 rounded-full text-white z-10">
                                 <i class="fas {{ $timelineStatus['daftar_ulang']['completed'] ? 'fa-check' : 'fa-clipboard-list' }} text-lg"></i>
                             </div>
                             <div class="ml-6">
-                                <h3 class="text-lg font-semibold {{ $timelineStatus['daftar_ulang']['completed'] ? 'text-gray-900' : ($timelineStatus['daftar_ulang']['current'] ? 'text-gray-900' : 'text-gray-500') }}">Daftar Ulang</h3>
-                                @if($timelineStatus['daftar_ulang']['current'])
-                                    @if($santri->status_pembayaran === 'rejected')
+                                <h3 class="text-lg font-semibold {{ $timelineStatus['daftar_ulang']['completed'] || $timelineStatus['daftar_ulang']['current'] ? 'text-gray-900' : 'text-gray-500' }}">Daftar Ulang</h3>
+                                
+                                @if($timelineStatus['daftar_ulang']['completed'])
+                                    <p class="text-green-600">Pendaftaran ulang telah diverifikasi</p>
+                                    @if($timelineStatus['daftar_ulang']['date'])
+                                    <p class="text-sm text-gray-600 font-medium">
+                                        <i class="fas fa-calendar-alt mr-1"></i>
+                                        {{ $timelineStatus['daftar_ulang']['date'] }}
+                                    </p>
+                                    @endif
+                                @elseif($timelineStatus['daftar_ulang']['current'])
+                                    
+                                    @if($santri->status_santri === 'diterima')
+                                        <p class="text-green-600 font-semibold">Selamat! Anda dinyatakan LULUS.</p>
+                                        @if($santri->tanggal_pembayaran)
+                                            <div class="mt-2 bg-blue-50 p-3 rounded-lg">
+                                                <p class="text-sm text-blue-800 font-medium">
+                                                    <i class="fas fa-calendar-check mr-2"></i>
+                                                    Pembayaran dilakukan pada: <span class="font-bold">{{ \Carbon\Carbon::parse($santri->tanggal_pembayaran)->format('d F Y') }}</span>
+                                                </p>
+                                            </div>
+                                        @else
+                                            <p class="text-sm text-gray-500 mt-2">
+                                                <i class="fas fa-info-circle mr-1"></i>
+                                                Informasi daftar ulang dan pembayaran akan segera diinformasikan.
+                                            </p>
+                                        @endif
+
+                                    @elseif($santri->status_pembayaran === 'rejected')
                                         <p class="text-red-600">Verifikasi pembayaran ditolak</p>
                                         @if($santri->catatan_verifikasi)
                                             <p class="text-sm text-gray-600 mb-2">
@@ -243,43 +298,52 @@
                                         </p>
                                     @else
                                         <p class="text-gray-600">Silakan melakukan pendaftaran ulang</p>
+                                        @if($timelineStatus['daftar_ulang']['deadline'])
+                                            <p class="text-sm text-red-600 font-medium mt-1">
+                                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                                Batas akhir: {{ $timelineStatus['daftar_ulang']['deadline'] }}
+                                            </p>
+                                        @endif
                                         <a href="{{ route('santri.daftar-ulang') }}" class="inline-block mt-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition duration-300">
                                             <i class="fas fa-clipboard-check mr-2"></i>
                                             Menuju Halaman Daftar Ulang
                                         </a>
                                     @endif
-                                @elseif($timelineStatus['daftar_ulang']['completed'])
-                                    <p class="text-green-600">Pendaftaran ulang telah diverifikasi</p>
-                                    <p class="text-sm text-gray-600 font-medium">
-                                        <i class="fas fa-calendar-alt mr-1"></i>
-                                        {{ $timelineStatus['daftar_ulang']['date'] }}
-                                    </p>
                                 @else
                                     <p class="text-gray-600">Menunggu tahap daftar ulang</p>
                                 @endif
                             </div>
                         </div>
 
+                        {{-- Tahap Pengumuman Hasil --}}
                         <div class="relative flex items-center">
-                            <div class="{{ isset($timelineStatus['pengumuman_hasil']) && $timelineStatus['pengumuman_hasil']['completed'] ? 'bg-green-500' : 'bg-gray-300' }} p-6 rounded-full text-white z-10">
-                                <i class="fas {{ isset($timelineStatus['pengumuman_hasil']) && $timelineStatus['pengumuman_hasil']['completed'] ? 'fa-check' : 'fa-bullhorn' }} text-lg"></i>
+                            {{-- AWAL PERUBAHAN: Logika diubah agar Pengumuman Hasil menjadi abu-abu saat status 'daftar_ulang' --}}
+                            @php
+                                // Logika kustom: Pengumuman hasil dianggap final (hijau) hanya jika status BUKAN 'daftar_ulang'.
+                                // Ini untuk menandakan bahwa proses belum selesai sepenuhnya hingga daftar ulang diverifikasi.
+                                $isResultFinal = isset($timelineStatus['pengumuman_hasil']) && $timelineStatus['pengumuman_hasil']['completed'] && $santri->status_santri !== 'daftar_ulang';
+                            @endphp
+                            <div class="{{ $isResultFinal ? 'bg-green-500' : 'bg-gray-300' }} p-6 rounded-full text-white z-10">
+                                <i class="fas {{ $isResultFinal ? 'fa-check' : 'fa-bullhorn' }} text-lg"></i>
                             </div>
                             <div class="ml-6">
-                                <h3 class="text-lg font-semibold {{ isset($timelineStatus['pengumuman_hasil']) && $timelineStatus['pengumuman_hasil']['completed'] ? 'text-gray-900' : 'text-gray-500' }}">Pengumuman Hasil</h3>
-                                @if(isset($timelineStatus['pengumuman_hasil']) && $timelineStatus['pengumuman_hasil']['completed'])
-                                <p class="text-{{ isset($timelineStatus['pengumuman_hasil']['status']) && $timelineStatus['pengumuman_hasil']['status'] == 'diterima' ? 'green' : 'red' }}-600">
-                                    {{ isset($timelineStatus['pengumuman_hasil']['status']) && $timelineStatus['pengumuman_hasil']['status'] == 'diterima' ? 'Selamat! Anda dinyatakan DITERIMA' : 'Mohon maaf, Anda belum diterima' }}
-                                </p>
-                                @if(isset($timelineStatus['pengumuman_hasil']['date']))
-                                <p class="text-sm text-gray-600 font-medium">
-                                    <i class="fas fa-calendar-alt mr-1"></i>
-                                    {{ $timelineStatus['pengumuman_hasil']['date'] }}
-                                </p>
-                                @endif
+                                <h3 class="text-lg font-semibold {{ $isResultFinal ? 'text-gray-900' : 'text-gray-500' }}">Pengumuman Hasil</h3>
+                                @if($isResultFinal)
+                                    <p class="text-{{ $timelineStatus['pengumuman_hasil']['status'] == 'diterima' ? 'green' : 'red' }}-600">
+                                        {{ $timelineStatus['pengumuman_hasil']['status'] == 'diterima' ? 'Selamat! Anda dinyatakan DITERIMA' : 'Mohon maaf, Anda belum diterima' }}
+                                    </p>
+                                    @if(isset($timelineStatus['pengumuman_hasil']['date']))
+                                    <p class="text-sm text-gray-600 font-medium">
+                                        <i class="fas fa-calendar-alt mr-1"></i>
+                                        {{ $timelineStatus['pengumuman_hasil']['date'] }}
+                                    </p>
+                                    @endif
                                 @else
-                                <p class="text-gray-500">Menunggu hasil seleksi</p>
+                                    {{-- Pesan ini ditampilkan saat status 'daftar_ulang', menandakan hasil belum final. --}}
+                                    <p class="text-gray-500">Menunggu verifikasi daftar ulang untuk pengumuman final</p>
                                 @endif
                             </div>
+                            {{-- AKHIR PERUBAHAN --}}
                         </div>
                     </div>
                 </div>
@@ -287,6 +351,7 @@
         </div>
     </section>
 
+    {{-- Kartu Status Pendaftaran --}}
     <section class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white rounded-lg shadow-lg p-6">
@@ -380,12 +445,13 @@
                     <h3 class="text-xl font-bold text-gray-900 mb-2">Selamat! Anda Diterima</h3>
                     <p class="text-gray-600 mb-4">Anda dinyatakan LULUS dan diterima di SMA Bina Prestasi. Silakan Download bukti penerimaan di bawah ini.</p>
                     
-                    {{-- Ganti button wire:click dengan link ke komponen Livewire baru --}}
-                    <a href="{{ route('psb.cetak-penerimaan', ['registrationId' => $santri->id]) }}"
-                       target="_blank" {{-- Buka di tab baru --}}
-                       class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 transform hover:scale-105">
-                        <i class="fas fa-file-pdf mr-3"></i> Unduh Surat Penerimaan (PDF)
-                    </a>
+                    <form action="{{ route('psb.download-penerimaan-pdf', ['santriId' => $santri->id]) }}" method="GET" class="inline">
+                        <button type="submit" 
+                                class="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 transform hover:scale-105">
+                            <i class="fas fa-file-pdf mr-3"></i>
+                            Unduh Surat Penerimaan (PDF)
+                        </button>
+                    </form>
                     
                     <div class="bg-green-50 p-4 rounded-lg mt-4">
                         <p class="text-sm text-green-800 font-medium">
@@ -420,6 +486,11 @@
                                 <i class="fas fa-clock text-yellow-600 text-2xl"></i>
                             </div>
                             <span class="bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">Menunggu Verifikasi</span>
+                        @elseif($santri->status_pembayaran === 'verified')
+                            <div class="bg-green-100 p-3 rounded-full">
+                                <i class="fas fa-check-circle text-green-600 text-2xl"></i>
+                            </div>
+                            <span class="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">Terverifikasi</span>
                         @else
                             <div class="bg-blue-100 p-3 rounded-full">
                                 <i class="fas fa-clipboard-list text-blue-600 text-2xl"></i>
@@ -452,12 +523,47 @@
                                 Kami akan menginformasikan hasil verifikasi melalui email dan WhatsApp.
                             </p>
                         </div>
+                        @if($santri->bukti_pembayaran)
+                            <button wire:click="viewPaymentProof({{ $santri->id }})" class="mt-4 inline-block px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300">
+                                <i class="fas fa-eye mr-2"></i>
+                                Lihat Bukti Pembayaran
+                            </button>
+                        @endif
+                    @elseif($santri->status_pembayaran === 'verified')
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Pembayaran Terverifikasi</h3>
+                        <p class="text-gray-600 mb-4">Selamat! Pembayaran Anda telah diverifikasi. Anda telah resmi menjadi siswa SMA Bina Prestasi.</p>
+                        <div class="bg-green-50 p-4 rounded-lg">
+                            <p class="text-sm text-green-800 font-medium">
+                                <i class="fas fa-check-circle mr-2"></i>
+                                Informasi selanjutnya akan dikirimkan melalui email dan WhatsApp.
+                            </p>
+                        </div>
+                        @if($santri->bukti_pembayaran)
+                            <button wire:click="viewPaymentProof({{ $santri->id }})" class="mt-4 inline-block px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300">
+                                <i class="fas fa-eye mr-2"></i>
+                                Lihat Bukti Pembayaran
+                            </button>
+                        @endif
+                    @else
+                        <h3 class="text-xl font-bold text-gray-900 mb-2">Daftar Ulang</h3>
+                        <p class="text-gray-600 mb-4">Silakan lakukan pembayaran sesuai dengan rincian biaya yang telah ditentukan.</p>
+                        <div class="bg-blue-50 p-4 rounded-lg mb-4">
+                            <p class="text-sm text-blue-800 font-medium">
+                                <i class="fas fa-info-circle mr-2"></i>
+                                Setelah melakukan pembayaran, silakan upload bukti pembayaran Anda.
+                            </p>
+                        </div>
+                        <a href="{{ route('santri.daftar-ulang') }}" class="inline-block px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition duration-300">
+                            <i class="fas fa-money-bill-wave mr-2"></i>
+                            Melakukan Pembayaran
+                        </a>
                     @endif
-                @endif {{-- Ini adalah penutup untuk @if($santri->status_santri == 'daftar_ulang') --}}
+                @endif
             </div>
         </div>
     </section>
 
+    {{-- Informasi Penting & Kontak --}}
     <section class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
@@ -517,11 +623,12 @@
         </div>
     </section>
 
+    {{-- Footer --}}
     <footer class="bg-gray-900 text-white py-8 mt-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center">
                 <div class="flex items-center justify-center mb-4">
-                    <img class="h-10 w-10 mr-3" src="https://via.placeholder.com/40x40/1e40af/ffffff?text=SMA" alt="Logo SMA" />
+                    <img class="h-10 w-10 mr-3" src="{{ asset('dist/assets/compiled/jpg/1.jpg') }}" alt="Logo SMA" />
                     <h3 class="text-xl font-bold">SMA Bina Prestasi</h3>
                 </div>
                 <p class="text-gray-400 mb-4">Dashboard Penerimaan Siswa Baru Tahun Ajaran 2025/2026</p>
@@ -530,46 +637,79 @@
         </div>
     </footer>
 
-
+    {{-- Modal Bukti Pembayaran --}}
+    <div x-data="{ show: false }" 
+         x-show="show" 
+         x-on:open-modal.window="show = true"
+         x-on:close-modal.window="show = false"
+         x-transition:enter="transition ease-out duration-300"
+         x-transition:enter-start="opacity-0"
+         x-transition:enter-end="opacity-100"
+         x-transition:leave="transition ease-in duration-200"
+         x-transition:leave-start="opacity-100"
+         x-transition:leave-end="opacity-0"
+         class="fixed inset-0 z-50 overflow-y-auto" 
+         style="display: none;">
+        <div class="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+            </div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900 mb-4">
+                                Bukti Pembayaran
+                            </h3>
+                            @if($santri && $santri->bukti_pembayaran)
+                                <div class="mt-2">
+                                    <img src="{{ Storage::url($santri->bukti_pembayaran) }}" 
+                                         alt="Bukti Pembayaran" 
+                                         class="w-full h-auto rounded-lg">
+                                </div>
+                            @else
+                                <p class="text-gray-500">Bukti pembayaran tidak tersedia</p>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                    <button type="button" 
+                            @click="show = false"
+                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                        Tutup
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
 @endsection
 
-{{-- Hapus atau Komentar bagian JavaScript ini karena sudah tidak relevan dengan alur baru --}}
-{{--
 @push('scripts')
 <script>
-    Livewire.on('downloadPdf', (data) => {
-        const htmlContent = data.html;
-        const fileName = data.fileName;
+    document.addEventListener('livewire:initialized', () => {
+        Livewire.on('openPdfInNewTab', (data) => {
+            console.log('openPdfInNewTab event received:', data);
+            try {
+                const url = data[0].url;
+                window.open(url, '_blank');
+                console.log('PDF download initiated in new tab for URL:', url);
+            } catch (error) {
+                console.error('Error opening PDF in new tab:', error);
+                Livewire.dispatch('showError', { message: 'Gagal mengunduh PDF. Silakan coba lagi.' });
+            }
+        });
 
-        const form = document.createElement('form');
-        form.method = 'POST';
-        form.action = '{{ route('download-certificate-pdf') }}';
-        form.target = '_blank';
+        Livewire.on('showError', (data) => {
+            alert(data.message);
+        });
 
-        const csrfToken = document.createElement('input');
-        csrfToken.type = 'hidden';
-        csrfToken.name = '_token';
-        csrfToken.value = '{{ csrf_token() }}';
-        form.appendChild(csrfToken);
-
-        const htmlInput = document.createElement('input');
-        htmlInput.type = 'hidden';
-        htmlInput.name = 'html_content';
-        htmlInput.value = htmlContent;
-        form.appendChild(htmlInput);
-
-        const fileNameInput = document.createElement('input');
-        fileNameInput.type = 'hidden';
-        fileNameInput.name = 'file_name';
-        fileNameInput.value = fileName;
-        form.appendChild(fileNameInput);
-
-        document.body.appendChild(form);
-        form.submit();
-        document.body.removeChild(form);
+        Livewire.on('redirect', (data) => {
+            window.location.href = data.url;
+        });
     });
 </script>
 @endpush
---}}

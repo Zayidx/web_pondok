@@ -191,16 +191,17 @@ return new class extends Migration
 
         Schema::create('jadwal_pelajaran', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('jenjang_id')->constrained('jenjangs')->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('kelas_id')->constrained('kelas')->onUpdate('cascade')->onDelete('cascade');
             $table->foreignId('kategori_pelajaran_id')->constrained('kategori_pelajaran')->onUpdate('cascade')->onDelete('cascade');
             $table->string('mata_pelajaran');
             $table->time('waktu_mulai');
             $table->time('waktu_selesai');
-            $table->enum('hari', ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu']);
+            $table->enum('hari', ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu']);
             $table->enum('role_guru', ['diniyyah', 'umum'])->default('umum');
-            $table->timestamps();   
+            $table->timestamps();
         });
-        
+
         Schema::create('tahun_ajarans', function (Blueprint $table) {
             $table->string('nama_tahun')->primary();
             $table->timestamps();
@@ -208,7 +209,7 @@ return new class extends Migration
     }
 
     /**
-     * Reverse the migrations.  
+     * Reverse the migrations.
      */
     public function down(): void
     {

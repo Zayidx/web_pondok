@@ -35,6 +35,12 @@
             <span>List Daftar Ulang</span>
         </a>
     </li>
+    <li class="sidebar-item {{ Request::routeIs('ppdb.daftar-ulang-settings') ? 'active' : '' }}">
+        <a href="{{ route('ppdb.daftar-ulang-settings') }}" wire:navigate class='sidebar-link'>
+        <i class="bi bi-gear"></i>
+            <span>Pengaturan Daftar Ulang</span>
+        </a>
+    </li>
 
     
     <li class="sidebar-item {{ Request::routeIs('admin.master-ujian.dashboard') ? 'active' : '' }}">
@@ -47,6 +53,13 @@
         <a href="{{ route('admin.psb.ujian.hasil') }}" wire:navigate class='sidebar-link'>
             <i class="bi bi-file-earmark-check-fill"></i> {{-- Icon dari Master Ujian --}}
             <span>Hasil Ujian Santri</span>
+        </a>
+    </li>
+
+    <li class="sidebar-item {{ Request::routeIs('admin.master-psb.sertifikat') ? 'active' : '' }}">
+        <a href="{{ route('admin.master-psb.sertifikat') }}" wire:navigate class='sidebar-link'>
+            <i class="bi bi-file-earmark-text"></i>
+            <span>Template Sertifikat</span>
         </a>
     </li>
 </ul>
