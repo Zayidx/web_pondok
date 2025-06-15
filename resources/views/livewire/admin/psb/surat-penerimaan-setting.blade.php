@@ -35,9 +35,9 @@
                         <div class="form-group mb-3">
                             <label>Logo Pesantren</label>
                             <div class="d-flex align-items-center gap-3">
-                                @if($settings->logo)
-                                    <img src="{{ Storage::url($settings->logo) }}" alt="Logo" class="img-thumbnail" style="height: 60px">
-                                @endif
+                            @if($settings->logo_base64)
+    <img src="{{ $settings->logo_base64 }}" width="140px">
+@endif
                                 <input type="file" class="form-control" wire:model="logo" accept="image/*">
                             </div>
                             @error('logo') <span class="text-danger">{{ $message }}</span> @enderror
@@ -46,9 +46,9 @@
                         <div class="form-group mb-3">
                             <label>Stempel Pesantren</label>
                             <div class="d-flex align-items-center gap-3">
-                                @if($settings->stempel)
-                                    <img src="{{ Storage::url($settings->stempel) }}" alt="Stempel" class="img-thumbnail" style="height: 60px">
-                                @endif
+                            @if($settings->stempel_base64)
+    <img src="{{ $settings->stempel_base64 }}" width="140px">
+@endif
                                 <input type="file" class="form-control" wire:model="stempel" accept="image/*">
                             </div>
                             @error('stempel') <span class="text-danger">{{ $message }}</span> @enderror

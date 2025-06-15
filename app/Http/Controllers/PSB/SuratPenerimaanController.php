@@ -6,75 +6,88 @@ use App\Http\Controllers\Controller;
 use App\Models\PSB\PendaftaranSantri;
 use App\Models\PSB\SuratPenerimaanSetting;
 use Illuminate\Http\Request;
+use Carbon\Carbon; // <-- Tambahkan ini
 use Barryvdh\DomPDF\Facade\Pdf;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\File;
+
 
 class SuratPenerimaanController extends Controller
 {
-    private function getBase64Image($path)
-    {
-        if (!$path) return null;
-        
-        try {
-            $imagePath = Storage::path(str_replace('public/', '', $path));
-            if (file_exists($imagePath)) {
-                $imageData = file_get_contents($imagePath);
-                $base64 = base64_encode($imageData);
-                $mime = mime_content_type($imagePath);
-                return "data:{$mime};base64,{$base64}";
-            }
-        } catch (\Exception $e) {
-            return null;
-        }
-        
-        return null;
-    }
+    /**
+     * Fungsi private untuk mengubah gambar menjadi string Base64.
+     * Base64 diperlukan agar gambar bisa langsung disematkan (embed) ke dalam file PDF
+     * tanpa perlu memuatnya dari URL eksternal.
+     *
+     * @param string|null $path Path file yang tersimpan di File.
+     * @return string|null String Base64 atau null jika gagal.
+     */
+    /**
+     * Mengubah path gambar menjadi string Base64.
+     */
+   
 
     /**
-     * Menampilkan halaman preview sertifikat
+     * Menampilkan halaman preview sertifikat (bukan PDF, tapi halaman HTML biasa).
+     * @param int $id ID pendaftaran santri.
      */
     public function previewPage($id)
     {
+        // Mencari data santri berdasarkan ID, akan gagal jika tidak ditemukan.
         $data = PendaftaranSantri::findOrFail($id);
+        // Mengambil baris pertama dari pengaturan surat penerimaan.
         $settings = SuratPenerimaanSetting::first();
 
+        // Jika pengaturan tidak ada di database, kembalikan ke halaman sebelumnya dengan pesan error.
         if (!$settings) {
             return redirect()->route('psb.check-status')->with('error', 'Pengaturan surat penerimaan belum dikonfigurasi.');
         }
 
-        // Convert images to base64
-        $settings->logo_base64 = $this->getBase64Image($settings->logo);
-        $settings->stempel_base64 = $this->getBase64Image($settings->stempel);
+      // PERBAIKAN: Menggunakan File::get() untuk konsistensi dan praktik terbaik.
+      $settings->logo_base64 = base64_encode(File::get($settings->logo));
+     
 
+
+        // Menampilkan view 'psb.preview-sertifikat' dengan data santri dan pengaturan.
         return view('psb.preview-sertifikat', compact('data', 'settings'));
     }
 
     /**
-     * Menampilkan preview surat penerimaan
+     * Menampilkan preview surat penerimaan dalam bentuk PDF di browser (stream).
+     * @param int $id ID pendaftaran santri.
      */
     public function preview($id)
     {
+        // Mencari data santri berdasarkan ID.
         $data = PendaftaranSantri::findOrFail($id);
+        // Mengambil pengaturan surat.
         $settings = SuratPenerimaanSetting::first();
 
+        // Memeriksa apakah pengaturan ada.
         if (!$settings) {
             return redirect()->route('psb.check-status')->with('error', 'Pengaturan surat penerimaan belum dikonfigurasi.');
         }
 
-        // Convert images to base64
-        $settings->logo_base64 = $this->getBase64Image($settings->logo);
-        $settings->stempel_base64 = $this->getBase64Image($settings->stempel);
+       // PERBAIKAN: Menggunakan File::get() untuk konsistensi dan praktik terbaik.
+       $settings->logo_base64 = base64_encode(File::get($settings->logo));
+       $settings->ttd_direktur_base64 = base64_encode(File::get($settings->ttd_direktur));
+       $settings->stempel_ttd_admin = base64_encode(File::get($settings->ttd_admin));
 
+
+        // Memuat view blade yang akan dijadikan PDF.
         $pdf = PDF::loadView('psb.surat-penerimaan', compact('data', 'settings'));
+        // Mengatur ukuran kertas menjadi A4 dengan orientasi potret.
         $pdf->setPaper('a4', 'portrait');
+        // Menampilkan PDF di browser tanpa mengunduhnya.
         return $pdf->stream('surat-penerimaan.pdf');
     }
 
     /**
-     * Mengunduh surat penerimaan dalam format PDF
+     * Mengunduh surat penerimaan dalam format PDF.
+     * @param int $id ID pendaftaran santri.
      */
     public function download($id)
     {
+        // Logika di sini identik dengan fungsi preview, hanya berbeda di bagian akhir.
         $data = PendaftaranSantri::findOrFail($id);
         $settings = SuratPenerimaanSetting::first();
 
@@ -82,20 +95,26 @@ class SuratPenerimaanController extends Controller
             return redirect()->route('psb.check-status')->with('error', 'Pengaturan surat penerimaan belum dikonfigurasi.');
         }
 
-        // Convert images to base64
-        $settings->logo_base64 = $this->getBase64Image($settings->logo);
-        $settings->stempel_base64 = $this->getBase64Image($settings->stempel);
+  
+         // PERBAIKAN: Menggunakan File::get() untuk konsistensi dan praktik terbaik.
+         $settings->logo_base64 = base64_encode(File::get($settings->logo));
+         $settings->ttd_direktur_base64 = base64_encode(File::get($settings->ttd_direktur));
+         $settings->stempel_ttd_admin = base64_encode(File::get($settings->ttd_admin));
+ 
 
         $pdf = PDF::loadView('psb.surat-penerimaan', compact('data', 'settings'));
         $pdf->setPaper('a4', 'portrait');
+        // Memulai proses unduh file PDF dengan nama file yang dinamis.
         return $pdf->download('surat-penerimaan-' . $data->nama_lengkap . '.pdf');
     }
 
     /**
-     * Mencetak surat penerimaan
+     * Mencetak surat penerimaan (biasanya membuka dialog print di browser).
+     * @param int $id ID pendaftaran santri.
      */
     public function print($id)
     {
+        // Logika di sini juga identik dengan fungsi preview.
         $data = PendaftaranSantri::findOrFail($id);
         $settings = SuratPenerimaanSetting::first();
 
@@ -103,12 +122,15 @@ class SuratPenerimaanController extends Controller
             return redirect()->route('psb.check-status')->with('error', 'Pengaturan surat penerimaan belum dikonfigurasi.');
         }
 
-        // Convert images to base64
-        $settings->logo_base64 = $this->getBase64Image($settings->logo);
-        $settings->stempel_base64 = $this->getBase64Image($settings->stempel);
+     // PERBAIKAN: Menggunakan File::get() untuk konsistensi dan praktik terbaik.
+     $settings->logo_base64 = base64_encode(File::get($settings->logo));
+     $settings->ttd_direktur_base64 = base64_encode(File::get($settings->ttd_direktur));
+     $settings->stempel_ttd_admin = base64_encode(File::get($settings->ttd_admin));
+
 
         $pdf = PDF::loadView('psb.surat-penerimaan', compact('data', 'settings'));
         $pdf->setPaper('a4', 'portrait');
+        // Stream PDF ke browser, yang biasanya akan memicu dialog cetak jika dibuka di tab baru.
         return $pdf->stream('surat-penerimaan.pdf');
     }
-} 
+}

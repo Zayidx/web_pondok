@@ -1,239 +1,183 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
     <title>Surat Penerimaan - {{ $data->nama_lengkap }}</title>
     <style>
         @page {
-            size: A4;
-            margin: 0;
+            margin: 20mm 20mm 20mm 20mm;
         }
         
         body {
             font-family: 'Times New Roman', Times, serif;
+            font-size: 12pt;
+            color: #333;
+        }
+
+        .header-table {
+            width: 100%;
+            border-bottom: 3px double #000;
+        }
+
+        .header-table td {
+            padding: 5px;
+            vertical-align: middle;
+        }
+
+        .logo {
+            width: 75px;
+            height: auto;
+        }
+
+        .kop-surat {
+            text-align: center;
+        }
+
+        .kop-surat .nama-pesantren {
+            font-size: 16pt;
+            font-weight: bold;
+        }
+
+        .kop-surat .nama-yayasan {
+            font-size: 14pt;
+        }
+
+        .kop-surat .alamat {
+            font-size: 10pt;
+        }
+
+        .surat-title {
+            text-align: center;
+            margin-top: 25px;
+            margin-bottom: 25px;
+        }
+
+        .surat-title h3 {
+            font-size: 14pt;
+            text-decoration: underline;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .surat-title p {
+            font-size: 12pt;
             margin: 0;
             padding: 0;
         }
 
-        .a4-page {
-            width: 210mm;
-            height: 297mm;
-            margin: 0 auto;
-            background: white;
-            position: relative;
-            overflow: hidden;
+        .data-table {
+            width: 100%;
+            margin-top: 15px;
+            margin-bottom: 15px;
         }
 
-        .ornament-corner {
-            position: absolute;
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(45deg, #3b82f6, #1d4ed8);
-            clip-path: polygon(0 0, 100% 0, 0 100%);
+        .data-table td {
+            padding: 4px 0;
+            vertical-align: top;
         }
 
-        .ornament-corner.top-left { top: 0; left: 0; }
-        .ornament-corner.top-right { top: 0; right: 0; transform: rotate(90deg); }
-        .ornament-corner.bottom-left { bottom: 0; left: 0; transform: rotate(-90deg); }
-        .ornament-corner.bottom-right { bottom: 0; right: 0; transform: rotate(180deg); }
-
-        .border-ornament {
-            border: 4px solid #3b82f6;
-            border-image: linear-gradient(45deg, #3b82f6, #1d4ed8, #3b82f6) 1;
-        }
-
-        .certificate-bg {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-        }
-
-        .watermark {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%) rotate(-45deg);
-            font-size: 120px;
-            color: rgba(59, 130, 246, 0.05);
-            font-weight: bold;
-            z-index: 1;
-            pointer-events: none;
-        }
-
-        .signature-line {
-            border-bottom: 2px solid #374151;
-            width: 200px;
-            margin: 0 auto;
-        }
-
-        .content {
-            padding: 40px;
-            position: relative;
-            z-index: 2;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .logo {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 20px;
-        }
-
-        .title {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 10px;
-        }
-
-        .subtitle {
-            font-size: 18px;
-            color: #4b5563;
-        }
-
-        .student-info {
-            background: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            margin: 20px 0;
-        }
-
-        .student-name {
-            font-size: 24px;
-            font-weight: bold;
-            color: #1e40af;
-            margin-bottom: 10px;
-        }
-
-        .footer {
+        .signature-table {
+            width: 100%;
             margin-top: 40px;
         }
 
-        .notes {
-            background: #fef3c7;
-            border-left: 4px solid #f59e0b;
-            padding: 15px;
-            margin-bottom: 30px;
-        }
-
-        .signatures {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 40px;
-        }
-
-        .signature-box {
+        .signature-table td {
+            width: 50%;
             text-align: center;
-            flex: 1;
-        }
-
-        .certificate-number {
-            text-align: center;
-            margin-top: 30px;
-            padding-top: 20px;
-            border-top: 1px solid #e5e7eb;
-            font-size: 12px;
-            color: #6b7280;
+            vertical-align: top;
         }
 
         .catatan-penting {
-            background: #fef3c7;
-            border-left: 4px solid #f59e0b;
-            padding: 15px;
-            margin-bottom: 30px;
+            border: 1px solid black;
+            padding: 10px 15px;
+            margin-top: 30px;
+            font-size: 11pt;
         }
+
     </style>
 </head>
 <body>
-    <div class="a4-page certificate-bg">
-        <!-- Watermark -->
-        <div class="watermark">DITERIMA</div>
-        
-        <!-- Corner Ornaments -->
-        <div class="ornament-corner top-left"></div>
-        <div class="ornament-corner top-right"></div>
-        <div class="ornament-corner bottom-left"></div>
-        <div class="ornament-corner bottom-right"></div>
-
-        <div class="content">
-            <!-- Header -->
-            <div class="header">
+    <table class="header-table">
+        <tr>
+            <td style="width: 20%; text-align: center;">
                 @if($settings->logo_base64)
-                    <img src="{{ $settings->logo_base64 }}" alt="Logo Pesantren" class="logo">
+                    <img src="{{ $settings->logo_base64 }}" alt="Logo" class="logo">
                 @endif
-                <div class="title">{{ $settings->nama_pesantren }}</div>
-                <div class="subtitle">{{ $settings->nama_yayasan }}</div>
-                <div>{{ $settings->alamat_pesantren }}</div>
-                <div>{{ $settings->telepon_pesantren }} | {{ $settings->email_pesantren }}</div>
-            </div>
+            </td>
+            <td style="width: 80%;" class="kop-surat">
+                <div class="nama-pesantren">{{ strtoupper($settings->nama_pesantren) }}</div>
+                <div class="nama-yayasan">{{ $settings->nama_yayasan }}</div>
+                <div class="alamat">{{ $settings->alamat_pesantren }}</div>
+                <div class="alamat">Telp: {{ $settings->telepon_pesantren }} | Email: {{ $settings->email_pesantren }}</div>
+            </td>
+        </tr>
+    </table>
 
-            <!-- Title -->
-            <div class="border-ornament" style="text-align: center; padding: 20px; margin-bottom: 30px;">
-                <h2 style="font-size: 24px; font-weight: bold; color: #1e40af; margin: 0;">SERTIFIKAT PENERIMAAN</h2>
-                <p style="font-size: 18px; color: #4b5563; margin: 5px 0 0;">SANTRI BARU PERIODE PENDAFTARAN</p>
-            </div>
-
-            <!-- Content -->
-            <div style="text-align: center; margin-bottom: 30px;">
-                <p style="font-size: 16px; margin-bottom: 20px;">Dengan ini menyatakan bahwa:</p>
-                
-                <div class="student-info">
-                    <div class="student-name">{{ $data->nama_lengkap }}</div>
-                    <p>NISN: {{ $data->nisn }}</p>
-                    <p style="font-size: 16px; color: #4b5563;">Telah diterima sebagai Santri Baru</p>
-                </div>
-
-                <p style="font-size: 16px; margin: 20px 0;">
-                    Telah <span style="font-weight: bold; color: #059669;">DITERIMA</span> dan terdaftar sebagai santri baru di 
-                    <span style="font-weight: bold; color: #1e40af;">{{ $settings->nama_pesantren }}</span> untuk mengikuti pendidikan 
-                    pada Tahun {{ date('Y') }}
-                </p>
-            </div>
-
-            <!-- Footer -->
-            <div class="footer">
-                <!-- Notes -->
-                @if(!empty($settings->catatan_penting))
-                    <div class="catatan-penting">
-                        <p><strong>Catatan Penting:</strong></p>
-                        <p style="white-space: pre-line;">{{ $settings->catatan_penting }}</p>
-                    </div>
-                @endif
-
-                <!-- Signatures -->
-                <div class="signatures">
-                    <div class="signature-box">
-                        <p>{{ date('d F Y') }}</p>
-                        @if($settings->stempel_base64)
-                            <img src="{{ $settings->stempel_base64 }}" alt="Stempel" style="max-width: 100px; margin: 10px 0;">
-                        @endif
-                    </div>
-
-                    <div class="signature-box">
-                        <p>Direktur Pesantren</p>
-                        <div class="signature-line"></div>
-                        <p style="font-weight: bold; margin-top: 5px;">{{ $settings->nama_direktur }}</p>
-                        <p style="font-size: 12px; color: #6b7280;">NIP: {{ $settings->nip_direktur }}</p>
-                    </div>
-
-                    <div class="signature-box">
-                        <p>Kepala Administrasi</p>
-                        <div class="signature-line"></div>
-                        <p style="font-weight: bold; margin-top: 5px;">{{ $settings->nama_kepala_admin }}</p>
-                        <p style="font-size: 12px; color: #6b7280;">NIP: {{ $settings->nip_kepala_admin }}</p>
-                    </div>
-                </div>
-
-                <!-- Certificate Number -->
-                <div class="certificate-number">
-                    No. Sertifikat: {{ date('Ymd') }}/{{ str_pad($data->id, 4, '0', STR_PAD_LEFT) }} | 
-                    Tanggal Terbit: {{ date('d F Y') }}
-                </div>
-            </div>
-        </div>
+    <div class="surat-title">
+        <h3>SURAT KETERANGAN DITERIMA</h3>
+        <p>Nomor: {{ date('Ymd') }}/{{ str_pad($data->id, 4, '0', STR_PAD_LEFT) }}/PSB/SKD/{{ date('Y') }}</p>
     </div>
+
+    <p>Dengan hormat,</p>
+    <p>Pimpinan {{ $settings->nama_pesantren }} dengan ini menerangkan bahwa, berdasarkan hasil seleksi Penerimaan Santri Baru (PSB) yang telah dilaksanakan, calon santri dengan data di bawah ini:</p>
+    
+    <table class="data-table">
+        <tr>
+            <td style="width: 30%;">Nama Lengkap</td>
+            <td style="width: 5%;">:</td>
+            <td style="width: 65%; font-weight: bold;">{{ $data->nama_lengkap }}</td>
+        </tr>
+        <tr>
+            <td>Nomor Induk Siswa Nasional (NISN)</td>
+            <td>:</td>
+            <td>{{ $data->nisn }}</td>
+        </tr>
+         <tr>
+            <td>Asal Sekolah</td>
+            <td>:</td>
+            <td>{{ $data->asal_sekolah }}</td>
+        </tr>
+    </table>
+
+    <p>Telah dinyatakan <b>DITERIMA</b> sebagai santri baru di <b>{{ $settings->nama_pesantren }}</b> untuk Tahun Ajaran {{ $settings->tahun_ajaran }}.</p>
+    <p>Demikian surat keterangan ini kami sampaikan untuk dapat dipergunakan sebagaimana mestinya.</p>
+    
+
+    <table class="signature-table">
+        <tr>
+            <td style="width: 50%;">
+                <p>Kepala Administrasi,</p>
+                <div style="height: 90px;">
+                    <img src="../../../public/storage/surat-penerimaan/72VMotgVU12wJLTmhDUFCaWvOfs04rIkfZcixr9M.jpg" alt="">
+                </div>
+                <p style="font-weight: bold; text-decoration: underline; margin-top: 0;">{{ $settings->nama_kepala_admin }}</p>
+                <p style="margin-top: -10px;">NIP: {{ $settings->nip_kepala_admin }}</p>
+            </td>
+            <!-- Kolom Tanda Tangan Direktur -->
+            <td style="width: 50%;">
+                <p>{{ $settings->kota_surat ?? 'Kota Anda' }}, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
+                <p>Direktur Pesantren,</p>
+                
+                <div style="height: 90px; position: relative;">
+                    @if($settings->ttd_direktur_base64)
+                        <img src="{{ $settings->ttd_direktur_base64 }}" alt="ttd_direktur" style="max-width: 110px; opacity: 0.9; position: absolute; left: 50%; top: -10px; transform: translateX(-50%);">
+                    @endif
+                </div>
+
+                <p style="font-weight: bold; text-decoration: underline; margin-top: 0;">{{ $settings->nama_direktur }}</p>
+                <p style="margin-top: -10px;">NIP: {{ $settings->nip_direktur }}</p>
+            </td>
+        </tr>
+    </table>
+
+    @if(!empty($settings->catatan_penting))
+        <div class="catatan-penting">
+            <p style="margin:0 0 5px 0;"><strong>Catatan Penting:</strong></p>
+            <div style="white-space: pre-wrap;">{!! nl2br(e($settings->catatan_penting)) !!}</div>
+        </div>
+    @endif
 </body>
-</html> 
+</html>
+```
+
+Saya telah memastikan semua informasi, termasuk nama kepala administrasi, NIP, dan ttd_direktur, ditampilkan dengan benar dalam tata letak dua kolom untuk tanda tang

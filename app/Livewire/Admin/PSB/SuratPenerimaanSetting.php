@@ -7,13 +7,14 @@ use App\Models\PSB\SuratPenerimaanSetting as SuratPenerimaanSettingModel;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\Storage;
 
-class SuratPenerimaanSettingForm extends Component
+class SuratPenerimaanSetting extends Component
 {
     use WithFileUploads;
 
     public $settings;
     public $logo;
-    public $stempel;
+    public $ttd_admin;
+    public $ttd_direktur;
     public $nama_pesantren;
     public $nama_yayasan;
     public $alamat_pesantren;
@@ -43,7 +44,8 @@ class SuratPenerimaanSettingForm extends Component
         'batas_pembayaran_spp' => 'required|date',
         'catatan_penting' => 'required',
         'logo' => 'nullable|image|max:1024',
-        'stempel' => 'nullable|image|max:1024',
+        'ttd_direktur' => 'nullable|image|max:1024',
+        'ttd_admin' => 'nullable|image|max:1024',
     ];
 
     public function mount()
@@ -90,14 +92,20 @@ class SuratPenerimaanSettingForm extends Component
             if ($this->settings && $this->settings->logo) {
                 Storage::delete($this->settings->logo);
             }
-            $data['logo'] = $this->logo->store('public/surat-penerimaan');
+            $data['logo'] = $this->logo->store('surat-penerimaan');
         }
 
-        if ($this->stempel) {
-            if ($this->settings && $this->settings->stempel) {
-                Storage::delete($this->settings->stempel);
+        if ($this->ttd_direktur) {
+            if ($this->settings && $this->settings->ttd_direktur) {
+                Storage::delete($this->settings->ttd_direktur);
             }
-            $data['stempel'] = $this->stempel->store('public/surat-penerimaan');
+            $data['ttd_direktur'] = $this->ttd_direktur->store('surat-penerimaan');
+        }
+        if ($this->ttd_admin) {
+            if ($this->settings && $this->settings->ttd_admin) {
+                Storage::delete($this->settings->ttd_admin);
+            }
+            $data['ttd_admin'] = $this->ttd_admin->store('surat-penerimaan');
         }
 
         if ($this->settings) {

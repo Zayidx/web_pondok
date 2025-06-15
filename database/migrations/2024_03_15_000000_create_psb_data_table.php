@@ -241,6 +241,9 @@ return new class extends Migration
             $table->text('alamat_pesantren');
             $table->string('telepon_pesantren'); // Mengubah 'nomor_telepon' menjadi 'telepon_pesantren' agar sesuai dengan seeder
             $table->string('email_pesantren');
+            $table->string('logo')->nullable();
+            $table->string('ttd_direktur')->nullable();
+            $table->string('ttd_admin')->nullable();
             $table->text('catatan_penting');
             $table->string('nama_direktur');
             $table->string('nip_direktur');

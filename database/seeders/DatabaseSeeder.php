@@ -37,7 +37,7 @@ class DatabaseSeeder extends Seeder
             KegiatanSeeder::class,
             PeriodeSeeder::class,
             PsbSeeder::class,
-            SertifikatTemplateSeeder::class,
+      
             SuratPenerimaanSettingSeeder::class,
             DaftarUlangSeeder::class,
         ]);

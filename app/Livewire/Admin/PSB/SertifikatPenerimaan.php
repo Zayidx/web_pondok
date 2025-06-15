@@ -14,7 +14,8 @@ class SertifikatPenerimaan extends Component
     #[Title('Pengaturan Template Sertifikat')]
     public $settings;
     public $logo;
-    public $stempel;
+  public $ttd_admin;
+  public $ttd_direktur;
     public $catatan;
 
     // Form fields
@@ -27,15 +28,17 @@ class SertifikatPenerimaan extends Component
     public $nip_direktur;
     public $nama_kepala_admin;
     public $nip_kepala_admin;
-
+    public $activeTab = 'umum';
     protected $rules = [
         'nama_pesantren' => 'required',
         'nama_yayasan' => 'required',
         'alamat_pesantren' => 'required',
         'telepon_pesantren' => 'required',
         'email_pesantren' => 'required|email',
-        'logo' => 'nullable|image|max:1024', // max 1MB
-        'stempel' => 'nullable|image|max:1024',
+        'logo' => 'nullable|image|max:2048', // max 1MB
+        'ttd_direktur' => 'nullable|image|max:1024',
+        'ttd_admin' => 'nullable|image|max:1024',
+
         'nama_direktur' => 'required',
         'nip_direktur' => 'required',
         'nama_kepala_admin' => 'required',
@@ -70,60 +73,62 @@ class SertifikatPenerimaan extends Component
         }
     }
 
+    // CONTOH IMPLEMENTASI METHOD SAVE (PENDEKATAN 1)
     public function save()
     {
         $this->validate();
-
-        // Handle logo upload
+        
+        // Handle logo upload dan langsung update properti model.
         if ($this->logo) {
             if ($this->settings->logo) {
                 Storage::delete($this->settings->logo);
             }
-            $logoPath = $this->logo->store('public/surat-penerimaan');
-            $this->settings->logo = $logoPath;
+            // Langsung set properti 'logo' pada model.
+            $this->settings->logo = $this->logo->store('public/surat-penerimaan');
         }
-
-        // Handle stempel upload
-        if ($this->stempel) {
-            if ($this->settings->stempel) {
-                Storage::delete($this->settings->stempel);
+    
+        
+        if ($this->ttd_direktur) {
+            if ($this->settings->ttd_direktur) {
+                Storage::delete($this->settings->ttd_direktur);
             }
-            $stempelPath = $this->stempel->store('public/surat-penerimaan');
-            $this->settings->stempel = $stempelPath;
+            // Langsung set properti 'ttd_direktur' pada model.
+            $this->settings->ttd_direktur = $this->ttd_direktur->store('public/surat-penerimaan');
         }
-
-        // Format catatan jika ada
+         if ($this->ttd_admin) {
+            if ($this->settings->ttd_admin) {
+                Storage::delete($this->settings->ttd_admin);
+            }
+            // Langsung set properti 'ttd_admin' pada model.
+            $this->settings->ttd_admin = $this->ttd_admin->store('public/surat-penerimaan');
+        }
+    
+        $catatan = null;
         if ($this->catatan) {
-            // Hapus nomor dan titik di awal baris jika ada
             $catatan = preg_replace('/^\d+\.\s*/m', '', $this->catatan);
-            // Hapus koma di akhir baris
             $catatan = preg_replace('/,\s*$/', '', $catatan);
-            // Ganti koma dengan baris baru
             $catatan = str_replace(',', "\n", $catatan);
-            // Hapus baris kosong berlebih
             $catatan = preg_replace('/\n\s*\n/', "\n", $catatan);
-            // Trim whitespace
             $catatan = trim($catatan);
         }
-
-        // Update other fields
+        // Langsung set properti 'catatan_penting' pada model.
+        $this->settings->catatan_penting = $catatan;
+    
+        // Gunakan fill() untuk sisa field yang lain.
         $this->settings->fill([
-            'logo'=>$this->$logoPath,
-            'stempel'=>$this->$stempelPath,
-                'nama_pesantren' => $this->nama_pesantren,
-                'nama_yayasan' => $this->nama_yayasan,
-                'alamat_pesantren' => $this->alamat_pesantren,
+            'nama_pesantren' => $this->nama_pesantren,
+            'nama_yayasan' => $this->nama_yayasan,
+            'alamat_pesantren' => $this->alamat_pesantren,
             'telepon_pesantren' => $this->telepon_pesantren,
-                'email_pesantren' => $this->email_pesantren,
-                'nama_direktur' => $this->nama_direktur,
-                'nip_direktur' => $this->nip_direktur,
-                'nama_kepala_admin' => $this->nama_kepala_admin,
-                'nip_kepala_admin' => $this->nip_kepala_admin,
-            'catatan_penting' => $catatan ?? null,
+            'email_pesantren' => $this->email_pesantren,
+            'nama_direktur' => $this->nama_direktur,
+            'nip_direktur' => $this->nip_direktur,
+            'nama_kepala_admin' => $this->nama_kepala_admin,
+            'nip_kepala_admin' => $this->nip_kepala_admin,
         ]);
-
+    
         $this->settings->save();
-
+    
         session()->flash('message', 'Pengaturan surat penerimaan berhasil disimpan!');
     }
 

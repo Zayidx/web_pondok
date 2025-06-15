@@ -3,157 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sertifikat Penerimaan - {{ $santri->nama_lengkap ?? 'Preview' }}</title>
+    <title>Surat Penerimaan Santri Baru</title>
     <style>
+        /* CSS ini diinjeksi langsung ke PDF, Dompdf tidak bisa memuat CSS dari CDN */
         @page {
             size: A4;
             margin: 0;
         }
 
         body {
-            font-family: 'Arial', sans-serif;
+            font-family: 'DejaVu Sans', sans-serif; /* Fallback font untuk Dompdf */
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
             margin: 0;
             padding: 0;
-            background: #fff;
+            position: relative;
+            font-size: 11pt;
+            color: #333;
         }
 
         .a4-page {
             width: 210mm;
             height: 297mm;
             margin: 0 auto;
-            background: white;
+            background: #ffffff; /* Default background */
             position: relative;
             overflow: hidden;
-        }
-
-        .ornament-corner {
-            position: absolute;
-            width: 80px;
-            height: 80px;
-            background: linear-gradient(45deg, #3b82f6, #1d4ed8);
-            clip-path: polygon(0 0, 100% 0, 0 100%);
-        }
-
-        .ornament-corner.top-left {
-            top: 0;
-            left: 0;
-        }
-
-        .ornament-corner.top-right {
-            top: 0;
-            right: 0;
-            transform: rotate(90deg);
-        }
-
-        .ornament-corner.bottom-left {
-            bottom: 0;
-            left: 0;
-            transform: rotate(-90deg);
-        }
-
-        .ornament-corner.bottom-right {
-            bottom: 0;
-            right: 0;
-            transform: rotate(180deg);
-        }
-
-        .border-ornament {
-            border: 4px solid #3b82f6;
-            border-image: linear-gradient(45deg, #3b82f6, #1d4ed8, #3b82f6) 1;
-            padding: 20px;
-            margin: 20px 0;
-            text-align: center;
-        }
-
-        .certificate-bg {
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            padding: 40px;
-        }
-
-        .header {
-            text-align: center;
-            margin-bottom: 40px;
-        }
-
-        .logo-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-bottom: 20px;
-        }
-
-        .logo {
-            width: 80px;
-            height: 80px;
-            margin-right: 20px;
-        }
-
-        .school-info {
-            text-align: left;
-        }
-
-        .title {
-            font-size: 32px;
-            color: #1d4ed8;
-            margin: 0;
-            font-weight: bold;
-        }
-
-        .subtitle {
-            font-size: 20px;
-            color: #4b5563;
-            margin: 5px 0;
-        }
-
-        .content {
-            text-align: center;
-            margin: 40px 0;
-        }
-
-        .student-name {
-            font-size: 28px;
-            color: #1d4ed8;
-            margin: 20px 0;
-            font-weight: bold;
-        }
-
-        .student-info {
-            background: white;
-            padding: 20px;
-            border-radius: 10px;
-            margin: 20px 0;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-
-        .important-notes {
-            background: #fff9c2;
-            border-left: 4px solid #eab308;
-            padding: 15px;
-            margin: 20px 0;
-            text-align: left;
-        }
-
-        .signatures {
-            display: flex;
-            justify-content: space-between;
-            margin-top: 40px;
-        }
-
-        .signature {
-            text-align: center;
-            flex: 1;
-        }
-
-        .stamp {
-            width: 120px;
-            height: auto;
-            margin: 20px 0;
-        }
-
-        .signature-line {
-            width: 200px;
-            border-bottom: 2px solid #374151;
-            margin: 10px auto;
+            border: 10px solid #3b82f6; /* Contoh border */
         }
 
         .watermark {
@@ -162,115 +38,373 @@
             left: 50%;
             transform: translate(-50%, -50%) rotate(-45deg);
             font-size: 120px;
-            color: rgba(59, 130, 246, 0.05);
+            color: rgba(59, 130, 246, 0.08); /* Opacity yang lebih terlihat */
             font-weight: bold;
             z-index: 1;
+            pointer-events: none;
+            white-space: nowrap;
         }
 
-        .certificate-number {
+        .main-content-area {
+            position: relative;
+            z-index: 2;
+            padding: 30mm 20mm; /* Padding untuk konten utama */
+        }
+
+        .logo-school-info {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .logo {
+            width: 70px; /* Lebih kecil agar tidak terlalu besar */
+            height: 70px;
+            background-color: #2563eb;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 20px;
+            flex-shrink: 0; /* Penting agar tidak menyusut */
+        }
+
+        /* SVG logo Anda di sini (jika menggunakan SVG) */
+        .logo svg {
+            width: 40px;
+            height: 40px;
+            color: #ffffff;
+        }
+        /* Atau jika logo adalah gambar PNG/JPG */
+        .logo img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+
+        .school-text {
+            text-align: left;
+            flex-grow: 1;
+        }
+
+        .school-text h1 {
+            font-size: 20px;
+            font-weight: bold;
+            color: #1a202c;
+            margin: 0;
+            padding: 0;
+        }
+
+        .school-text p {
+            font-size: 14px;
+            color: #4a5568;
+            margin: 0;
+            padding: 0;
+        }
+        .school-text .address {
+            font-size: 10px;
+            color: #a0aec0;
+        }
+
+
+        .line-separator {
+            border-bottom: 1px solid #eee;
+            margin-top: 10px;
+            margin-bottom: 20px;
+        }
+
+        .certificate-title-box {
             text-align: center;
+            padding: 15px;
+            margin-bottom: 30px;
+            background-color: #f0f7ff; /* light blue background */
+            border: 1px solid #a0c2e6; /* light blue border */
+            border-radius: 5px;
+        }
+
+        .certificate-title-box h2 {
+            font-size: 28px; /* Lebih kecil agar pas */
+            font-weight: bold;
+            color: #2563eb;
+            margin-bottom: 5px;
+        }
+
+        .certificate-title-box p {
+            font-size: 16px;
+            color: #4a5568;
+        }
+
+        .content-block {
+            margin-bottom: 20px;
+            line-height: 1.6;
+            text-align: justify;
+        }
+
+        .content-block p {
+            margin-bottom: 10px;
+        }
+
+        .student-data-table {
+            width: 100%;
+            margin: 20px 0 20px 40px; /* Indentasi */
+            border-collapse: collapse;
+        }
+
+        .student-data-table td {
+            padding: 5px 0;
+            vertical-align: top;
+        }
+
+        .student-data-table td:first-child {
+            width: 35%;
+            font-weight: bold;
+        }
+
+        .status-text {
+            font-weight: bold;
+            color: #10b981;
+        }
+
+        .school-name-text {
+            font-weight: bold;
+            color: #2563eb;
+        }
+
+        .important-notes {
+            background-color: #fffbeb;
+            border-left: 4px solid #fbbf24;
+            padding: 15px;
+            margin-top: 25px;
+            margin-bottom: 25px;
+            border-radius: 5px;
+        }
+
+        .important-notes h5 {
+            font-weight: bold;
+            color: #92400e;
+            margin-bottom: 8px;
+        }
+
+        .important-notes ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .important-notes ul li {
+            font-size: 10pt; /* Ukuran font lebih kecil */
+            color: #b45309;
+            line-height: 1.4;
+        }
+
+        .important-notes ul li::before {
+            content: '• ';
+            color: #fbbf24;
+            font-weight: bold;
+            display: inline-block;
+            width: 1em;
+            margin-left: -1em;
+        }
+
+        .signatures-area {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
             margin-top: 40px;
+            width: 100%;
+        }
+
+        .signature-block {
+            text-align: center;
+            width: 30%; /* Sesuaikan lebar */
+            padding: 0 5px;
+            vertical-align: top;
+        }
+
+        .seal {
+            width: 80px; /* Sesuaikan ukuran segel */
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, #3b82f6, #1d4ed8);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
+            margin: 0 auto 10px;
+        }
+
+        .seal::before {
+            content: '';
+            position: absolute;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            border: 1px solid white;
+        }
+        .seal-text {
+            color: white;
+            text-align: center;
+            font-weight: bold;
+            font-size: 8pt; /* Ukuran font segel */
+            line-height: 1.1;
+        }
+
+        .signature-line {
+            border-bottom: 1px solid #374151;
+            width: 150px;
+            margin: 0 auto 10px;
+        }
+
+        .signature-text {
+            font-weight: bold;
+            color: #1f2937;
+            font-size: 10pt;
+        }
+
+        .nik-text {
+            font-size: 8pt;
+            color: #4a5568;
+        }
+
+        .certificate-number-info {
+            text-align: right; /* Pindahkan ke kanan */
+            margin-top: 20px;
+            padding-top: 10px;
+            border-top: 0.5px solid #d1d5db;
+            font-size: 9pt;
             color: #6b7280;
-            font-size: 12px;
+        }
+
+        .certificate-number-info .font-bold {
+            font-weight: bold;
+            font-family: monospace;
         }
     </style>
-</head>
+    </head>
 <body>
-    @if(!$settings)
-    <div style="display: flex; justify-content: center; align-items: center; height: 100vh; text-align: center;">
-        <div>
-            <h1 style="color: #ef4444; margin-bottom: 1rem;">Pengaturan Belum Dikonfigurasi</h1>
-            <p style="color: #4b5563;">Maaf, Surat Penerimaan Santri belum dikonfigurasi. Silahkan hubungi administrator untuk melakukan pengaturan.</p>
-        </div>
-    </div>
-    @else
-    <div class="a4-page certificate-bg">
-            <!-- Watermark -->
-            <div class="watermark">DITERIMA</div>
-        
-        <!-- Corner Ornaments -->
-        <div class="ornament-corner top-left"></div>
-        <div class="ornament-corner top-right"></div>
-        <div class="ornament-corner bottom-left"></div>
-        <div class="ornament-corner bottom-right"></div>
+    <div class="a4-page">
+        <div class="watermark">DITERIMA</div>
 
-            <!-- Header -->
-            <div class="header">
-                <div class="logo-container">
-                @if($settings->logo_path && Storage::exists($settings->logo_path))
-                    <img src="{{ public_path(Storage::url($settings->logo_path)) }}" alt="Logo" class="logo">
-                    @endif
-                    <div class="school-info">
-                    <h1>{{ $settings->nama_pesantren }}</h1>
-                    <p>{{ $settings->nama_yayasan }}</p>
-                    <p>{{ $settings->alamat_pesantren }}</p>
-                    <p>{{ $settings->nomor_telepon }} | {{ $settings->email_pesantren }}</p>
-                    </div>
-                </div>
-
-            <div class="border-ornament">
-                <h2 class="title">SERTIFIKAT PENERIMAAN</h2>
-                <p class="subtitle">SANTRI BARU {{ $periode_pendaftaran }}</p>
+        <div class="main-content-area">
+            <div class="logo-school-info">
+            <div class="logo">
+    @if($settings->logo_base64)
+        <img src="{{ $settings->logo_base64 }}" alt="Logo">
+    @endif
+</div>
+                <div class="school-text">
+                    <h1>PESANTREN AL-HIKMAH</h1>
+                    <p>Yayasan Pendidikan Islam Terpadu</p>
+                    <p class="address">Jl. Pendidikan No. 123, Jakarta Selatan 12345</p>
+                    <p class="address">Telp: (021) 1234-5678 | Email: info@alhikmah.ac.id</p>
                 </div>
             </div>
 
-            <!-- Main Content -->
-        <div class="content">
-            <p>Dengan ini menyatakan bahwa:</p>
-            
-            <div class="student-info">
-                <h3 class="student-name">{{ $santri->nama_lengkap }}</h3>
-                <p>NISN: {{ $santri->nisn }}</p>
-                    <p>Telah diterima sebagai Santri Baru</p>
-                </div>
+            <div class="line-separator"></div>
 
-                <p>
-                    Telah <strong style="color: #059669;">DITERIMA</strong> dan terdaftar sebagai santri baru di 
-                <strong style="color: #1d4ed8;">{{ $settings->nama_pesantren }}</strong> untuk mengikuti pendidikan 
-                pada {{ $periode_pendaftaran }}
-                </p>
+            <div class="certificate-title-box">
+                <h2>SURAT PEMBERITAHUAN PENERIMAAN SANTRI BARU</h2>
+                <p>TAHUN AJARAN {{ $periode_pendaftaran ?? '2025/2026' }}</p>
+            </div>
 
-            <!-- Important Notes -->
+            <div class="content-block">
+                <p>Assalamu'alaikum Warahmatullahi Wabarakatuh,</p>
+                <p>Dengan hormat, kami sampaikan bahwa berdasarkan hasil seleksi Penerimaan Santri Baru Pondok Pesantren Al-Hikmah Tahun Ajaran {{ $periode_pendaftaran ?? '2025/2026' }}, Ananda dengan data sebagai berikut:</p>
+
+                <table class="student-data-table">
+                    <tr>
+                        <td>Nama Lengkap</td>
+                        <td>: <strong>{{ $santri->nama_lengkap ?? '-' }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Nomor Pendaftaran</td>
+                        <td>: <strong>{{ $santri->id ?? '-' }}</strong></td>
+                    </tr>
+                    <tr>
+                        <td>Jenis Kelamin</td>
+                        <td>: {{ $santri->jenis_kelamin == 'L' ? 'Laki-laki' : 'Perempuan' }}</td>
+                    </tr>
+                    <tr>
+                        <td>Asal Sekolah</td>
+                        <td>: {{ $santri->asal_sekolah ?? '-' }}</td>
+                    </tr>
+                    <tr>
+                        <td>Jenjang Pendidikan</td>
+                        <td>: {{ $jenjang_diterima ?? 'SMA' }}</td>
+                    </tr>
+                    <tr>
+                        <td>Dinyatakan Diterima</td>
+                        <td>: Sebagai Santri Baru Pondok Pesantren Al-Hikmah pada jenjang <strong>{{ $jenjang_diterima ?? 'SMA' }}</strong>.</td>
+                    </tr>
+                    <tr>
+                        <td>Nama Wali</td>
+                        <td>: {{ $santri->wali->nama_ayah ?? $santri->wali->nama_ibu ?? $santri->wali->nama_wali ?? '-' }}</td>
+                    </tr>
+                    <tr>
+                        <td>Nomor Telepon Wali</td>
+                        <td>: {{ $santri->wali->no_hp_ortu ?? $santri->wali->no_hp ?? '-' }}</td>
+                    </tr>
+                </table>
+
+                <p>Selanjutnya, Ananda diharapkan untuk segera melakukan proses daftar ulang sesuai dengan jadwal dan persyaratan yang telah ditetapkan oleh panitia.</p>
+                <p>Demikian surat pemberitahuan ini kami sampaikan. Kami ucapkan selamat bergabung dan semoga Allah SWT senantiasa memberikan kemudahan dan keberkahan dalam menuntut ilmu di Pondok Pesantren Al-Hikmah.</p>
+                <p>Wassalamu'alaikum Warahmatullahi Wabarakatuh.</p>
+            </div>
+
             <div class="important-notes">
-                <h5 style="margin: 0 0 10px 0;">CATATAN PENTING:</h5>
-                <ul style="margin: 0; padding-left: 20px;">
-                    @foreach($settings->catatan_penting ?? [] as $catatan)
-                        <li>{{ $catatan }}</li>
-                    @endforeach
+                <h5>CATATAN PENTING:</h5>
+                <ul>
+                    <li>Orientasi santri baru dimulai tanggal 15 Juli 2024</li>
+                    <li>Harap membawa Surat ini saat registrasi ulang</li>
+                    <li>Pembayaran SPP semester pertama paling lambat 20 Juli 2024</li>
+                    <li>Untuk informasi lebih lanjut hubungi bagian administrasi</li>
                 </ul>
             </div>
 
-            <!-- Signatures -->
-            <div class="signatures">
-                <div class="signature">
-                    <p>{{ $acceptanceDate }}</p>
-                    @if($settings->stempel_path && Storage::exists($settings->stempel_path))
-                        <img src="{{ public_path(Storage::url($settings->stempel_path)) }}" alt="Stempel" class="stamp">
-                    @endif
-                </div>
+            <table class="signatures-area">
+                <tr>
+                    <td class="signature-block">
+                        <p>Jakarta, {{ $acceptanceDate }}</p>
+                        <div class="seal">
+                            <div class="seal-text">
+                                <div>PESANTREN</div>
+                                <div>AL-HIKMAH</div>
+                                <div>2024</div>
+                            </div>
+                        </div>
+                        @if($settings->stempel_base64)
+    <img src="{{ $settings->stempel_base64 }}" alt="Stempel" style="width: 80px; height: 80px; position: absolute; left: 50%; transform: translateX(-50%); margin-top: 15px; opacity: 0.8;">
+@endif
 
-                <div class="signature">
-                    <p>Direktur Pesantren</p>
-                    <div class="signature-line"></div>
-                    <p><strong>{{ $settings->nama_direktur }}</strong></p>
-                    <p>NIP: {{ $settings->nip_direktur }}</p>
-                </div>
+                    </td>
 
-                <div class="signature">
-                    <p>Kepala Administrasi</p>
-                    <div class="signature-line"></div>
-                    <p><strong>{{ $settings->nama_kepala_admin }}</strong></p>
-                    <p>NIP: {{ $settings->nip_kepala_admin }}</p>
-                </div>
-            </div>
+                    <td class="signature-block">
+                        <p>Direktur Pesantren</p>
+                        <div class="signature-line"></div>
+                        <p class="signature-text">Dr. H. Abdul Rahman, M.Pd</p>
+                        <p class="nik-text">NIK: 1234567890123456</p>
+                    </td>
 
-            <!-- Certificate Number -->
-            <div class="certificate-number">
-                No. Sertifikat: {{ $certificateNumber }} | 
+                    <td class="signature-block">
+                        <p>Kepala Administrasi</p>
+                        <div class="signature-line"></div>
+                        <p class="signature-text">Hj. Fatimah, S.Pd</p>
+                        <p class="nik-text">NIK: 9876543210987654</p>
+                    </td>
+                </tr>
+            </table>
+
+            <div class="certificate-number-info">
+                <p>
+                    No. Surat: <span class="font-bold">{{ $certificateNumber }}</span> |
                     Tanggal Terbit: {{ $issueDate }}
+                </p>
             </div>
         </div>
     </div>
-    @endif
 </body>
-</html> 
+</html>

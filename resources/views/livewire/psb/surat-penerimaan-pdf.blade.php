@@ -1,4 +1,3 @@
-{{-- resources/views/psb/surat-penerimaan-pdf.blade.php --}}
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -292,15 +291,11 @@
 
         <div class="main-content-area">
             <div class="logo-school-info">
-                <div class="logo">
-                    {{-- Gunakan variabel $logoBase64 di sini --}}
-                    @if ($logoBase64)
-                        <img src="{{ $logoBase64 }}" alt="Logo Pesantren">
-                    @else
-                        {{-- Fallback jika logo tidak ditemukan atau gagal di-encode --}}
-                        <div style="width: 100%; height: 100%; background-color: lightgray; display: flex; align-items: center; justify-content: center; color: white;">LOGO</div>
-                    @endif
-                </div>
+            <div class="logo">
+    @if($settings->logo_base64)
+        <img src="{{ $settings->logo_base64 }}" alt="Logo">
+    @endif
+</div>
                 <div class="school-text">
                     <h1>PESANTREN AL-HIKMAH</h1>
                     <p>Yayasan Pendidikan Islam Terpadu</p>
@@ -381,7 +376,10 @@
                                 <div>2024</div>
                             </div>
                         </div>
-                        <p class="nik-text">Stempel Resmi</p>
+                        @if($settings->stempel_base64)
+    <img src="{{ $settings->stempel_base64 }}" alt="Stempel" style="width: 80px; height: 80px; position: absolute; left: 50%; transform: translateX(-50%); margin-top: 15px; opacity: 0.8;">
+@endif
+
                     </td>
 
                     <td class="signature-block">

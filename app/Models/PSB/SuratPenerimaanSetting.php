@@ -23,6 +23,9 @@ class SuratPenerimaanSetting extends Model
         'alamat_pesantren',
         'telepon_pesantren', // Diubah dari 'nomor_telepon' agar sesuai dengan migrasi
         'email_pesantren',
+        'logo',
+        'ttd_direktur',
+        'ttd_admin',
         'catatan_penting',
         'nama_direktur',
         'nip_direktur',
