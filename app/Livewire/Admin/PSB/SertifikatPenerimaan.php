@@ -84,7 +84,7 @@ class SertifikatPenerimaan extends Component
                 Storage::delete($this->settings->logo);
             }
             // Langsung set properti 'logo' pada model.
-            $this->settings->logo = $this->logo->store('public/surat-penerimaan');
+            $this->settings->logo = $this->logo->store('/public/surat-penerimaan');
         }
     
         

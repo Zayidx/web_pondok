@@ -100,9 +100,9 @@
     <table class="header-table">
         <tr>
             <td style="width: 20%; text-align: center;">
-                @if($settings->logo_base64)
-                    <img src="{{ $settings->logo_base64 }}" alt="Logo" class="logo">
-                @endif
+               
+                    <img src="data:image/png;base64,{{ $logo_base64 }}"  alt="Logo" class="logo">
+              
             </td>
             <td style="width: 80%;" class="kop-surat">
                 <div class="nama-pesantren">{{ strtoupper($settings->nama_pesantren) }}</div>
@@ -145,27 +145,30 @@
 
     <table class="signature-table">
         <tr>
-            <td style="width: 50%;">
-                <p>Kepala Administrasi,</p>
-                <div style="height: 90px;">
-                    <img src="../../../public/storage/surat-penerimaan/72VMotgVU12wJLTmhDUFCaWvOfs04rIkfZcixr9M.jpg" alt="">
-                </div>
-                <p style="font-weight: bold; text-decoration: underline; margin-top: 0;">{{ $settings->nama_kepala_admin }}</p>
-                <p style="margin-top: -10px;">NIP: {{ $settings->nip_kepala_admin }}</p>
-            </td>
+            
             <!-- Kolom Tanda Tangan Direktur -->
             <td style="width: 50%;">
                 <p>{{ $settings->kota_surat ?? 'Kota Anda' }}, {{ \Carbon\Carbon::now()->translatedFormat('d F Y') }}</p>
                 <p>Direktur Pesantren,</p>
                 
                 <div style="height: 90px; position: relative;">
-                    @if($settings->ttd_direktur_base64)
-                        <img src="{{ $settings->ttd_direktur_base64 }}" alt="ttd_direktur" style="max-width: 110px; opacity: 0.9; position: absolute; left: 50%; top: -10px; transform: translateX(-50%);">
-                    @endif
+                    
+                        <img src="data:image/png;base64,{{ $ttd_direktur_base64 }}"  alt="ttd_direktur" style="max-width: 110px; opacity: 0.9; position: absolute; left: 50%; top: -10px; transform: translateX(-50%);">
+              
                 </div>
 
                 <p style="font-weight: bold; text-decoration: underline; margin-top: 0;">{{ $settings->nama_direktur }}</p>
                 <p style="margin-top: -10px;">NIP: {{ $settings->nip_direktur }}</p>
+            </td>
+            <td style="width: 50%;">
+                <p>Kepala Administrasi,</p>
+                <div style="height: 90px; position: relative;">
+                        
+                            <img src="data:image/png;base64,{{ $ttd_admin_base64 }}"  alt="ttd_direktur" style="max-width: 110px; opacity: 0.9; position: absolute; left: 50%; top: -10px; transform: translateX(-50%);">
+                      
+                </div>
+                <p style="font-weight: bold; text-decoration: underline; margin-top: 0;">{{ $settings->nama_kepala_admin }}</p>
+                <p style="margin-top: -10px;">NIP: {{ $settings->nip_kepala_admin }}</p>
             </td>
         </tr>
     </table>

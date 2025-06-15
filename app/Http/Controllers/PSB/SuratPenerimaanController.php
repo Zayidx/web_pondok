@@ -70,11 +70,17 @@ class SuratPenerimaanController extends Controller
        // PERBAIKAN: Menggunakan File::get() untuk konsistensi dan praktik terbaik.
        $settings->logo_base64 = base64_encode(File::get($settings->logo));
        $settings->ttd_direktur_base64 = base64_encode(File::get($settings->ttd_direktur));
-       $settings->stempel_ttd_admin = base64_encode(File::get($settings->ttd_admin));
+       $settings->ttd_admin_base64 = base64_encode(File::get($settings->ttd_admin));
 
 
         // Memuat view blade yang akan dijadikan PDF.
-        $pdf = PDF::loadView('psb.surat-penerimaan', compact('data', 'settings'));
+       $pdf = PDF::loadView('psb.surat-penerimaan',
+        [
+            'logo' => $settings->logo_base64,
+            'ttd_direktur' => $settings->ttd_direktur_base64,
+            'ttd_admin' => $settings->ttd_admin_base64,
+        ]
+        ,compact('data', 'settings'));
         // Mengatur ukuran kertas menjadi A4 dengan orientasi potret.
         $pdf->setPaper('a4', 'portrait');
         // Menampilkan PDF di browser tanpa mengunduhnya.
@@ -87,22 +93,23 @@ class SuratPenerimaanController extends Controller
      */
     public function download($id)
     {
-        // Logika di sini identik dengan fungsi preview, hanya berbeda di bagian akhir.
-        $data = PendaftaranSantri::findOrFail($id);
+        $data = PendaftaranSantri::findOrFail($id);;
         $settings = SuratPenerimaanSetting::first();
-
         if (!$settings) {
             return redirect()->route('psb.check-status')->with('error', 'Pengaturan surat penerimaan belum dikonfigurasi.');
         }
-
-  
-         // PERBAIKAN: Menggunakan File::get() untuk konsistensi dan praktik terbaik.
+        
          $settings->logo_base64 = base64_encode(File::get($settings->logo));
+         
          $settings->ttd_direktur_base64 = base64_encode(File::get($settings->ttd_direktur));
-         $settings->stempel_ttd_admin = base64_encode(File::get($settings->ttd_admin));
- 
-
-        $pdf = PDF::loadView('psb.surat-penerimaan', compact('data', 'settings'));
+         $settings->ttd_admin_base64 = base64_encode(File::get($settings->ttd_admin));
+        $pdf = PDF::loadView('psb.surat-penerimaan',
+        [
+            'logo' => $settings->logo_base64,
+            'ttd_direktur' => $settings->ttd_direktur_base64,
+            'ttd_admin' => $settings->ttd_admin_base64,
+        ]
+        ,compact('data', 'settings'));
         $pdf->setPaper('a4', 'portrait');
         // Memulai proses unduh file PDF dengan nama file yang dinamis.
         return $pdf->download('surat-penerimaan-' . $data->nama_lengkap . '.pdf');
@@ -125,10 +132,16 @@ class SuratPenerimaanController extends Controller
      // PERBAIKAN: Menggunakan File::get() untuk konsistensi dan praktik terbaik.
      $settings->logo_base64 = base64_encode(File::get($settings->logo));
      $settings->ttd_direktur_base64 = base64_encode(File::get($settings->ttd_direktur));
-     $settings->stempel_ttd_admin = base64_encode(File::get($settings->ttd_admin));
+     $settings->ttd_admin_base64 = base64_encode(File::get($settings->ttd_admin));
 
 
-        $pdf = PDF::loadView('psb.surat-penerimaan', compact('data', 'settings'));
+       $pdf = PDF::loadView('psb.surat-penerimaan',
+        [
+            'logo' => $settings->logo_base64,
+            'ttd_direktur' => $settings->ttd_direktur_base64,
+            'ttd_admin' => $settings->ttd_admin_base64,
+        ]
+        ,compact('data', 'settings'));
         $pdf->setPaper('a4', 'portrait');
         // Stream PDF ke browser, yang biasanya akan memicu dialog cetak jika dibuka di tab baru.
         return $pdf->stream('surat-penerimaan.pdf');
