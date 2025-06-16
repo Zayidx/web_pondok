@@ -1,5 +1,5 @@
 <div>
-    {{-- Div ini memanggil method 'checkScanStatus' setiap 2 detik --}}
+    {{-- Div ini memanggil method 'checkScanStatus' setiap 2 detik untuk refresh data --}}
     <div wire:poll.2s="checkScanStatus">
         <div class="text-center">
             <h3>Piket & Absensi QR Code</h3>
@@ -30,7 +30,8 @@
     {{-- Bagian untuk menampilkan log/daftar yang sudah scan --}}
     <div class="mt-5">
         <h4>Log Absensi</h4>
-        @if (!empty($scanLogs) && $scanLogs->count() > 0)
+        {{-- Di sini perubahannya: Cek apakah koleksi $scanLogs tidak kosong --}}
+        @if ($scanLogs && $scanLogs->count() > 0)
             <div class="table-responsive">
                 <table class="table table-striped table-hover">
                     <thead class="thead-dark">
@@ -43,12 +44,13 @@
                     </thead>
                     <tbody>
                         @foreach ($scanLogs as $log)
-                            {{-- Pastikan relasi santri tidak null --}}
+                            {{-- Pastikan relasi santri tidak null untuk menghindari error --}}
                             @if ($log->santri)
                             <tr>
                                 <td>{{ $loop->iteration }}</td>
                                 <td>{{ $log->santri->nama }}</td>
                                 <td>{{ $log->santri->nisn }}</td>
+                                {{-- Format waktu agar lebih mudah dibaca --}}
                                 <td>{{ \Carbon\Carbon::parse($log->scanned_at)->format('H:i:s d-M-Y') }}</td>
                             </tr>
                             @endif

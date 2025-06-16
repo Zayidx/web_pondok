@@ -10,7 +10,7 @@ class KategoriPelajaran extends Model
     protected $fillable = [
         'nama',
         'deskripsi',
-        'role_guru'
+        'role_guru',
     ];
 
     public function jadwalPelajaran()

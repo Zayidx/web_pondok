@@ -19,14 +19,17 @@ class Dashboard extends Component
     #[Title('Dashboard Santri')]
     public $detailKegiatanModal, $detailPengumumanModal;
 
-    public $profile, $credentials, $timeline_spp, $pembayaran, $jadwalPelajaran, $jadwalHari;
+    public $profile, $credentials, $timeline_spp, $pembayaran, $jadwalPelajaran, $jadwalHari,$userId;
     public $setStatusSpp, $isMobile;
 
     public function mount()
     {
         Carbon::setLocale('id');
+        // Dapatkan ID dari santri yang sedang login
+$santriId = Auth::guard('santri')->id();
 
-        $this->profile = Santri::with('kamar', 'kelas', 'semester', 'angkatan')->where('nama', Auth::guard('santri')->user()->nama)->first();
+// Cari profil santri berdasarkan ID-nya (primary key)
+$this->profile = Santri::with('kamar', 'kelas', 'semester', 'angkatan')->find($santriId);
         $this->timeline_spp = PembayaranTimeline::all();
 
         $this->setStatusSpp = Carbon::now()->translatedFormat('F');
@@ -49,13 +52,16 @@ class Dashboard extends Component
 
     public function updatedSetStatusSpp($value)
     {
+         // Pastikan $this->profile tidak null sebelum menjalankan query
+    if (!$this->profile) {
+        $this->pembayaran = null;
+        return;
+    }
         $this->pembayaran = Pembayaran::with('pembayaranTimeline', 'santri')
-            ->whereHas('santri', function ($query) {
-                return $query->where('nama', Auth::guard('santri')->user()->nama);
-            })
-            ->whereHas('pembayaranTimeline', function ($query) use ($value) {
-                return $query->where('nama_bulan', $value);
-            })->first();
+        ->where('santri_id', $this->profile->id) // Menggunakan ID santri
+        ->whereHas('pembayaranTimeline', function ($query) use ($value) {
+            return $query->where('nama_bulan', $value);
+        })->first();
     }
 
     #[Computed]

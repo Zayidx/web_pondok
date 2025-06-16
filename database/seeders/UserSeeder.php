@@ -48,12 +48,6 @@ class UserSeeder extends Seeder
             ],
             [
                 'roles_id' => 6,
-                'name' => 'Muhammad Rajo',
-                'email' => 'santri@example.com',
-                'password' => Hash::make('password123')
-            ],
-            [
-                'roles_id' => 6,
                 'name' => 'Randi Kurang',
                 'email' => '0102100612',
                 'password' => Hash::make('0102100612')
@@ -76,6 +70,7 @@ class UserSeeder extends Seeder
                 'email' => 'pendaftaran-santri@example.com',
                 'password' => Hash::make('password123')
             ],
+            
         ];
 
         foreach ($data as $userData) {

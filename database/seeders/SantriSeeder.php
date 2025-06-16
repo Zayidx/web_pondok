@@ -6,7 +6,7 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-
+use Faker\Factory as Faker;
 class SantriSeeder extends Seeder
 {
     /**
@@ -14,13 +14,16 @@ class SantriSeeder extends Seeder
      */
     public function run(): void
     {
+        $faker = Faker::create('id_ID');
         $data = [
             [
+                
                 'foto'                  => '',
                 'nama'                  => 'asep subardjo',
                 'nisn'                  => '0102100612',
                 'nism'                  => '131232150027240102',
                 'kewarganegaraan'       => 'WNI',
+                'email'                 => $faker->unique()->safeEmail,
                 'nik'                   => '3215125401100001',
                 'tempat_lahir'          => 'Karawang',
                 'tanggal_lahir'         => '2010-01-14',
@@ -47,6 +50,7 @@ class SantriSeeder extends Seeder
                 'nama'                  => 'Muhammad Rajo',
                 'nisn'                  => '0102100611',
                 'nism'                  => '131232150027240102',
+                'email'                 => $faker->unique()->safeEmail,
                 'kewarganegaraan'       => 'WNI',
                 'nik'                   => '3215125401100001',
                 'tempat_lahir'          => 'Karawang',

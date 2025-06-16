@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Models\admin\Angkatan;
 use App\Models\admin\Semester;
 use App\Models\Cashless\LaundryOrder;
+use App\Models\ESantri\JadwalPiket;
 use App\Models\Spp\Pembayaran;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -42,7 +43,7 @@ class Santri extends Authenticatable
         'yang_membiayai_sekolah',
         'password',
         'remember_token',
-
+        'email',
         'kelas_id',
         'kamar_id',
         'semester_id',

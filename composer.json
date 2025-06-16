@@ -19,7 +19,8 @@
         "laravel/tinker": "^2.8",
         "livewire/livewire": "^3.5",
         "maatwebsite/excel": "^3.1",
-        "mobiledetect/mobiledetectlib": "^4.8"
+        "mobiledetect/mobiledetectlib": "^4.8",
+        "simplesoftwareio/simple-qrcode": "^4.2"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.15",

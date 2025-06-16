@@ -91,7 +91,7 @@ return new class extends Migration
             $table->string('no_kip')->nullable();
             $table->string('no_kk');
             $table->string('nama_kepala_keluarga');
-
+            $table->string('email');
             $table->enum('riwayat_penyakit', ['sehat', 'kurang_sehat']);
             $table->enum('status_kesantrian', ['aktif', 'nonaktif'])->default('aktif');
             $table->enum('status_santri', ['reguler', 'dhuafa', 'yatim_piatu']);
