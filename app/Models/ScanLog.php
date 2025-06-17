@@ -9,14 +9,17 @@ class ScanLog extends Model
 {
     use HasFactory;
 
+    // Menentukan nama tabel secara eksplisit
+    protected $table = 'scan_logs';
+
+    // Kolom yang dapat diisi secara massal
     protected $fillable = [
         'qr_session_id',
         'santri_id',
     ];
 
     /**
-     * Mendefinisikan bahwa satu Log Scan milik satu Santri.
-     * Relasi "belongs-to".
+     * Relasi belongs-to: Satu ScanLog milik satu Santri.
      */
     public function santri()
     {
@@ -24,8 +27,7 @@ class ScanLog extends Model
     }
 
     /**
-     * Mendefinisikan bahwa satu Log Scan milik satu Sesi QR.
-     * Relasi "belongs-to".
+     * Relasi belongs-to: Satu ScanLog milik satu Sesi QR.
      */
     public function qrSession()
     {

@@ -19,7 +19,6 @@ Route::middleware('guest:santri')->group(function () {
     Route::post('/login-ppdb', [SantriAuthController::class, 'login'])->name('login-ppdb-santri.post');
     Route::get('/check-status', CheckStatus::class)->name('check-status');
     Route::get('/psb/cetak-penerimaan/{registrationId}', CetakPenerimaanSurat::class)->name('psb.cetak-penerimaan');
-    Route::get('/pendaftaran-santri',\App\Livewire\Admin\PSB\PsbPage::class)->name('homepage-ppdb');
 });
 
 Route::post('/logout-santri', function () {

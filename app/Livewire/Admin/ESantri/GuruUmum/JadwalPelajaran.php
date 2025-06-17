@@ -56,6 +56,8 @@ class JadwalPelajaran extends Component
     {
         $this->jadwalPelajaranId = null;
         $this->jadwalPelajaranForm->reset();
+        session()->flash('message', 'Jadwal Pelajaran berhasil ditambahkan!');
+            $this->dispatch('close-modal');
     }
 
     public function createJadwalPelajaran()

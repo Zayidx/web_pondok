@@ -2,19 +2,18 @@
 
 namespace App\Livewire\Santri;
 
-use App\Models\ScanLog; // <-- Import model baru
-use Livewire\Component;
+use App\Models\AbsensiDetail;
 use App\Models\QrSession;
 use App\Models\Santri;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Component;
 
 class Absensi extends Component
 {
-    // ... (properti lain tetap sama) ...
     public $message;
     public $status;
     public $token;
-    public ?Santri $santri; 
+    public ?Santri $santri;
     public $scanCompleted = false;
     public $isValidSession = false;
 
@@ -22,54 +21,78 @@ class Absensi extends Component
     {
         $this->token = $token;
         $this->santri = Auth::guard('santri')->user();
-        $session = QrSession::where('token', $this->token)->first();
+        
+        // Komentar: Cari sesi QR berdasarkan token.
+        $session = QrSession::where('token', $this->token)
+            ->with('absensi') // Eager load relasi absensi
+            ->first();
 
+        // Validasi #1: Sesi tidak ditemukan.
         if (!$session) {
             $this->status = 'error';
-            $this->message = 'QR Code tidak valid atau tidak ditemukan.';
-        } elseif (now()->gt($session->expires_at)) {
+            $this->message = 'QR Code tidak valid atau sesi tidak ditemukan.';
+            return;
+        }
+
+        // Validasi #2: Sesi sudah kedaluwarsa.
+        if (now()->gt($session->expires_at)) {
             $this->status = 'error';
             $this->message = 'Maaf, QR Code ini sudah kedaluwarsa.';
-        } else {
-            // Cek apakah santri ini sudah pernah scan untuk sesi ini
-            $alreadyScanned = ScanLog::where('qr_session_id', $session->id)
-                                     ->where('santri_id', $this->santri->id)
-                                     ->exists();
-            if ($alreadyScanned) {
-                 $this->status = 'error';
-                 $this->message = 'Anda sudah melakukan absensi untuk sesi ini.';
-                 $this->scanCompleted = true;
-            } else {
-                $this->isValidSession = true;
-            }
+            return;
         }
+        
+        // Validasi #3: Santri tidak terdaftar di kelas yang benar.
+        if ($this->santri->kelas_id !== $session->absensi->kelas_id) {
+            $this->status = 'error';
+            $this->message = 'Anda tidak terdaftar pada kelas untuk sesi absensi ini.';
+            return;
+        }
+        
+        // Komentar: Cari detail absensi untuk santri dan sesi ini.
+        $absensiDetail = AbsensiDetail::where('absensi_id', $session->absensi_id)
+                                    ->where('santri_id', $this->santri->id)
+                                    ->first();
+
+        // Validasi #4: Santri sudah tercatat hadir.
+        if ($absensiDetail && $absensiDetail->status === 'Hadir') {
+            $this->status = 'error';
+            $this->message = 'Anda sudah melakukan absensi untuk sesi ini.';
+            $this->scanCompleted = true; // Langsung tampilkan pesan error
+            return;
+        }
+        
+        // Jika semua validasi lolos
+        $this->isValidSession = true;
     }
 
-
-    // Method ini akan dipanggil saat santri menekan tombol konfirmasi
+    /**
+     * Komentar: Method ini akan dipanggil saat santri menekan tombol konfirmasi.
+     */
     public function confirmScan()
     {
         if (!$this->isValidSession) {
             return;
         }
-
+        
         $session = QrSession::where('token', $this->token)->first();
-
+        
         if ($session) {
-            // PERUBAHAN UTAMA: Buat record baru di tabel scan_logs
-            ScanLog::create([
-                'qr_session_id' => $session->id,
-                'santri_id' => $this->santri->id,
-            ]);
+            // Komentar: Update record di tabel absensi_details.
+            AbsensiDetail::where('absensi_id', $session->absensi_id)
+                ->where('santri_id', $this->santri->id)
+                ->update([
+                    'status' => 'Hadir',
+                    'jam_hadir' => now()
+                ]);
 
             $this->status = 'success';
             $this->message = 'Absensi Anda berhasil tercatat. Terima kasih!';
-            $this->scanCompleted = true;
         } else {
             $this->status = 'error';
             $this->message = 'Gagal! Sesi QR tidak ditemukan lagi.';
-            $this->scanCompleted = true;
         }
+        
+        $this->scanCompleted = true; // Tampilkan halaman hasil
     }
 
     public function render()
@@ -77,4 +100,3 @@ class Absensi extends Component
         return view('livewire.santri.absensi');
     }
 }
-

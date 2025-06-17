@@ -1,66 +1,68 @@
+<script src="https://cdn.tailwindcss.com"></script>
 <div>
-    {{-- Div ini memanggil method 'checkScanStatus' setiap 2 detik untuk refresh data --}}
-    <div wire:poll.2s="checkScanStatus">
-        <div class="text-center">
-            <h3>Piket & Absensi QR Code</h3>
-            <p>Silakan Scan QR Code di Bawah Ini</p>
-        </div>
+    <div class="container mx-auto p-4 font-sans antialiased">
+        <h1 class="text-3xl font-extrabold mb-4 text-gray-900 text-center">Dashboard Admin Piket</h1>
 
-        {{-- Bagian untuk menampilkan QR Code --}}
-        <div class="text-center p-4 border rounded bg-white shadow-sm mx-auto" style="max-width: 350px;">
-            @if ($qrCodeUrl)
-                {!! QrCode::size(300)->generate($qrCodeUrl) !!}
-            @else
-                <p>Membuat QR Code...</p>
-            @endif
-        </div>
-
-        {{-- Tombol untuk membuat QR code baru --}}
-        <div class="text-center mt-3">
-            <button wire:click="generateNewQrCode" class="btn btn-primary">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-repeat" viewBox="0 0 16 16">
-                    <path d="M11.534 7h3.932a.25.25 0 0 1 .192.41l-1.966 2.36a.25.25 0 0 1-.384 0l-1.966-2.36a.25.25 0 0 1 .192-.41zm-11 2h3.932a.25.25 0 0 0 .192-.41L2.692 6.23a.25.25 0 0 0-.384 0L.342 8.59A.25.25 0 0 0 .534 9z"/>
-                    <path fill-rule="evenodd" d="M8 3c-1.552 0-2.94.707-3.857 1.818a.5.5 0 1 1-.771-.636A6.002 6.002 0 0 1 13.917 7H12.5A5.002 5.002 0 0 0 8 3zM3.5 13A5.002 5.002 0 0 0 8 15c1.552 0 2.94-.707 3.857-1.818a.5.5 0 1 1 .771.636A6.002 6.002 0 0 1 2.083 9H3.5A5.002 5.002 0 0 0 8 13z"/>
-                </svg>
-                Buat QR Code Baru
+        <!-- Kontrol untuk memilih tanggal dan ekspor -->
+        <div class="bg-white p-4 rounded-lg shadow-md mb-8 flex flex-col sm:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2">
+                <label for="date-filter" class="font-semibold text-gray-700">Pilih Tanggal:</label>
+                <!-- Input tanggal yang terhubung dengan properti $selectedDate -->
+                <input type="date" id="date-filter" wire:model.live="selectedDate" class="border-gray-300 rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50">
+            </div>
+            <!-- Tombol untuk mengekspor data ke Excel -->
+            <button wire:click="exportExcel" class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                <i class="bi bi-file-earmark-excel-fill mr-2"></i>
+                Export ke Excel
             </button>
         </div>
-    </div>
 
-    {{-- Bagian untuk menampilkan log/daftar yang sudah scan --}}
-    <div class="mt-5">
-        <h4>Log Absensi</h4>
-        {{-- Di sini perubahannya: Cek apakah koleksi $scanLogs tidak kosong --}}
-        @if ($scanLogs && $scanLogs->count() > 0)
+        <p class="text-xl text-gray-700 mb-8 text-center">
+            Menampilkan Jadwal untuk: <span class="font-semibold text-blue-700">{{ $hariDipilih }}, {{ $tanggalDipilihFormatted }}</span>
+        </p>
+
+        @if (!empty($groupedJadwal))
             <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead class="thead-dark">
+                <table class="table table-hover table-striped">
+                    <thead>
                         <tr>
-                            <th>#</th>
-                            <th>Nama Santri</th>
-                            <th>NISN</th>
-                            <th>Waktu Scan</th>
+                            <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Kelas</th>
+                            <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total Mapel</th>
+                            <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jadwal Masuk</th>
+                            <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Jadwal Pulang</th>
+                            <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach ($scanLogs as $log)
-                            {{-- Pastikan relasi santri tidak null untuk menghindari error --}}
-                            @if ($log->santri)
-                            <tr>
-                                <td>{{ $loop->iteration }}</td>
-                                <td>{{ $log->santri->nama }}</td>
-                                <td>{{ $log->santri->nisn }}</td>
-                                {{-- Format waktu agar lebih mudah dibaca --}}
-                                <td>{{ \Carbon\Carbon::parse($log->scanned_at)->format('H:i:s d-M-Y') }}</td>
+                    <tbody class="divide-y divide-gray-200">
+                        @forelse ($groupedJadwal as $kelasId => $dataKelas)
+                            <tr class="hover:bg-gray-50">
+                                <td class="py-3 px-4 whitespace-nowrap font-semibold">{{ $dataKelas['kelas_nama'] }}</td>
+                                <td class="py-3 px-4 whitespace-nowrap">
+                                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                                        {{ $dataKelas['total_mapel'] }}
+                                    </span>
+                                </td>
+                                <td class="py-3 px-4 whitespace-nowrap">{{ $dataKelas['jadwal_masuk'] }}</td>
+                                <td class="py-3 px-4 whitespace-nowrap">{{ $dataKelas['jadwal_pulang'] }}</td>
+                                <td class="py-3 px-4 whitespace-nowrap">
+                                    <!-- Link detail sekarang menyertakan tanggal yang dipilih -->
+                                    <a href="{{ route('admin.piket.detail_kelas', ['kelasId' => $dataKelas['kelas_id'], 'tanggal' => $selectedDate]) }}" wire:navigate class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700">
+                                        <i class="bi bi-eye-fill mr-1"></i> Detail
+                                    </a>
+                                </td>
                             </tr>
-                            @endif
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="5" class="py-4 px-4 text-center text-gray-500">Tidak ada jadwal pelajaran.</td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
         @else
-            <div class="alert alert-info">
-                Belum ada santri yang melakukan scan untuk sesi ini.
+            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-6 rounded-lg shadow-md" role="alert">
+                <p class="font-bold text-lg">Informasi</p>
+                <p>Tidak ada jadwal pelajaran untuk <span class="font-semibold">{{ $hariDipilih }}, {{ $tanggalDipilihFormatted }}</span>.</p>
             </div>
         @endif
     </div>

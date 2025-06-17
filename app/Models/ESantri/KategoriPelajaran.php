@@ -10,7 +10,7 @@ class KategoriPelajaran extends Model
     protected $fillable = [
         'nama',
         'deskripsi',
-        'role_guru',
+        'role_guru', // Jika kolom ini tidak lagi relevan dengan guru, pertimbangkan untuk menghapusnya dari tabel database juga.
     ];
 
     public function jadwalPelajaran()

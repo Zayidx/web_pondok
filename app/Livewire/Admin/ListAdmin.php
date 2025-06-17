@@ -12,12 +12,14 @@ use Livewire\WithPagination;
 
 class ListAdmin extends Component
 {
-    use WithPagination;
 
+    use WithPagination;
+    
     public $admin_id, $user_id, $roles_id;
     #[Title('Halaman List Admin')]
 
     #[Url(except: "")]
+    protected $paginationTheme = 'bootstrap';
     public $perPage = 5;
 
     public function updatedPerPage()

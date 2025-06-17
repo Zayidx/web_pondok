@@ -5,22 +5,23 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class QrSession extends Model
+class AbsensiDetail extends Model
 {
     use HasFactory;
 
     // Menentukan nama tabel secara eksplisit
-    protected $table = 'qr_sessions';
+    protected $table = 'absensi_details';
 
     // Kolom yang dapat diisi secara massal
     protected $fillable = [
         'absensi_id',
-        'token',
-        'expires_at',
+        'santri_id',
+        'status',
+        'jam_hadir',
     ];
 
     /**
-     * Relasi belongs-to: Satu QrSession milik satu sesi Absensi.
+     * Relasi belongs-to: Satu AbsensiDetail milik satu Absensi (sesi induk).
      */
     public function absensi()
     {
@@ -28,10 +29,10 @@ class QrSession extends Model
     }
 
     /**
-     * Relasi one-to-many: Satu QrSession dapat memiliki banyak ScanLog.
+     * Relasi belongs-to: Satu AbsensiDetail milik satu Santri.
      */
-    public function scanLogs()
+    public function santri()
     {
-        return $this->hasMany(ScanLog::class);
+        return $this->belongsTo(Santri::class);
     }
 }

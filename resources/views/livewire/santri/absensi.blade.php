@@ -2,7 +2,7 @@
     <div class="row justify-content-center">
         <div class="col-md-8 col-lg-6">
 
-            {{-- Tampilkan halaman konfirmasi jika sesi valid DAN scan belum selesai --}}
+            {{-- Komentar: Tampilkan halaman konfirmasi jika sesi valid DAN scan belum selesai. --}}
             @if ($isValidSession && !$scanCompleted)
                 <div class="card shadow-sm">
                     <div class="card-header text-center bg-primary text-white">
@@ -11,9 +11,9 @@
                     <div class="card-body text-center">
                         <p>Pastikan data di bawah ini adalah benar milik Anda sebelum melanjutkan.</p>
                         
-                        {{-- Tampilkan foto santri jika ada, jika tidak, tampilkan inisial --}}
+                        {{-- Komentar: Tampilkan foto santri jika ada, jika tidak, tampilkan inisial. --}}
                         @if ($santri->foto)
-                            <img src="{{ asset('storage/' . $santri->foto) }}" class="rounded-circle mb-3" width="100" height="100" alt="Foto Santri">
+                            <img src="{{ asset('storage/' . $santri->foto) }}" class="rounded-circle mb-3 object-cover" width="100" height="100" alt="Foto Santri">
                         @else
                             <div class="rounded-circle bg-secondary text-white d-flex justify-content-center align-items-center mx-auto mb-3" style="width: 100px; height: 100px;">
                                 <span style="font-size: 2.5rem;">{{ strtoupper(substr($santri->nama, 0, 1)) }}</span>
@@ -22,38 +22,42 @@
 
                         <h5 class="card-title">{{ $santri->nama }}</h5>
                         <ul class="list-group list-group-flush text-left">
-                            <li class="list-group-item"><strong>NISN:</strong> {{ $santri->nisn }}</li>
-                            <li class="list-group-item"><strong>Kelas:</strong> {{ $santri->kelas->nama_kelas ?? 'Tidak ada data' }}</li>
-                            <li class="list-group-item"><strong>Kamar:</strong> {{ $santri->kamar->nama_kamar ?? 'Tidak ada data' }}</li>
+                            <li class="list-group-item"><strong>NISN:</strong> {{ $santri->nisn ?? '-' }}</li>
+                            {{-- Komentar: Memuat relasi kelas untuk menampilkan nama kelas --}}
+                            <li class="list-group-item"><strong>Kelas:</strong> {{ $santri->kelas->nama ?? 'Tidak ada data' }}</li>
                         </ul>
 
                         <div class="mt-4">
-                            {{-- Tombol Konfirmasi --}}
+                            {{-- Komentar: Tombol Konfirmasi --}}
                             <button wire:click="confirmScan" wire:loading.attr="disabled" class="btn btn-success btn-lg">
                                 <span wire:loading.remove>✅ Ya, Konfirmasi Kehadiran Saya</span>
                                 <span wire:loading>Memproses...</span>
                             </button>
 
-                            {{-- Tombol Batal --}}
-                            <a href="{{ url()->previous() }}" class="btn btn-danger btn-lg">Batal</a>
+                            {{-- Komentar: Tombol Batal --}}
+                            <a href="{{ route('santri.scanner') }}" wire:navigate class="btn btn-danger btn-lg">Batal</a>
                         </div>
                     </div>
                 </div>
 
-            {{-- Tampilkan hasil setelah konfirmasi atau jika sesi tidak valid --}}
+            {{-- Komentar: Tampilkan halaman hasil setelah konfirmasi atau jika sesi tidak valid. --}}
             @else
                 <div class="card shadow-sm text-center">
-                    <div class="card-body">
+                    <div class="card-body p-5">
                         @if ($status === 'success')
-                            <h1 class="text-success" style="font-size: 4rem;">✓</h1>
+                            <div class="text-success mb-3" style="font-size: 4rem;">
+                                <i class="bi bi-check-circle-fill"></i>
+                            </div>
                             <h2>Berhasil!</h2>
                             <p class="lead">{{ $message }}</p>
                         @else
-                            <h1 class="text-danger" style="font-size: 4rem;">✗</h1>
+                            <div class="text-danger mb-3" style="font-size: 4rem;">
+                                <i class="bi bi-x-circle-fill"></i>
+                            </div>
                             <h2>Gagal!</h2>
                             <p class="lead">{{ $message }}</p>
                         @endif
-                        <a href="#" class="btn btn-primary mt-3">Kembali ke Dashboard</a>
+                        <a href="{{ route('santri.dashboard') }}" wire:navigate class="btn btn-primary mt-3">Kembali ke Dashboard</a>
                     </div>
                 </div>
             @endif

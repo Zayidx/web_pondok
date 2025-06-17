@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 use App\Livewire\Admin\ESantri\GuruDiniyyah;
 use App\Livewire\Admin\ESantri\GuruUmum;
 use App\Livewire\Santri;
-use App\Livewire\Santri\Absensi;
 use App\Livewire\Santri\Scanner;
 
 Route::prefix('e-santri')->middleware('auth')->group(function () {
@@ -30,7 +29,7 @@ Route::prefix('santri')->middleware(['web', 'auth:santri'])->group(function () {
     Route::get('/profile', Santri\Profile::class)->name('santri.profile');
     Route::get('/kegiatan', Santri\Kegiatan::class)->name('santri.kegiatan');
     Route::get('/pengumuman', Santri\Pengumuman::class)->name('santri.pengumuman');
+    // Komentar: Rute untuk menampilkan halaman dengan kamera scanner.
+    Route::get('/scanner', Scanner::class)->name('scanner');
 
-     Route::get('/scanner', Scanner::class)->name('santri.scanner');
-     Route::get('/absensi/{token}', Absensi::class)->name('santri.absensi');
 });

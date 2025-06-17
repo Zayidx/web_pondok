@@ -1,8 +1,6 @@
 <?php
-use App\Livewire\Admin\AdminPiket\Dashboard;
-use App\Livewire\Santri\Absensi;
+
 use App\Livewire\Auth;
-use App\Livewire\Santri\Scanner;
 use App\Livewire\StudentExam;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
@@ -35,14 +33,13 @@ Route::get('/generate', function () {
     echo 'ok';
 });
 
-// Rute untuk admin, tetap publik tanpa middleware
-Route::get('/admin/piket/dashboard', Dashboard::class)->name('admin.piket.dashboard');
 
 
 // Route redirect
 require __DIR__ . '/superadmin.php';
 require __DIR__ . '/e-spp.php';
 require __DIR__ . '/e-ppdb.php';
+require __DIR__ . '/e-absensi.php';
 require __DIR__ . '/e-santri.php';
 require __DIR__ . '/e-cashless/petugas-e-cashless.php';
 require __DIR__ . '/e-cashless/petugas-laundry.php';

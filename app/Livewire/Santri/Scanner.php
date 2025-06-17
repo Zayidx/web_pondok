@@ -12,7 +12,7 @@ class Scanner extends Component
      */
     public function render()
     {
-        // Pastikan Anda menggunakan layout yang sesuai untuk halaman santri
+        // Komentar: Pastikan Anda menggunakan layout yang sesuai untuk halaman santri.
         return view('livewire.santri.scanner');
     }
 }

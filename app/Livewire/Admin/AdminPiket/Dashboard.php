@@ -2,70 +2,88 @@
 
 namespace App\Livewire\Admin\AdminPiket;
 
+use App\Exports\AbsensiExport;
+use App\Models\ESantri\JadwalPelajaran;
+use Carbon\Carbon;
 use Livewire\Component;
-use App\Models\QrSession;
-use Illuminate\Support\Str;
+use Maatwebsite\Excel\Facades\Excel;
 
 class Dashboard extends Component
 {
-    public $qrCodeUrl;
-    public $sessionId;
-
-    // Properti untuk menyimpan daftar santri yang sudah scan
-    public $scanLogs = [];
+    // Properti untuk menyimpan tanggal yang dipilih, defaultnya hari ini
+    public $selectedDate;
 
     public function mount()
     {
-        // Panggil method untuk membuat QR code baru saat komponen dimuat
-        $this->generateNewQrCode();
+        // Menginisialisasi tanggal dengan tanggal hari ini
+        $this->selectedDate = now()->format('Y-m-d');
     }
 
-    public function generateNewQrCode()
+    /**
+     * Method untuk mengekspor data absensi ke file Excel.
+     */
+    public function exportExcel()
     {
-        // Hapus sesi QR yang lama untuk memulai sesi yang baru dan bersih
-        if ($this->sessionId) {
-            QrSession::find($this->sessionId)->delete();
-        }
-
-        // Buat token acak yang unik
-        $token = Str::random(40);
-        
-        // Buat record baru di tabel qr_sessions
-        $session = QrSession::create([
-            'token' => $token,
-            'expires_at' => now()->addMinutes(5), // QR Code berlaku selama 5 menit
-        ]);
-
-        // Simpan ID sesi dan buat URL menggunakan helper url() standar
-        $this->sessionId = $session->id;
-        // Gunakan env NGROK_URL jika ada, jika tidak gunakan url() biasa
-        // Ini penting agar QR Code bisa di-scan dari HP saat development
-        $baseUrl = env('NGROK_URL', url('/'));
-        $this->qrCodeUrl = rtrim($baseUrl, '/') . '/santri/absensi/' . $token;
-        
-        // Kosongkan log scan setiap kali QR baru dibuat
-        $this->scanLogs = [];
+        // Nama file yang akan diunduh
+        $fileName = 'rekap-absensi-' . $this->selectedDate . '.xlsx';
+        // Menggunakan pustaka Maatwebsite Excel untuk mengunduh file
+        return Excel::download(new AbsensiExport($this->selectedDate), $fileName);
     }
-
-    // Method untuk memeriksa status dan mengambil log scan
-    public function checkScanStatus()
-    {
-        if (!$this->sessionId) {
-            return;
-        }
-
-        // Ambil data sesi QR yang aktif beserta relasi ke scanLogs
-        $session = QrSession::with('scanLogs.santri')->find($this->sessionId);
-
-        // Jika sesi ditemukan, perbarui properti scanLogs
-        if ($session) {
-            $this->scanLogs = $session->scanLogs;
-        }
-    }
-
+    
     public function render()
     {
-        // Tampilkan view
-        return view('livewire.admin.admin-piket.dashboard');
+        Carbon::setLocale('id');
+
+        // Mengambil nama hari dari tanggal yang dipilih
+        $selectedCarbonDate = Carbon::parse($this->selectedDate);
+        $hariDipilih = $selectedCarbonDate->translatedFormat('l');
+
+        // Mengambil jadwal pelajaran berdasarkan hari dari tanggal yang dipilih
+        $jadwalCollection = JadwalPelajaran::with(['kelas', 'kategoriPelajaran'])
+            ->where('hari', $hariDipilih)
+            ->get();
+
+        $groupedJadwal = [];
+
+        foreach ($jadwalCollection as $jadwal) {
+            $kelasId = $jadwal->kelas_id;
+            $namaKelas = $jadwal->kelas->nama ?? 'Tanpa Kelas';
+
+            if (!isset($groupedJadwal[$kelasId])) {
+                $groupedJadwal[$kelasId] = [
+                    'kelas_id' => $kelasId,
+                    'kelas_nama' => $namaKelas,
+                    'jadwals' => [],
+                    'waktu_mulai_terawal' => null,
+                    'waktu_selesai_terakhir' => null,
+                ];
+            }
+
+            $groupedJadwal[$kelasId]['jadwals'][] = $jadwal;
+
+            $waktuMulai = Carbon::parse($jadwal->waktu_mulai);
+            $waktuSelesai = Carbon::parse($jadwal->waktu_selesai);
+
+            if ($groupedJadwal[$kelasId]['waktu_mulai_terawal'] === null || $waktuMulai->lt(Carbon::parse($groupedJadwal[$kelasId]['waktu_mulai_terawal']))) {
+                $groupedJadwal[$kelasId]['waktu_mulai_terawal'] = $waktuMulai->toTimeString();
+            }
+
+            if ($groupedJadwal[$kelasId]['waktu_selesai_terakhir'] === null || $waktuSelesai->gt(Carbon::parse($groupedJadwal[$kelasId]['waktu_selesai_terakhir']))) {
+                $groupedJadwal[$kelasId]['waktu_selesai_terakhir'] = $waktuSelesai->toTimeString();
+            }
+        }
+
+        foreach ($groupedJadwal as $kelasId => $data) {
+            $groupedJadwal[$kelasId]['jadwal_masuk'] = $data['waktu_mulai_terawal'] ? Carbon::parse($data['waktu_mulai_terawal'])->format('H:i') : '-';
+            // FIX: Mengubah variabel $groupedJwal menjadi $groupedJadwal
+            $groupedJadwal[$kelasId]['jadwal_pulang'] = $data['waktu_selesai_terakhir'] ? Carbon::parse($data['waktu_selesai_terakhir'])->format('H:i') : '-';
+            $groupedJadwal[$kelasId]['total_mapel'] = count($data['jadwals']);
+        }
+        
+        return view('livewire.admin.admin-piket.dashboard', [
+            'tanggalDipilihFormatted' => $selectedCarbonDate->translatedFormat('d F Y'),
+            'hariDipilih' => $hariDipilih,
+            'groupedJadwal' => $groupedJadwal,
+        ]);
     }
 }
