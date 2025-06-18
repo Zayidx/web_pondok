@@ -6,9 +6,6 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     */
     public function up(): void
     {
         Schema::create('jenjangs', function (Blueprint $table) {
@@ -91,27 +88,22 @@ return new class extends Migration
             $table->string('no_kip')->nullable();
             $table->string('no_kk');
             $table->string('nama_kepala_keluarga');
-
+            $table->string('email');
             $table->enum('riwayat_penyakit', ['sehat', 'kurang_sehat']);
             $table->enum('status_kesantrian', ['aktif', 'nonaktif'])->default('aktif');
             $table->enum('status_santri', ['reguler', 'dhuafa', 'yatim_piatu']);
-
             $table->string('asal_sekolah')->default('Sekolah');
             $table->string('yang_membiayai_sekolah')->default('Ayah');
-
             $table->foreignId('kelas_id')->nullable()->constrained('kelas')->onUpdate('cascade')->onDelete('cascade')->default(1);
             $table->foreignId('kamar_id')->nullable()->constrained('kamars')->onUpdate('cascade')->onDelete('cascade')->default(1);
             $table->foreignId('semester_id')->nullable()->constrained('semesters')->onUpdate('cascade')->onDelete('cascade')->default(1);
             $table->foreignId('angkatan_id')->nullable()->constrained('angkatans')->onUpdate('cascade')->onDelete('cascade')->default(1);
-
             $table->timestamps();
         });
 
         Schema::create('orang_tua_santris', function (Blueprint $table) {
             $table->id();
             $table->foreignId('santri_id')->nullable()->constrained('santris')->onDelete('cascade')->onUpdate('cascade');
-
-            // Data Ayah
             $table->string('nama_ayah');
             $table->enum('status_ayah', ['hidup', 'meninggal']);
             $table->enum('kewarganegaraan_ayah', ['wni', 'wna'])->default('wni');
@@ -122,8 +114,6 @@ return new class extends Migration
             $table->string('pekerjaan_ayah');
             $table->string('penghasilan_ayah');
             $table->string('no_telp_ayah');
-
-            // Data Ibu
             $table->string('nama_ibu');
             $table->enum('status_ibu', ['hidup', 'meninggal'])->default("hidup");
             $table->enum('kewarganegaraan_ibu', ['wni', 'wna'])->default('wni');
@@ -134,8 +124,6 @@ return new class extends Migration
             $table->string('pekerjaan_ibu');
             $table->string('penghasilan_ibu');
             $table->string('no_telp_ibu');
-
-            // Alamat Orang Tua
             $table->string('status_kepemilikan_rumah');
             $table->string('provinsi');
             $table->string('kabupaten');
@@ -146,11 +134,9 @@ return new class extends Migration
             $table->string('alamat');
             $table->string('kode_pos');
             $table->enum('status_orang_tua', ['kawin', 'cerai hidup', 'cerai mati'])->default("kawin");
-
             $table->timestamps();
         });
 
-        // Tabel pengumuman
         Schema::create('pengumuman', function (Blueprint $table) {
             $table->id();
             $table->string('judul');
@@ -159,7 +145,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // Tabel kegiatan
         Schema::create('kegiatan', function (Blueprint $table) {
             $table->id();
             $table->string('judul');
@@ -169,7 +154,6 @@ return new class extends Migration
             $table->timestamps();
         });
 
-        // Tabel Jadwal Piket
         Schema::create('jadwal_piket', function (Blueprint $table) {
             $table->id();
             $table->foreignId('santri_id')->constrained('santris')->onUpdate('cascade')->onDelete('cascade');
@@ -199,6 +183,7 @@ return new class extends Migration
             $table->time('waktu_selesai');
             $table->enum('hari', ['Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu', 'Minggu']);
             $table->enum('role_guru', ['diniyyah', 'umum'])->default('umum');
+            $table->boolean('sesi_absensi_aktif')->default(false);
             $table->timestamps();
         });
 
@@ -206,13 +191,32 @@ return new class extends Migration
             $table->string('nama_tahun')->primary();
             $table->timestamps();
         });
+
+        Schema::create('qr_tokens', function (Blueprint $table) {
+            $table->id();
+            $table->string('token')->unique();
+            $table->foreignId('jadwal_pelajaran_id')->constrained('jadwal_pelajaran')->onDelete('cascade');
+            $table->foreignId('used_by')->nullable()->constrained('santris')->onDelete('set null');
+            $table->timestamp('expires_at');
+            $table->timestamps();
+        });
+
+        Schema::create('kehadiran', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('santri_id')->constrained('santris')->onDelete('cascade');
+            $table->foreignId('jadwal_pelajaran_id')->constrained('jadwal_pelajaran')->onDelete('cascade');
+            $table->date('tanggal');
+            $table->enum('status', ['hadir', 'sakit', 'izin', 'alpa'])->default('hadir');
+            $table->timestamp('waktu_hadir');
+            $table->timestamps();
+            $table->unique(['santri_id', 'jadwal_pelajaran_id', 'tanggal']);
+        });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
+        Schema::dropIfExists('kehadiran');
+        Schema::dropIfExists('qr_tokens');
         Schema::dropIfExists('jenjangs');
         Schema::dropIfExists('roles');
         Schema::dropIfExists('admins');

@@ -5,9 +5,9 @@
         </div>
         <div class="card-body">
             @if (session()->has('message'))
-                <div class="alert alert-success">
-                    {{ session('message') }}
-                </div>
+            <div class="alert alert-success">
+                {{ session('message') }}
+            </div>
             @endif
 
             <form wire:submit="save">
@@ -35,9 +35,9 @@
                         <div class="form-group mb-3">
                             <label>Logo Pesantren</label>
                             <div class="d-flex align-items-center gap-3">
-                            @if($settings->logo_base64)
-    <img src="{{ $settings->logo_base64 }}" width="140px">
-@endif
+                                @if($settings->logo_base64)
+                                <img src="{{ $settings->logo_base64 }}" width="140px">
+                                @endif
                                 <input type="file" class="form-control" wire:model="logo" accept="image/*">
                             </div>
                             @error('logo') <span class="text-danger">{{ $message }}</span> @enderror
@@ -46,9 +46,9 @@
                         <div class="form-group mb-3">
                             <label>Stempel Pesantren</label>
                             <div class="d-flex align-items-center gap-3">
-                            @if($settings->stempel_base64)
-    <img src="{{ $settings->stempel_base64 }}" width="140px">
-@endif
+                                @if($settings->stempel_base64)
+                                <img src="{{ $settings->stempel_base64 }}" width="140px">
+                                @endif
                                 <input type="file" class="form-control" wire:model="stempel" accept="image/*">
                             </div>
                             @error('stempel') <span class="text-danger">{{ $message }}</span> @enderror
@@ -178,4 +178,4 @@
             </form>
         </div>
     </div>
-</div> 
+</div>

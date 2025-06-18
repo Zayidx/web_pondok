@@ -46,6 +46,7 @@ class CheckStatus extends Component
             'completed' => false,
             'current' => false,
             'date' => null,
+            'deadline' => null, // Tambahan untuk batas waktu
         ],
     ];
 
@@ -119,11 +120,21 @@ class CheckStatus extends Component
                 ? $this->santri->updated_at->format('d F Y')
                 : null,
         ];
+        
+        // --- LOGIKA YANG DIPERBAIKI ---
+        $deadlineDaftarUlang = optional($this->santri->periode)->akhir_pendaftaran_ulang 
+            ? Carbon::parse($this->santri->periode->akhir_pendaftaran_ulang)->format('d F Y') 
+            : null;
 
         $this->timelineStatus['daftar_ulang'] = [
+            // Selesai jika status 'daftar_ulang' DAN pembayaran sudah terverifikasi
             'completed' => $this->santri->status_santri === 'daftar_ulang' && $this->santri->status_pembayaran === 'verified',
-            'current' => $this->santri->status_santri === 'daftar_ulang',
-            'date' => $this->santri->tanggal_pembayaran ? Carbon::parse($this->santri->tanggal_pembayaran)->format('d F Y') : null
+            // Menjadi tahap 'current' jika sudah diterima ATAU sedang dalam proses daftar ulang
+            'current' => in_array($this->santri->status_santri, ['diterima', 'daftar_ulang']),
+            // Tanggal yang ditampilkan adalah tanggal verifikasi pembayaran
+            'date' => $this->santri->status_pembayaran === 'verified' && $this->santri->tanggal_pembayaran ? Carbon::parse($this->santri->tanggal_pembayaran)->format('d F Y') : null,
+            // Menambahkan info batas akhir pendaftaran ulang
+            'deadline' => $deadlineDaftarUlang,
         ];
     }
 

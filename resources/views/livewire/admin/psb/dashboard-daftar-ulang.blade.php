@@ -192,20 +192,39 @@
     @endif
 
     @if($showProofModal)
-    <div class="modal fade show" style="display: block;">
-        <div class="modal-dialog modal-lg modal-dialog-centered">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Bukti Pembayaran</h5>
-                    <button type="button" class="btn-close" wire:click="closeProofModal"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <img src="{{ $proofImageUrl }}" class="img-fluid rounded" alt="Bukti Pembayaran">
+    <div class="modal fade show" style="display: block;" tabindex="-1" role="dialog">
+            <div class="modal-dialog modal-lg modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Bukti Pembayaran</h5>
+                        <button type="button" class="btn-close" wire:click="closeProofModal"></button>
+                    </div>
+                    <div class="modal-body text-center" style="min-height: 250px; display: flex; justify-content: center; align-items: center;">
+                        
+                        {{-- Indikator Loading: Muncul saat ada aksi Livewire yang berjalan --}}
+                        <div wire:loading>
+                            <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+                                <span class="visually-hidden">Memuat...</span>
+                            </div>
+                            <p class="mt-3">Memuat gambar...</p>
+                        </div>
+
+                        {{-- Kontainer Gambar: Dihapus dari DOM saat loading --}}
+                        <div wire:loading.remove>
+                            @if ($proofImageUrl)
+                                <img src="{{ $proofImageUrl }}" class="img-fluid rounded" alt="Bukti Pembayaran">
+                            @else
+                                {{-- Pesan opsional jika gambar gagal dimuat --}}
+                                <p>Gagal memuat gambar atau gambar tidak ditemukan.</p>
+                            @endif
+                        </div>
+
+                    </div>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="modal-backdrop fade show"></div>
+        {{-- Latar belakang modal --}}
+        <div class="modal-backdrop fade show"></div>
     @endif
 
     @if($registrations->isEmpty())

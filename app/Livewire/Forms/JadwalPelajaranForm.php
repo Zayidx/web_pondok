@@ -22,4 +22,5 @@ class JadwalPelajaranForm extends Form
     public $hari;
     #[Validate('required|in:diniyyah,umum')]
     public $role_guru;
+    public $jenjang_id;
 }

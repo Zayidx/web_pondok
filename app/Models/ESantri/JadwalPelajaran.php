@@ -2,7 +2,6 @@
 namespace App\Models\ESantri;
 
 use App\Models\Kelas;
-
 use Illuminate\Database\Eloquent\Model;
 
 class JadwalPelajaran extends Model
@@ -16,7 +15,7 @@ class JadwalPelajaran extends Model
         'waktu_mulai', 
         'waktu_selesai', 
         'hari',
-        'role_guru'
+        'jenjang_id' 
     ];
 
     public function kelas()
@@ -26,6 +25,12 @@ class JadwalPelajaran extends Model
 
     public function kategoriPelajaran()
     {
-        return $this->belongsTo(kategoriPelajaran::class);
+        return $this->belongsTo(KategoriPelajaran::class);
     }
+
+    // Relasi guru() dihapus
+    // public function guru()
+    // {
+    //     return $this->belongsTo(User::class, 'role_guru', 'id');
+    // }
 }

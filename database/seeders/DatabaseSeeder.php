@@ -40,6 +40,7 @@ class DatabaseSeeder extends Seeder
       
             SuratPenerimaanSettingSeeder::class,
             DaftarUlangSeeder::class,
+            JadwalSelasaLengkapSeeder::class,
         ]);
     }
 }

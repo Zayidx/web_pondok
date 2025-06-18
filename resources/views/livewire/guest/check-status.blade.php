@@ -1,8 +1,8 @@
-{{-- Ujian/livewire/guest/check-status.blade.php --}}
 @extends('components.layouts.check-status')
 
 @section('content')
 <div>
+    {{-- Bagian Navigasi --}}
     <nav class="bg-white shadow-lg fixed w-full top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="flex justify-between items-center h-16">
@@ -56,6 +56,7 @@
         </div>
     </nav>
 
+    {{-- Notifikasi Session --}}
     @if (session()->has('message'))
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-20">
         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative" role="alert">
@@ -72,6 +73,7 @@
     </div>
     @endif
 
+    {{-- Header Dashboard --}}
     <section class="bg-gradient-to-br from-blue-50 to-indigo-100 pt-20 pb-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center">
@@ -87,6 +89,7 @@
         </div>
     </section>
 
+    {{-- Informasi Siswa --}}
     <section class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
@@ -132,6 +135,7 @@
         </div>
     </section>
 
+    {{-- Timeline Seleksi --}}
     <section class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
@@ -147,6 +151,7 @@
                 <div class="relative">
                     <div class="absolute left-8 top-0 bottom-0 w-1 bg-gray-300"></div>
                     <div class="space-y-8">
+                        {{-- Tahap Pendaftaran Online --}}
                         <div class="relative flex items-center">
                             <div class="bg-green-500 p-6 rounded-full text-white z-10">
                                 <i class="fas fa-check text-lg"></i>
@@ -158,6 +163,7 @@
                             </div>
                         </div>
 
+                        {{-- Tahap Wawancara --}}
                         <div class="relative flex items-center">
                             @php
                                 $showAsCompleted = $santri->status_santri === 'daftar_ulang' || $timelineStatus['wawancara']['completed'];
@@ -193,6 +199,7 @@
                             </div>
                         </div>
 
+                        {{-- Tahap Ujian Online --}}
                         <div class="relative flex items-center">
                             @php
                                 $showAsCompleted = $santri->status_santri === 'daftar_ulang' || $timelineStatus['ujian']['completed'];
@@ -221,14 +228,56 @@
                                 @endif
                             </div>
                         </div>
+
+                        {{-- --- BAGIAN DAFTAR ULANG YANG DIPERBAIKI --- --}}
                         <div class="relative flex items-center mt-8">
-                            <div class="{{ $timelineStatus['daftar_ulang']['completed'] ? 'bg-green-500' : ($timelineStatus['daftar_ulang']['current'] ? 'bg-yellow-500 animate-pulse' : 'bg-gray-300') }} p-6 rounded-full text-white z-10">
+                            @php
+                                $daftarUlangStatusClass = 'bg-gray-300'; // Default
+                                if ($timelineStatus['daftar_ulang']['completed']) {
+                                    $daftarUlangStatusClass = 'bg-green-500'; // Sudah selesai dan terverifikasi
+                                } elseif ($timelineStatus['daftar_ulang']['current']) {
+                                    if ($santri->status_santri === 'diterima' || ($santri->status_santri === 'daftar_ulang' && !$santri->status_pembayaran)) {
+                                        $daftarUlangStatusClass = 'bg-green-500'; // Tahap aktif (diterima) -> HIJAU
+                                    } elseif ($santri->status_pembayaran === 'pending') {
+                                        $daftarUlangStatusClass = 'bg-yellow-500 animate-pulse'; // Menunggu verifikasi -> KUNING
+                                    } elseif ($santri->status_pembayaran === 'rejected') {
+                                        $daftarUlangStatusClass = 'bg-red-500'; // Ditolak -> MERAH
+                                    }
+                                }
+                            @endphp
+                            <div class="{{ $daftarUlangStatusClass }} p-6 rounded-full text-white z-10">
                                 <i class="fas {{ $timelineStatus['daftar_ulang']['completed'] ? 'fa-check' : 'fa-clipboard-list' }} text-lg"></i>
                             </div>
                             <div class="ml-6">
-                                <h3 class="text-lg font-semibold {{ $timelineStatus['daftar_ulang']['completed'] ? 'text-gray-900' : ($timelineStatus['daftar_ulang']['current'] ? 'text-gray-900' : 'text-gray-500') }}">Daftar Ulang</h3>
-                                @if($timelineStatus['daftar_ulang']['current'])
-                                    @if($santri->status_pembayaran === 'rejected')
+                                <h3 class="text-lg font-semibold {{ $timelineStatus['daftar_ulang']['completed'] || $timelineStatus['daftar_ulang']['current'] ? 'text-gray-900' : 'text-gray-500' }}">Daftar Ulang</h3>
+                                
+                                @if($timelineStatus['daftar_ulang']['completed'])
+                                    <p class="text-green-600">Pendaftaran ulang telah diverifikasi</p>
+                                    @if($timelineStatus['daftar_ulang']['date'])
+                                    <p class="text-sm text-gray-600 font-medium">
+                                        <i class="fas fa-calendar-alt mr-1"></i>
+                                        {{ $timelineStatus['daftar_ulang']['date'] }}
+                                    </p>
+                                    @endif
+                                @elseif($timelineStatus['daftar_ulang']['current'])
+                                    
+                                    @if($santri->status_santri === 'diterima')
+                                        <p class="text-green-600 font-semibold">Selamat! Anda dinyatakan LULUS.</p>
+                                        @if($santri->tanggal_pembayaran)
+                                            <div class="mt-2 bg-blue-50 p-3 rounded-lg">
+                                                <p class="text-sm text-blue-800 font-medium">
+                                                    <i class="fas fa-calendar-check mr-2"></i>
+                                                    Pembayaran dilakukan pada: <span class="font-bold">{{ \Carbon\Carbon::parse($santri->tanggal_pembayaran)->format('d F Y') }}</span>
+                                                </p>
+                                            </div>
+                                        @else
+                                            <p class="text-sm text-gray-500 mt-2">
+                                                <i class="fas fa-info-circle mr-1"></i>
+                                                Informasi daftar ulang dan pembayaran akan segera diinformasikan.
+                                            </p>
+                                        @endif
+
+                                    @elseif($santri->status_pembayaran === 'rejected')
                                         <p class="text-red-600">Verifikasi pembayaran ditolak</p>
                                         @if($santri->catatan_verifikasi)
                                             <p class="text-sm text-gray-600 mb-2">
@@ -249,43 +298,52 @@
                                         </p>
                                     @else
                                         <p class="text-gray-600">Silakan melakukan pendaftaran ulang</p>
+                                        @if($timelineStatus['daftar_ulang']['deadline'])
+                                            <p class="text-sm text-red-600 font-medium mt-1">
+                                                <i class="fas fa-exclamation-triangle mr-1"></i>
+                                                Batas akhir: {{ $timelineStatus['daftar_ulang']['deadline'] }}
+                                            </p>
+                                        @endif
                                         <a href="{{ route('santri.daftar-ulang') }}" class="inline-block mt-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition duration-300">
                                             <i class="fas fa-clipboard-check mr-2"></i>
                                             Menuju Halaman Daftar Ulang
                                         </a>
                                     @endif
-                                @elseif($timelineStatus['daftar_ulang']['completed'])
-                                    <p class="text-green-600">Pendaftaran ulang telah diverifikasi</p>
-                                    <p class="text-sm text-gray-600 font-medium">
-                                        <i class="fas fa-calendar-alt mr-1"></i>
-                                        {{ $timelineStatus['daftar_ulang']['date'] }}
-                                    </p>
                                 @else
                                     <p class="text-gray-600">Menunggu tahap daftar ulang</p>
                                 @endif
                             </div>
                         </div>
 
+                        {{-- Tahap Pengumuman Hasil --}}
                         <div class="relative flex items-center">
-                            <div class="{{ isset($timelineStatus['pengumuman_hasil']) && $timelineStatus['pengumuman_hasil']['completed'] ? 'bg-green-500' : 'bg-gray-300' }} p-6 rounded-full text-white z-10">
-                                <i class="fas {{ isset($timelineStatus['pengumuman_hasil']) && $timelineStatus['pengumuman_hasil']['completed'] ? 'fa-check' : 'fa-bullhorn' }} text-lg"></i>
+                            {{-- AWAL PERUBAHAN: Logika diubah agar Pengumuman Hasil menjadi abu-abu saat status 'daftar_ulang' --}}
+                            @php
+                                // Logika kustom: Pengumuman hasil dianggap final (hijau) hanya jika status BUKAN 'daftar_ulang'.
+                                // Ini untuk menandakan bahwa proses belum selesai sepenuhnya hingga daftar ulang diverifikasi.
+                                $isResultFinal = isset($timelineStatus['pengumuman_hasil']) && $timelineStatus['pengumuman_hasil']['completed'] && $santri->status_santri !== 'daftar_ulang';
+                            @endphp
+                            <div class="{{ $isResultFinal ? 'bg-green-500' : 'bg-gray-300' }} p-6 rounded-full text-white z-10">
+                                <i class="fas {{ $isResultFinal ? 'fa-check' : 'fa-bullhorn' }} text-lg"></i>
                             </div>
                             <div class="ml-6">
-                                <h3 class="text-lg font-semibold {{ isset($timelineStatus['pengumuman_hasil']) && $timelineStatus['pengumuman_hasil']['completed'] ? 'text-gray-900' : 'text-gray-500' }}">Pengumuman Hasil</h3>
-                                @if(isset($timelineStatus['pengumuman_hasil']) && $timelineStatus['pengumuman_hasil']['completed'])
-                                <p class="text-{{ isset($timelineStatus['pengumuman_hasil']['status']) && $timelineStatus['pengumuman_hasil']['status'] == 'diterima' ? 'green' : 'red' }}-600">
-                                    {{ isset($timelineStatus['pengumuman_hasil']['status']) && $timelineStatus['pengumuman_hasil']['status'] == 'diterima' ? 'Selamat! Anda dinyatakan DITERIMA' : 'Mohon maaf, Anda belum diterima' }}
-                                </p>
-                                @if(isset($timelineStatus['pengumuman_hasil']['date']))
-                                <p class="text-sm text-gray-600 font-medium">
-                                    <i class="fas fa-calendar-alt mr-1"></i>
-                                    {{ $timelineStatus['pengumuman_hasil']['date'] }}
-                                </p>
-                                @endif
+                                <h3 class="text-lg font-semibold {{ $isResultFinal ? 'text-gray-900' : 'text-gray-500' }}">Pengumuman Hasil</h3>
+                                @if($isResultFinal)
+                                    <p class="text-{{ $timelineStatus['pengumuman_hasil']['status'] == 'diterima' ? 'green' : 'red' }}-600">
+                                        {{ $timelineStatus['pengumuman_hasil']['status'] == 'diterima' ? 'Selamat! Anda dinyatakan DITERIMA' : 'Mohon maaf, Anda belum diterima' }}
+                                    </p>
+                                    @if(isset($timelineStatus['pengumuman_hasil']['date']))
+                                    <p class="text-sm text-gray-600 font-medium">
+                                        <i class="fas fa-calendar-alt mr-1"></i>
+                                        {{ $timelineStatus['pengumuman_hasil']['date'] }}
+                                    </p>
+                                    @endif
                                 @else
-                                <p class="text-gray-500">Menunggu hasil seleksi</p>
+                                    {{-- Pesan ini ditampilkan saat status 'daftar_ulang', menandakan hasil belum final. --}}
+                                    <p class="text-gray-500">Menunggu verifikasi daftar ulang untuk pengumuman final</p>
                                 @endif
                             </div>
+                            {{-- AKHIR PERUBAHAN --}}
                         </div>
                     </div>
                 </div>
@@ -293,6 +351,7 @@
         </div>
     </section>
 
+    {{-- Kartu Status Pendaftaran --}}
     <section class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-white rounded-lg shadow-lg p-6">
@@ -504,6 +563,7 @@
         </div>
     </section>
 
+    {{-- Informasi Penting & Kontak --}}
     <section class="py-8">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
@@ -563,6 +623,7 @@
         </div>
     </section>
 
+    {{-- Footer --}}
     <footer class="bg-gray-900 text-white py-8 mt-12">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center">
@@ -576,7 +637,7 @@
         </div>
     </footer>
 
-    <!-- Payment Proof Modal -->
+    {{-- Modal Bukti Pembayaran --}}
     <div x-data="{ show: false }" 
          x-show="show" 
          x-on:open-modal.window="show = true"

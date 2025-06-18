@@ -28,7 +28,7 @@
     <section class="bg-gradient-to-r from-primary to-blue-700 text-white py-12">
         <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h1 class="text-3xl md:text-4xl font-bold mb-4">Pendaftaran Ulang Santri</h1>
-            <p class="text-xl mb-6">Tahun Ajaran {{ $periode->tahun_ajaran ?? '2025/2026' }}</p>
+            <p class="text-xl mb-6">Tahun Ajaran {{ $periode_daftar_ulang->tahun_ajaran ?? '2025/2026' }}</p>
         </div>
     </section>
 
@@ -138,6 +138,40 @@
                 </p>
             </div>
         </div>
+         {{-- KONDISI 1: Jika pembayaran sudah terverifikasi --}}
+                @if($santri->status_pembayaran === 'verified')
+                    <div class="bg-white rounded-lg shadow-lg p-8 text-center">
+                        <div class="bg-green-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-check-circle text-green-600 text-3xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4">Pendaftaran Ulang Telah Diverifikasi</h2>
+                        <p class="text-gray-600 mb-6">
+                            Selamat! Pembayaran Anda telah kami terima dan pendaftaran ulang Anda telah selesai.
+                        </p>
+                        <a href="{{ route('check-status') }}" class="inline-block px-6 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition duration-300">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Kembali ke Halaman Status
+                        </a>
+                    </div>
+
+                {{-- KONDISI 2: Jika periode daftar ulang tidak aktif / tidak ada. Ini FIX untuk error. --}}
+                @elseif (!$periode_daftar_ulang || !$pengaturan)
+                    <div class="bg-white rounded-lg shadow-lg p-8 text-center">
+                        <div class="bg-yellow-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                            <i class="fas fa-clock text-yellow-600 text-3xl"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-gray-900 mb-4">Pendaftaran Ulang Belum Dibuka</h2>
+                        <p class="text-gray-600 mb-6">
+                            Saat ini belum ada periode pendaftaran ulang yang aktif. Silakan periksa kembali halaman status Anda secara berkala untuk informasi terbaru.
+                        </p>
+                        <a href="{{ route('check-status') }}" class="inline-block px-6 py-2 bg-primary text-white rounded-lg hover:bg-blue-700 transition duration-300">
+                            <i class="fas fa-arrow-left mr-2"></i>
+                            Kembali ke Halaman Status
+                        </a>
+                    </div>
+
+                {{-- KONDISI 3: Jika semua syarat terpenuhi, tampilkan form --}}
+                @else
                 <form wire:submit.prevent="submit" id="registrationForm" class="space-y-8">
                     <!-- Step 1: Data Pembayaran -->
                     <div id="step1" class="{{ $formPage == 1 ? 'block' : 'hidden' }} bg-white rounded-lg shadow-lg p-8">
@@ -286,6 +320,7 @@
                         </div>
                     </div>
                 </form>
+                @endif
             @endif
 
             <!-- Loading Overlay -->

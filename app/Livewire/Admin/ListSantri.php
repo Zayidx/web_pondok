@@ -40,7 +40,6 @@ class ListSantri extends Component
     #[Url(except: "")]
     public $perPage = 5;
 
-
     // data
     public $kelas, $kamar, $semester, $angkatan, $santri_id, $jenjang, $santriEditId, $formPage = 1;
     public $kelasFilter, $jenjangFilter, $kamarFilter, $jenisKelaminFilter;
@@ -53,18 +52,29 @@ class ListSantri extends Component
     #[Validate('nullable|image|mimes:jpeg,png,jpg|max:4084')]
     public $foto;
 
+    // Added for sorting functionality
+    public $sortField = 'nama'; // Default sort field
+    public $sortDirection = 'asc'; // Default sort direction
+
     public function updatedPerPage()
     {
         $this->resetPage();
     }
 
+    public function sortBy($field)
+    {
+        if ($this->sortField === $field) {
+            $this->sortDirection = $this->sortDirection === 'asc' ? 'desc' : 'asc';
+        } else {
+            $this->sortDirection = 'asc';
+        }
+        $this->sortField = $field;
+    }
+
     public function mount()
     {
-        // get url params edit has id wali santri
         if (request()->has('wali')) {
-            // parse argument of edit function parameter
             $this->edit(request()->wali);
-            // trigger livewire javascript dispatch
             $this->dispatch('showModal');
         }
 
@@ -124,10 +134,7 @@ class ListSantri extends Component
     {
         $this->santriEditId = $santriId;
 
-        // Data Santri
         $santriData = Santri::findOrFail($santriId);
-
-        // Data Wali dan Data Alamat
         $waliData = OrangTuaSantri::where('santri_id', $santriId)->first();
 
         $this->user = User::where('email', $santriData->nisn)->first();
@@ -161,7 +168,6 @@ class ListSantri extends Component
         $this->santriForm->semester_id = $santriData->semester_id;
         $this->santriForm->angkatan_id = $santriData->angkatan_id;
 
-        // Data Ayah
         $this->waliSantriForm->nama_ayah = $waliData->nama_ayah;
         $this->waliSantriForm->status_ayah = $waliData->status_ayah;
         $this->waliSantriForm->kewarganegaraan_ayah = $waliData->kewarganegaraan_ayah;
@@ -173,7 +179,6 @@ class ListSantri extends Component
         $this->waliSantriForm->penghasilan_ayah = $waliData->penghasilan_ayah;
         $this->waliSantriForm->no_telp_ayah = $waliData->no_telp_ayah;
 
-        // Data Ibu
         $this->waliSantriForm->santri_id = $waliData->santri_id;
         $this->waliSantriForm->nama_ibu = $waliData->nama_ibu;
         $this->waliSantriForm->status_ibu = $waliData->status_ibu;
@@ -186,7 +191,6 @@ class ListSantri extends Component
         $this->waliSantriForm->penghasilan_ibu = $waliData->penghasilan_ibu;
         $this->waliSantriForm->no_telp_ibu = $waliData->no_telp_ibu;
 
-        // Data Alamat
         $this->waliSantriForm->status_kepemilikan_rumah = $waliData->status_kepemilikan_rumah;
         $this->waliSantriForm->provinsi = $waliData->provinsi;
         $this->waliSantriForm->kabupaten = $waliData->kabupaten;
@@ -247,60 +251,61 @@ class ListSantri extends Component
     #[Computed]
     public function getData()
     {
-        if ($this->search || $this->kelasFilter || $this->jenjangFilter || $this->kamarFilter || $this->jenisKelaminFilter) {
-            return Santri::with(['kelas', 'kamar'])
-                ->where(function ($query) {
-                    $query->whereRaw('nama LIKE ?', ["%{$this->search}%"])
-                        ->orWhereRaw('CASE
-                                WHEN jenis_kelamin = "putera" THEN "laki-laki"
-                                WHEN jenis_kelamin = "puteri" THEN "perempuan"
-                                END LIKE ?', ["%{$this->search}%"])
-                        ->orWhere('jenis_kelamin', 'LIKE', "%{$this->search}%")
+        $query = Santri::with(['kelas', 'kamar']);
 
-                        ->orWhereHas('kelas', function ($query) {
-                            $query->where('nama', 'LIKE', "%{$this->search}%");
-                        })
-                        ->orWhereHas('kelas.jenjang', function ($query) {
-                            $query->where('nama', 'LIKE', "%{$this->search}%");
-                        })
-                        ->orWhereHas('kamar', function ($query) {
-                            $query->where('nama', 'LIKE', "%{$this->search}%");
-                        });
-                })
-                ->when($this->kelasFilter, function ($query) {
-                    $query->whereHas('kelas', function ($query) {
-                        $query->where('nama', 'LIKE', "%{$this->kelasFilter}%");
-                    });
-                })
-                ->when($this->jenjangFilter, function ($query) {
-                    $query->whereHas('kelas.jenjang', function ($query) {
-                        $query->where('nama', 'LIKE', "%{$this->jenjangFilter}%");
-                    });
-                })
-                ->when($this->kamarFilter, function ($query) {
-                    $query->whereHas('kamar', function ($query) {
-                        $query->where('nama', 'LIKE', "%{$this->kamarFilter}%");
-                    });
-                })
-                ->when($this->jenisKelaminFilter, function ($query) {
-                    $query->where('jenis_kelamin', 'LIKE', "%{$this->jenisKelaminFilter}%");
-                })
-                ->paginate($this->perPage);
+        if ($this->search) {
+            $query->where(function ($q) {
+                $q->whereRaw('nama LIKE ?', ["%{$this->search}%"])
+                  ->orWhereRaw('CASE
+                            WHEN jenis_kelamin = "putera" THEN "laki-laki"
+                            WHEN jenis_kelamin = "perempuan" THEN "perempuan"
+                            END LIKE ?', ["%{$this->search}%"])
+                  ->orWhere('jenis_kelamin', 'LIKE', "%{$this->search}%")
+                  ->orWhereHas('kelas', function ($query) {
+                      $query->where('nama', 'LIKE', "%{$this->search}%");
+                  })
+                  ->orWhereHas('kelas.jenjang', function ($query) {
+                      $query->where('nama', 'LIKE', "%{$this->search}%");
+                  })
+                  ->orWhereHas('kamar', function ($query) {
+                      $query->where('nama', 'LIKE', "%{$this->search}%");
+                  });
+            });
         }
 
-        return Santri::with(['kelas', 'kamar'])->paginate($this->perPage);
+        $query->when($this->kelasFilter, function ($q) {
+            $q->whereHas('kelas', function ($query) {
+                $query->where('nama', 'LIKE', "%{$this->kelasFilter}%");
+            });
+        })
+        ->when($this->jenjangFilter, function ($q) {
+            $q->whereHas('kelas.jenjang', function ($query) {
+                $query->where('nama', 'LIKE', "%{$this->jenjangFilter}%");
+            });
+        })
+        ->when($this->kamarFilter, function ($q) {
+            $q->whereHas('kamar', function ($query) {
+                $query->where('nama', 'LIKE', "%{$this->kamarFilter}%");
+            });
+        })
+        ->when($this->jenisKelaminFilter, function ($q) {
+            $q->where('jenis_kelamin', 'LIKE', "%{$this->jenisKelaminFilter}%");
+        });
+
+        return $query->paginate($this->perPage);
     }
 
     public function render()
     {
-        $santris = Santri::with(['kamar', 'kelas', 'jenjang', 'orangTua'])
+        // Changed 'orangTua' to 'orangTuaSantri' to match the relationship name in the Santri model.
+        $santris = Santri::with(['kamar', 'kelas', 'kelas.jenjang', 'orangTuaSantri']) 
             ->when($this->search, function ($query) {
-                $query->where('nama_santri', 'like', '%' . $this->search . '%')
-                      ->orWhere('nis', 'like', '%' . $this->search . '%');
+                $query->where('nama', 'like', '%' . $this->search . '%')
+                      ->orWhere('nisn', 'like', '%' . $this->search . '%');
             })
             ->orderBy($this->sortField, $this->sortDirection)
-            ->paginate(10);
-    
+            ->paginate($this->perPage);
+
         return view('livewire.admin.list-santri', [
             'santris' => $santris,
             'jenjangs' => Jenjang::all(),

@@ -23,7 +23,7 @@ class JadwalPelajaran extends Component
     public $jadwalPelajaranId;
     public $detailJadwalPelajaranList;
 
-    public $kelasList, $kategoriPelajaranList;
+    public $kelasList, $kategoriPelajaranList,$jenjang_id;
     
     public $hariList = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu', 'minggu'];
     
@@ -56,6 +56,8 @@ class JadwalPelajaran extends Component
     {
         $this->jadwalPelajaranId = null;
         $this->jadwalPelajaranForm->reset();
+        session()->flash('message', 'Jadwal Pelajaran berhasil ditambahkan!');
+            $this->dispatch('close-modal');
     }
 
     public function createJadwalPelajaran()
@@ -64,7 +66,10 @@ class JadwalPelajaran extends Component
             $this->jadwalPelajaranForm->role_guru = 'umum';
 
             $this->jadwalPelajaranForm->validate();
-            
+            $kelas = Kelas::find($this->jadwalPelajaranForm->kelas_id);
+// Memastikan jenjang_id dari kelas yang dipilih ikut disimpan
+if ($kelas) {
+    $this->jadwalPelajaranForm->jenjang_id = $kelas->jenjang_id;}
             ModelsJadwalPelajaran::create($this->jadwalPelajaranForm->all());
             
             session()->flash('success', 'Jadwal Pelajaran baru berhasil dibuat!');

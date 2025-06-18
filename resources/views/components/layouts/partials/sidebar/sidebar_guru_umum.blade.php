@@ -37,4 +37,10 @@
             <span>Pengumuman</span>
         </a>
     </li>
+    <li class="sidebar-item {{ Request::routeIs('e-santri-guru-umum.absensi') ? 'active' : '' }}">
+        <a wire:navigate  href="{{ route('e-santri-guru-umum.absensi') }}" class='sidebar-link'>
+            <i class="{{ Request::routeIs('e-santri-guru-umum.absensi') ? 'bi bi-calendar-fill' : 'bi bi-calendar' }}"></i>
+            <span>Absensi Kelas</span>
+        </a>
+    </li>
 </ul>

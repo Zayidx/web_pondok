@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 
 <head>
@@ -50,9 +51,6 @@
             <!-- Include ApexCharts library -->
             <script src="https://cdn.jsdelivr.net/npm/apexcharts@3.45.1/dist/apexcharts.min.js"></script>
 
-            <!-- Livewire Charts Scripts -->
-            @livewireChartsScripts
-
             <!-- Livewire Scripts -->
             @livewireScripts
             @livewireChartsScripts
@@ -84,6 +82,9 @@
             console.error("Service workers are not supported.");
         }
     </script>
+        {{-- TAMBAHKAN DI SINI --}}
+        <script src="https://cdn.jsdelivr.net/npm/qrcode-generator/qrcode.js"></script>
+
 </body>
 
 </html>
