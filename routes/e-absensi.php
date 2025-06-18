@@ -1,16 +1,13 @@
 <?php
 
+use App\Livewire\Absensi\Scan;
 use App\Livewire\Admin\ESantri\GuruUmum\Absensi;
-use App\Livewire\Santri\Scanner;
+
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Admin\ESantri\GuruUmum;
 
-Route::prefix('santri')->middleware(['web', 'auth:santri'])->group(function () {
-    Route::get('/scanner', Scanner::class)->name('santri.scanner');
-    
 
-});
 Route::get('/absensi/{token}', Absensi::class)->name('santri.absensi');
 Route::prefix('e-santri')->middleware('auth')->group(function () {
     Route::prefix('guru')->group(function () {
@@ -22,4 +19,9 @@ Route::prefix('e-santri')->middleware('auth')->group(function () {
         Route::get('/pengumuman', GuruUmum\Pengumuman::class)->name('e-santri-guru-umum.pengumuman');
         Route::get('/absensi',  GuruUmum\Absensi::class)->name('e-santri-guru-umum.absensi');
     });
+});
+
+Route::middleware(['auth:santri'])->group(function() {
+    // ... rute santri lainnya
+    Route::get('/absensi/scan/{token}', Scan::class)->name('santri.absensi.scan');
 });

@@ -1,60 +1,115 @@
-<script src="https://cdn.tailwindcss.com"></script>
+<div>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
-<div class="container mx-auto p-4 font-sans antialiased">
-    @if ($kelas)
-        <h1 class="text-3xl font-extrabold mb-2 text-gray-900 text-center">Detail Jadwal: {{ $kelas->nama }}</h1>
-        <p class="text-xl text-gray-600 mb-8 text-center">{{ $tanggalFormatted }}</p>
+    <div class="mb-3">
+        <a href="{{ route('admin.piket.dashboard') }}" class="btn btn-primary">
+            <i class="bi bi-arrow-left"></i> Kembali ke Dashboard Absensi
+        </a>
+    </div>
+    <div class="row">
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title mb-1">Detail Jadwal : {{ $kelas->nama }}</h5>
 
-        @if ($jadwalKelasHariIni->isNotEmpty())
-            <div class="bg-white rounded-xl shadow-lg overflow-hidden border border-gray-200">
-                <table class="min-w-full divide-y divide-gray-200">
-                    <thead class="bg-gray-50">
-                        <tr>
-                            <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mata Pelajaran</th>
-                            <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Waktu</th>
-                            <th class="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Aksi</th>
-                        </tr>
-                    </thead>
-                    <tbody class="bg-white divide-y divide-gray-200">
-                        @foreach ($jadwalKelasHariIni as $jadwal)
-                            <tr class="hover:bg-gray-50">
-                                <td class="py-3 px-4 whitespace-nowrap font-medium text-gray-800">{{ $jadwal->mata_pelajaran }}</td>
-                                <td class="py-3 px-4 whitespace-nowrap text-gray-600">{{ \Carbon\Carbon::parse($jadwal->waktu_mulai)->format('H:i') }} - {{ \Carbon\Carbon::parse($jadwal->waktu_selesai)->format('H:i') }}</td>
-                                <td class="py-3 px-4 whitespace-nowrap">
-                                    <!-- LOGIKA KONDISIONAL UNTUK TOMBOL -->
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nama Guru</label>
+                        <p>Nama Mapel</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Total Mata Pelajaran</label>
+                        <p>{{ $jadwalKelasHariIni->count() }} Mata Pelajaran</p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tanggal</label>
+                        <p class="text-muted mb-0">
+                            <i class="bi bi-calendar3 me-2"></i>{{ $tanggalFormatted }}
+                        </p>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Waktu</label>
+                        <p> {{ $jadwalKelasHariIni->min('waktu_mulai') ? \Carbon\Carbon::parse($jadwalKelasHariIni->min('waktu_mulai'))->format('H:i') : '-' }} : {{ $jadwalKelasHariIni->max('waktu_selesai') ? \Carbon\Carbon::parse($jadwalKelasHariIni->max('waktu_selesai'))->format('H:i') : '-' }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        @if ($kelas)
+
+        <div class="card rounded-4 col-md-8 mb-3">
+            <div class="card-body">
+                @if ($jadwalKelasHariIni->isNotEmpty())
+                <div class="table-responsive">
+                    <table class="table table-hover table-striped">
+                        <thead>
+                            <tr>
+                                <th class="fw-semibold">No.</th>
+                                <th class="fw-semibold">
+                                    <i class="bi bi-book me-2"></i>Mata Pelajaran
+                                </th>
+                                <th class="fw-semibold">
+                                    <i class="bi bi-clock me-2"></i>Waktu
+                                </th>
+                                <th class="fw-semibold text-center">
+                                    <i class="bi bi-gear me-2"></i>Aksi
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($jadwalKelasHariIni as $index => $jadwal)
+                            <tr>
+                                <td class="fw-medium">{{ $index + 1 }}</td>
+                                <td>
+                                    <div class="d-flex align-items-center">
+
+                                        <span class="fw-medium">{{ $jadwal->mata_pelajaran }}</span>
+                                    </div>
+                                </td>
+                                <td>
+                                    <span>
+                                        {{ \Carbon\Carbon::parse($jadwal->waktu_mulai)->format('H:i') }} -
+                                        {{ \Carbon\Carbon::parse($jadwal->waktu_selesai)->format('H:i') }}
+                                    </span>
+                                </td>
+                                <td class="text-center">
                                     @if($isToday)
-                                        <!-- Jika hari ini, tombol mengarah ke halaman Absensi QR -->
-                                        <a href="{{ route('admin.piket.absensi.murid', ['jadwalId' => $jadwal->id]) }}" wire:navigate class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700">
-                                            <i class="bi bi-qr-code-scan mr-2"></i> Absensi
-                                        </a>
+                                    <a href="{{ route('admin.piket.absensi.murid', ['jadwalId' => $jadwal->id]) }}"
+                                        wire:navigate
+                                        class="btn btn-sm btn-primary">
+                                        <i class="bi bi-qr-code-scan me-1"></i>Absensi
+                                    </a>
                                     @else
-                                        <!-- Jika hari lain, tombol mengarah ke halaman Hasil Absensi -->
-                                        <a href="{{ route('admin.piket.hasil.absensi', ['jadwalId' => $jadwal->id, 'tanggal' => $tanggal]) }}" wire:navigate class="inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-teal-600 hover:bg-teal-700">
-                                            <i class="bi bi-card-checklist mr-2"></i> Hasil Absensi
-                                        </a>
+                                    <a href="{{ route('admin.piket.hasil.absensi', ['jadwalId' => $jadwal->id, 'tanggal' => $tanggal]) }}"
+                                        wire:navigate
+                                        class="btn btn-sm btn-info text-white">
+                                        <i class="bi bi-card-checklist me-1"></i>Hasil Absensi
+                                    </a>
                                     @endif
                                 </td>
                             </tr>
-                        @endforeach
-                    </tbody>
-                </table>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+                @else
+                <div class="text-center py-5">
+                    <div class="mb-4">
+                        <i class="bi bi-calendar-x display-1 text-muted"></i>
+                    </div>
+                    <h5 class="text-muted mb-3">Tidak Ada Jadwal Pelajaran</h5>
+                    <p class="text-muted mb-0">
+                        Tidak ada jadwal pelajaran ditemukan untuk kelas <strong>{{ $kelas->nama }}</strong>
+                        pada tanggal yang dipilih.
+                    </p>
+                </div>
+                @endif
             </div>
-        @else
-            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-6 rounded-lg shadow-md" role="alert">
-                <p class="font-bold text-lg">Informasi</p>
-                <p>Tidak ada jadwal pelajaran ditemukan untuk kelas ini pada tanggal yang dipilih.</p>
-            </div>
-        @endif
 
-        <div class="mt-8 text-center">
-            <a href="{{ route('admin.piket.dashboard') }}" wire:navigate class="inline-flex items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                Kembali ke Dashboard
-            </a>
         </div>
-    @else
-        <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-6 rounded-lg" role="alert">
-            <p class="font-bold">Error</p>
-            <p>Data kelas tidak ditemukan.</p>
-        </div>
-    @endif
+        @endif
+    </div>
+
 </div>

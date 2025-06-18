@@ -1,4 +1,3 @@
-<!-- Bottom Navbar -->
 <nav class="navbar navbar-dark bg-primary navbar-expand fixed-bottom d-md-none d-lg-none d-xl-none p-0">
     <ul class="navbar-nav nav-justified w-100">
         <li class="nav-item">
@@ -9,18 +8,19 @@
             </a>
         </li>
         <li class="nav-item">
-            <a wire:navigate href="{{ route('santri.profile') }}"
-                class="nav-link text-center {{ Request::routeIs('santri.profile') ? 'active' : '' }}">
-                <i class="bi {{ Request::routeIs('santri.profile') ? 'bi-person-fill' : 'bi-person' }} fs-4"></i>
-                <span class="small d-block">Profile</span>
-            </a>
-        </li>
-        <li class="nav-item">
             <a wire:navigate href="{{ route('santri.kegiatan') }}"
                 class="nav-link text-center {{ Request::routeIs('santri.kegiatan') ? 'active' : '' }}">
                 <i
                     class="bi {{ Request::routeIs('santri.kegiatan') ? 'bi-bookmark-star-fill' : 'bi-bookmark-star' }} fs-4"></i>
                 <span class="small d-block">Kegiatan</span>
+            </a>
+        </li>
+
+        <li class="nav-item">
+            <a  href="{{ route('santri.scanner') }}"
+                class="nav-link text-center {{ Request::routeIs('santri.scanner') ? 'active' : '' }}">
+                <i class="bi bi-qr-code-scan fs-4"></i>
+                <span class="small d-block">Scanner</span>
             </a>
         </li>
         <li class="nav-item">
@@ -32,7 +32,11 @@
             </a>
         </li>
         <li class="nav-item">
-            <livewire:mobile.auth.logout>
+            <a wire:navigate href="{{ route('santri.profile') }}"
+                class="nav-link text-center {{ Request::routeIs('santri.profile') ? 'active' : '' }}">
+                <i class="bi {{ Request::routeIs('santri.profile') ? 'bi-person-fill' : 'bi-person' }} fs-4"></i>
+                <span class="small d-block">Profile</span>
+            </a>
         </li>
     </ul>
 </nav>

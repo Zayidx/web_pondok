@@ -30,6 +30,6 @@ Route::prefix('santri')->middleware(['web', 'auth:santri'])->group(function () {
     Route::get('/kegiatan', Santri\Kegiatan::class)->name('santri.kegiatan');
     Route::get('/pengumuman', Santri\Pengumuman::class)->name('santri.pengumuman');
     // Komentar: Rute untuk menampilkan halaman dengan kamera scanner.
-    Route::get('/scanner', Scanner::class)->name('scanner');
+    Route::get('/scanner', Scanner::class)->name('santri.scanner');
 
 });

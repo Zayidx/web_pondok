@@ -1,66 +1,165 @@
-<div>
-    {{-- Komentar: Container utama untuk halaman scanner. --}}
-    <div class="container py-4">
-        <div class="row justify-content-center">
-            <div class="col-md-8 col-lg-6">
-                <div class="card shadow-sm">
-                    <div class="card-header text-center bg-primary text-white">
-                        <h4>Pindai QR Code Absensi</h4>
-                    </div>
-                    <div class="card-body text-center">
-                        <p>Arahkan kamera ke QR Code yang ditampilkan oleh petugas piket.</p>
-                        
-                        {{-- Komentar: Elemen ini akan menjadi tempat viewfinder kamera. --}}
-                        <div id="qr-reader" style="width:100%;"></div>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 
-                        {{-- Komentar: Tampilan saat kamera tidak bisa diakses atau ada error. --}}
-                        <div id="qr-reader-error" class="alert alert-danger" style="display: none;">
-                            Gagal mengakses kamera. Pastikan Anda telah memberikan izin (allow) untuk penggunaan kamera di browser ini.
-                        </div>
-                    </div>
-                </div>
-            </div>
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        background-color: #1a1a1a; 
+        color: #f0f0f0;
+    }
+
+    .scanner-wrapper {
+        position: relative;
+        width: 100%;
+        height: 100vh; 
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        box-sizing: border-box;
+    }
+
+    .scanner-header {
+        text-align: center;
+        margin-bottom: 15px;
+    }
+    .scanner-header h4 {
+        font-weight: 600;
+        margin-bottom: 5px;
+    }
+    .scanner-header p {
+        color: #b0b0b0;
+        font-size: 0.9em;
+    }
+
+    #qr-reader {
+        width: 100%;
+        max-width: 500px;
+        border: none;
+        position: relative;
+        overflow: hidden;
+        border-radius: 12px;
+        background-color: #333;
+    }
+    
+    #qr-reader::after {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 4px;
+        background: linear-gradient(90deg, rgba(0,255,150,0), rgba(0,255,150,0.8), rgba(0,255,150,0));
+        box-shadow: 0 0 10px rgba(0, 255, 150, 0.7);
+        animation: scanline 2.5s linear infinite;
+    }
+
+    @keyframes scanline {
+        0% { transform: translateY(0); }
+        100% { transform: translateY(calc(100% - 4px)); }
+    }
+    
+    #scan-success-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(26, 178, 106, 0.9);
+        display: none;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        z-index: 9999;
+        color: white;
+    }
+    .success-icon i {
+        font-size: 60px;
+        margin-bottom: 20px;
+    }
+    .success-message {
+        font-size: 1.5em;
+        font-weight: 500;
+    }
+
+    #qr-reader-error {
+        margin-top: 15px;
+        padding: 15px;
+        border-radius: 8px;
+        width: 100%;
+        max-width: 500px;
+        box-sizing: border-box;
+    }
+</style>
+
+<div>
+    <div class="scanner-wrapper">
+        
+        <div class="scanner-header">
+            <h4>Pindai QR Code Absensi</h4>
+            <p>Arahkan kamera ke QR Code yang disediakan.</p>
+        </div>
+
+        <div id="qr-reader"></div>
+        
+        <div id="qr-reader-error" class="alert alert-danger" style="display: none;">
+            <i class="fas fa-exclamation-triangle"></i> Gagal mengakses kamera. Pastikan Anda telah memberikan izin (allow) untuk penggunaan kamera.
         </div>
     </div>
 
-    {{-- Komentar: 1. Sertakan library html5-qrcode dari CDN. --}}
+    <div id="scan-success-overlay">
+        <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+        <div class="success-message">Scan Berhasil!</div>
+    </div>
+
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
 
     <script>
-        // Komentar: Pastikan script berjalan setelah seluruh halaman dimuat.
         document.addEventListener('DOMContentLoaded', function () {
             
-            // Komentar: 2. Fungsi yang akan dijalankan jika scan BERHASIL.
+            const successOverlay = document.getElementById('scan-success-overlay');
+
+            let html5QrcodeScanner;
+
             function onScanSuccess(decodedText, decodedResult) {
-                // `decodedText` berisi URL dari QR code.
                 console.log(`Scan berhasil, hasilnya: ${decodedText}`);
 
-                // Komentar: Hentikan pemindai setelah berhasil untuk menghemat resource.
-                html5QrcodeScanner.clear();
+                if (html5QrcodeScanner && html5QrcodeScanner.getState() === Html5QrcodeScannerState.SCANNING) {
+                    html5QrcodeScanner.clear().catch(error => {
+                        console.error("Gagal menghentikan scanner.", error);
+                    });
+                }
+                
+                successOverlay.style.display = 'flex';
 
-                // Komentar: Arahkan pengguna ke URL yang didapat dari QR code.
-                window.location.href = decodedText;
+                setTimeout(() => {
+                    window.location.href = decodedText;
+                }, 1500);
             }
 
-            // Komentar: 3. Fungsi yang akan dijalankan jika terjadi ERROR.
             function onScanFailure(error) {
-                // Komentar: Fungsi ini sering dipanggil, jadi kita bisa biarkan kosong atau
-                // hanya log ke konsol untuk debugging.
             }
 
-            // Komentar: 4. Buat instance baru dari pemindai.
-            let html5QrcodeScanner = new Html5QrcodeScanner(
-                "qr-reader", // ID dari div tempat kamera akan ditampilkan
+            html5QrcodeScanner = new Html5QrcodeScanner(
+                "qr-reader",
                 { 
-                    fps: 10, // Frames per second, 10 sudah cukup
-                    qrbox: { width: 250, height: 250 } // Ukuran kotak pemindai di tengah layar
+                    fps: 10,
+                    qrbox: (viewfinderWidth, viewfinderHeight) => {
+                        let minEdge = Math.min(viewfinderWidth, viewfinderHeight);
+                        let qrboxSize = Math.floor(minEdge * 0.8);
+                        return {
+                            width: qrboxSize,
+                            height: qrboxSize
+                        };
+                    },
+                    facingMode: "environment" 
                 },
                 /* verbose= */ false
             );
 
-            // Komentar: 5. Jalankan pemindai.
             html5QrcodeScanner.render(onScanSuccess, onScanFailure);
-
         });
     </script>
 </div>
