@@ -16,7 +16,9 @@ use App\Models\Periode;
 
 class CheckStatus extends Component
 {
+   
     use WithoutUrlPagination;
+     #[Layout('components.layouts.check-status')]
     public $santri = null;
     public $timelineStatus = [
         'pendaftaran_online' => [

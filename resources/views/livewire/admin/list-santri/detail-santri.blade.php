@@ -27,12 +27,7 @@
                                     {{ ucfirst($santri->status_santri ?? 'Menunggu') }}
                                 </span>
                             </p>
-                            <p>
-                                Status Kesantrian:
-                                <span class="badge {{ $santri->status_kesantrian == 'aktif' ? 'bg-success' : 'bg-danger' }}">
-                                    {{ ucfirst($santri->status_kesantrian) }}
-                                </span>
-                            </p>
+                           
                             @if ($santri->reason_rejected)
                                 <p>
                                     Alasan Penolakan:

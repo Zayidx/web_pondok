@@ -37,12 +37,7 @@
                                         {{ ucfirst($santri->status_santri ?? 'Menunggu') }}
                                     </span>
                                 </p>
-                                <p>
-                                    Status Kesantrian:
-                                    <span class="badge {{ $santri->status_kesantrian == 'aktif' ? 'bg-success' : 'bg-danger' }}">
-                                        {{ ucfirst($santri->status_kesantrian) }}
-                                    </span>
-                                </p>
+                               
                                 @if ($santri->reason_rejected)
                                     <p>
                                         Alasan Penolakan:
@@ -147,31 +142,41 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach(['Pas Foto', 'KTP', 'KK', 'Akta Kelahiran', 'Ijazah'] as $jenisBerkas)
-                                                <tr>
-                                                    <td>{{ $jenisBerkas }}</td>
-                                                    <td>
-                                                        @if($dokumen->where('jenis_berkas', $jenisBerkas)->first())
-                                                            <span class="badge bg-success">Tersedia</span>
-                                                        @else
-                                                            <span class="badge bg-danger">Belum Upload</span>
-                                                        @endif
-                                                    </td>
-                                                    <td>
-                                                        @if($dokumen->where('jenis_berkas', $jenisBerkas)->first())
-                                                            <a href="{{ asset('storage/' . $dokumen->where('jenis_berkas', $jenisBerkas)->first()->file_path) }}" 
-                                                               target="_blank" 
-                                                               class="btn btn-sm btn-primary">
-                                                                <i class="bi bi-eye"></i> Lihat
-                                                            </a>
-                                                        @else
-                                                            <button class="btn btn-sm btn-secondary" disabled>
-                                                                <i class="bi bi-eye-slash"></i> Tidak Tersedia
-                                                            </button>
-                                                        @endif
-                                                    </td>
-                                                </tr>
-                                            @endforeach
+                                           {{-- Ganti array ini agar sesuai dengan jenis berkas yang Anda simpan --}}
+{{-- 'Kartu Keluarga' (bukan 'KK'), tambahkan 'SKHUN', dan hapus 'KTP' karena tidak ada --}}
+@foreach(['Pas Foto', 'Ijazah', 'SKHUN', 'Akta Kelahiran', 'Kartu Keluarga'] as $jenisBerkas)
+    <tr>
+        {{-- Kolom untuk menampilkan nama jenis berkas --}}
+        <td>{{ $jenisBerkas }}</td>
+        <td>
+            {{-- Memeriksa apakah dokumen dengan jenis berkas yang sesuai ada dalam koleksi --}}
+            @if($dokumen->where('jenis_berkas', $jenisBerkas)->first())
+                {{-- Jika ada, tampilkan status Tersedia --}}
+                <span class="badge bg-success">Tersedia</span>
+            @else
+                {{-- Jika tidak ada, tampilkan status Belum Upload --}}
+                <span class="badge bg-danger">Belum Upload</span>
+            @endif
+        </td>
+        <td>
+            {{-- Mencari file dokumen yang sesuai untuk membuat link --}}
+            @php $file = $dokumen->where('jenis_berkas', $jenisBerkas)->first(); @endphp
+            @if($file)
+                {{-- Jika file ditemukan, buat tombol untuk melihat file --}}
+                <a href="{{ asset('storage/' . $file->file_path) }}" 
+                   target="_blank" 
+                   class="btn btn-sm btn-primary">
+                    <i class="bi bi-eye"></i> Lihat
+                </a>
+            @else
+                {{-- Jika file tidak ditemukan, buat tombol yang dinonaktifkan --}}
+                <button class="btn btn-sm btn-secondary" disabled>
+                    <i class="bi bi-eye-slash"></i> Tidak Tersedia
+                </button>
+            @endif
+        </td>
+    </tr>
+@endforeach
                                         </tbody>
                                     </table>
                                 </div>

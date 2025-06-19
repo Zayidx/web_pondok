@@ -8,7 +8,7 @@
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
                     <div class="flex-shrink-0">
-                        <img class="h-10 w-10" src="{{ asset('dist/assets/compiled/jpg/1.jpg') }}" alt="Logo SMA" />
+                        <img class="h-10 w-10" src="{{ asset('logo.webp') }}" alt="Logo SMA" />
                     </div>
                     <div class="ml-3">
                         <h1 class="text-xl font-bold text-primary">SMA Bina Prestasi</h1>
@@ -628,7 +628,7 @@
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center">
                 <div class="flex items-center justify-center mb-4">
-                    <img class="h-10 w-10 mr-3" src="{{ asset('dist/assets/compiled/jpg/1.jpg') }}" alt="Logo SMA" />
+                    <img class="h-10 w-10 mr-3" src="{{ asset('logo.webp') }}" alt="Logo SMA" />
                     <h3 class="text-xl font-bold">SMA Bina Prestasi</h3>
                 </div>
                 <p class="text-gray-400 mb-4">Dashboard Penerimaan Siswa Baru Tahun Ajaran 2025/2026</p>
