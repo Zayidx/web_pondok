@@ -1,14 +1,11 @@
 <div class="">
-    <!-- Top Bar -->
     <div class="mb-md-3 d-flex md-2">
         <img class="bg-secondary" src="" alt="">
         <div class="">
             <h2 class="fw-bold text-dark">Selamat Datang, {{ explode(' ', auth()->user()->name)[0] }}</h2>
         </div>
     </div>
-    <!-- Dashboard Grid -->
     <div class="row">
-        <!-- Profile Card -->
         <div class="col-12 col-md-6 col-lg-4">
             <div class="card shadow-sm">
                 <div class="card-body">
@@ -45,7 +42,6 @@
                 </div>
             </div>
         </div>
-        <!-- SPP Status Card -->
         <div class="col-12 col-md-6 col-lg-4">
             <div class="card shadow-sm">
                 <div class="card-body">
@@ -117,7 +113,6 @@
                 </div>
             </div>
         </div>
-        <!-- Schedule Card -->
         <div class="col-12 col-md-6 col-lg-4">
             <div class="card shadow-sm">
                 <div class="card-body">
@@ -150,7 +145,6 @@
                 </div>
             </div>
         </div>
-        <!-- Announcements Card -->
         <div class="col-12 col-md-6 col-lg-4">
             <div class="card shadow-sm">
                 <div class="card-body">
@@ -182,7 +176,6 @@
                 </div>
             </div>
         </div>
-        <!-- Duty Roster Card -->
         <div class="col-12 col-md-6 col-lg-4">
             <div class="card shadow-sm">
                 <div class="card-body">
@@ -220,7 +213,6 @@
                 </div>
             </div>
         </div>
-        <!-- Activities Card -->
         <div class="col-12 col-md-6 col-lg-4">
             <div class="card shadow-sm">
                 <div class="card-body">

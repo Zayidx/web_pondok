@@ -1,8 +1,6 @@
-{{-- Komentar: Div terluar ini akan me-refresh isinya setiap 5 detik dengan memanggil method 'loadKehadiran'. --}}
 <div wire:poll.5s="loadKehadiran">
     <div class="card shadow-sm h-100">
         <div class="card-body">
-            {{-- Komentar: Judul yang menampilkan jumlah hadir sekarang menjadi bagian dari komponen ini. --}}
             <h2 class="card-title fw-bold mb-4">Jumlah Siswa Yang Hadir ({{ $jumlahHadir }} / {{ $totalSantri }} Hadir)</h2>
             <div class="table-responsive">
                 <table class="table table-striped table-hover">
@@ -31,7 +29,6 @@
                                     @endif
                                 </td>
                                 <td class="text-center">
-                                    {{-- Komentar: Tombol ini sekarang memanggil method 'updateStatus' di komponen LiveSantriList. --}}
                                     <div class="btn-group btn-group-sm" role="group">
                                         @foreach(['Hadir', 'Izin', 'Sakit', 'Alpa'] as $status)
                                             <button 

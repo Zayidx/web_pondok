@@ -267,7 +267,7 @@
                                 </div>
                                 <div>
                                     <label class="block text-sm font-medium text-gray-700 mb-2">No. HP Orang Tua *</label>
-                                    <input type="tel" wire:model="waliForm.no_telp_ibu" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="08xxxxxxxxxx" />
+                                    <input type="tel" wire:model="waliForm.no_telp_ibu" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent" placeholder="62812xxxxxxxx" />
                                     @error('waliForm.no_telp_ibu') <span class="text-red-600 text-sm">{{ $message }}</span> @enderror
                                 </div>
                             </div>

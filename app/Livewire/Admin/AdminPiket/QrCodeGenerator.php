@@ -37,8 +37,7 @@ class QrCodeGenerator extends Component
             $this->sessionExpiresAt = $expiryTime->toIso8601String();
             $this->qrCodeUrl = route('santri.absensi.scan', ['token' => $token]);
 
-            // Komentar: Mengirim event 'qrSessionCreated' dengan membawa ID sesi yang baru.
-            // Ini akan didengarkan oleh komponen LiveScanList.
+        
             $this->dispatch('qrSessionCreated', qrSessionId: $qrSession->id);
 
             Log::info('[QrCodeGenerator] Sesi QR baru dibuat dengan ID: ' . $qrSession->id);
@@ -49,7 +48,6 @@ class QrCodeGenerator extends Component
 
     public function render()
     {
-        // Komentar: Pengecekan kedaluwarsa ini aman karena tidak ada polling yang mengganggunya.
         if ($this->sessionExpiresAt && now()->greaterThan($this->sessionExpiresAt)) {
             $this->qrCodeUrl = null;
         }

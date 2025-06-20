@@ -1,5 +1,4 @@
 <div>
-    {{-- Komentar: Menggunakan CDN Bootstrap & Icons sebagai contoh. Idealnya ini ada di file layout utama Anda. --}}
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
@@ -9,7 +8,6 @@
         </a>
     </div>
     <div class="row">
-        {{-- Exam Info Card --}}
         <div class="col-md-4 mb-3">
             <div class="card">
                 <div class="card-header">
@@ -39,16 +37,11 @@
             </div>
         </div>
 
-
-        {{-- Komentar: Memeriksa apakah data kelas tersedia sebelum merender konten --}}
         @if ($kelas)
 
-        {{-- [Main Content] Konten utama dengan gaya card yang konsisten --}}
         <div class="card rounded-4 col-md-8 mb-3">
             <div class="card-body">
-                {{-- Komentar: Memeriksa apakah ada jadwal pelajaran untuk hari yang dipilih --}}
                 @if ($jadwalKelasHariIni->isNotEmpty())
-                {{-- [Table Section] Tabel dengan styling yang diperbaiki --}}
                 <div class="table-responsive">
                     <table class="table table-hover table-striped">
                         <thead>
@@ -66,7 +59,6 @@
                             </tr>
                         </thead>
                         <tbody>
-                            {{-- Komentar: Melakukan loop pada data jadwal pelajaran yang ada --}}
                             @foreach ($jadwalKelasHariIni as $index => $jadwal)
                             <tr>
                                 <td class="fw-medium">{{ $index + 1 }}</td>
@@ -83,7 +75,6 @@
                                     </span>
                                 </td>
                                 <td class="text-center">
-                                    {{-- [LOGIKA DIPERTAHANKAN] Logika kondisional untuk tombol tetap sama --}}
                                     @if($isToday)
                                     <a href="{{ route('admin.piket.absensi.murid', ['jadwalId' => $jadwal->id]) }}"
                                         wire:navigate
@@ -104,7 +95,6 @@
                     </table>
                 </div>
                 @else
-                {{-- [Empty State] Pesan kosong dengan styling yang lebih menarik --}}
                 <div class="text-center py-5">
                     <div class="mb-4">
                         <i class="bi bi-calendar-x display-1 text-muted"></i>

@@ -17,10 +17,7 @@ class LiveSantriList extends Component
     public int $jumlahHadir = 0;
     public int $totalSantri = 0;
 
-    /**
-     * Dijalankan saat komponen pertama kali dimuat.
-     * Menerima ID absensi dan ID kelas dari komponen induk.
-     */
+
     public function mount($absensiId, $kelasId)
     {
         $this->absensiId = $absensiId;
@@ -34,10 +31,6 @@ class LiveSantriList extends Component
         $this->loadKehadiran();
     }
 
-    /**
-     * Method ini akan dipanggil oleh wire:poll setiap 5 detik.
-     * Tugasnya adalah mengambil data kehadiran terbaru dari database.
-     */
     public function loadKehadiran()
     {
         // Mengambil semua detail absensi untuk sesi ini.
@@ -49,9 +42,6 @@ class LiveSantriList extends Component
         $this->jumlahHadir = $this->daftarKehadiran->where('status', 'Hadir')->count();
     }
 
-    /**
-     * Dijalankan saat admin menekan tombol status secara manual.
-     */
     public function updateStatus($santriId, $status)
     {
         AbsensiDetail::updateOrCreate(
@@ -62,14 +52,9 @@ class LiveSantriList extends Component
             ]
         );
 
-        // Setelah update, langsung panggil loadKehadiran agar UI langsung berubah
-        // tanpa harus menunggu siklus polling berikutnya.
         $this->loadKehadiran();
     }
 
-    /**
-     * Merender file view untuk komponen ini.
-     */
     public function render()
     {
         return view('livewire.admin.admin-piket.live-santri-list');

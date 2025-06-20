@@ -19,16 +19,15 @@ class LiveScanList extends Component
         $this->liveScans = collect();
     }
     
-    // Komentar: Method ini akan berjalan ketika menerima event 'qrSessionCreated'
+    
     #[On('qrSessionCreated')]
     public function updateQrSessionId($qrSessionId)
     {
         $this->qrSessionId = $qrSessionId;
-        // Komentar: Kosongkan daftar scan lama saat QR baru dibuat.
+        
         $this->liveScans = collect();
     }
     
-    // Komentar: Method ini juga akan berjalan ketika menerima event 'scanUpdated' dari parent
     #[On('scanUpdated')]
     public function checkScanStatus()
     {

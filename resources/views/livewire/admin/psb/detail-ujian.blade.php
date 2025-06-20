@@ -1,18 +1,18 @@
 <section>
     @if (session()->has('success'))
-        <div class="d-flex justify-content-end">
-            <div wire:poll class="alert alert-success">
-                {{ session('success') }}
-            </div>
+    <div class="d-flex justify-content-end">
+        <div wire:poll class="alert alert-success">
+            {{ session('success') }}
         </div>
+    </div>
     @endif
 
     @if (session()->has('error'))
-        <div class="d-flex justify-content-end">
-            <div wire:poll class="alert alert-danger">
-                {{ session('error') }}
-            </div>
+    <div class="d-flex justify-content-end">
+        <div wire:poll class="alert alert-danger">
+            {{ session('error') }}
         </div>
+    </div>
     @endif
 
     <div class="mb-3">
@@ -24,7 +24,7 @@
     <div class="row">
         {{-- Exam Info Card --}}
         <div class="col-md-4 mb-3">
-    <div class="card">
+            <div class="card">
                 <div class="card-header">
                     <h5 class="card-title mb-0">Informasi Ujian</h5>
                 </div>
@@ -63,43 +63,43 @@
                         Tambah Soal +
                     </button>
                 </div>
-        <div class="card-body">
+                <div class="card-body">
                     <div class="table-responsive">
                         <table class="table table-hover">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Pertanyaan</th>
+                            <thead>
+                                <tr>
+                                    <th>No</th>
+                                    <th>Pertanyaan</th>
                                     <th>Tipe</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse ($this->listSoal() as $soal)
-                        <tr>
-                            <td>{{ $loop->iteration }}</td>
-                                        <td>{{ Str::limit($soal->pertanyaan, 50) }}</td>
-                                        <td>
-                                            <span class="badge {{ $soal->tipe_soal === 'pg' ? 'bg-info' : 'bg-warning' }}">
-                                                {{ $soal->tipe_soal === 'pg' ? 'Pilihan Ganda' : 'Essay' }}
-                                            </span>
-                                        </td>
-                            <td>
-                                            <button wire:click="edit({{ $soal->id }})" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#createOrUpdateSoal">
-                                                <i class="bi bi-pencil"></i>
-                                            </button>
-                                            <button wire:click="deleteSoal({{ $soal->id }})" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus soal ini?')">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                                        <td colspan="4" class="text-center">Belum ada soal</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
+                                    <th>Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @forelse ($this->listSoal() as $soal)
+                                <tr>
+                                    <td>{{ $loop->iteration }}</td>
+                                    <td>{{ Str::limit($soal->pertanyaan, 50) }}</td>
+                                    <td>
+                                        <span class="badge {{ $soal->tipe_soal === 'pg' ? 'bg-info' : 'bg-warning' }}">
+                                            {{ $soal->tipe_soal === 'pg' ? 'Pilihan Ganda' : 'Essay' }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <button wire:click="edit({{ $soal->id }})" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#createOrUpdateSoal">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button wire:click="deleteSoal({{ $soal->id }})" class="btn btn-danger btn-sm" onclick="return confirm('Yakin ingin menghapus soal ini?')">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </td>
+                                </tr>
+                                @empty
+                                <tr>
+                                    <td colspan="4" class="text-center">Belum ada soal</td>
+                                </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -123,7 +123,7 @@
                                 <option value="essay">Essay</option>
                             </select>
                             @error('soalForm.tipe_soal')
-                                <div class="text-danger">{{ $message }}</div>
+                            <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>
 
@@ -131,53 +131,53 @@
                             <label class="form-label">Pertanyaan</label>
                             <textarea class="form-control" wire:model="soalForm.pertanyaan" rows="3" placeholder="Tulis pertanyaan di sini..."></textarea>
                             @error('soalForm.pertanyaan')
-                                <div class="text-danger">{{ $message }}</div>
+                            <div class="text-danger">{{ $message }}</div>
                             @enderror
                         </div>
 
                         @if($soalForm->tipe_soal === 'pg')
-    <div class="mb-3">
-        <div class="d-flex justify-content-between align-items-center mb-2">
-            <label class="form-label mb-0">Opsi Jawaban</label>
-            @if(count($soalForm->opsi) < 5)
-                <button type="button" class="btn btn-sm btn-outline-primary" wire:click="addOption">
-                    Tambah Opsi +
-                </button>
-            @endif
-        </div>
-        
-        @foreach($soalForm->opsi as $index => $option)
-            <div class="row mb-2">
-                <div class="col-1">
-                    <span class="fw-bold">{{ chr($index + 65) }}.</span>
-                </div>
-                <div class="col-8">
-                    <input type="text" class="form-control" wire:model="soalForm.opsi.{{ $index }}.teks" placeholder="Teks opsi">
-                    @error("soalForm.opsi.{$index}.teks")
-                        <div class="text-danger">{{ $message }}</div>
-                    @enderror
-                </div>
-                <div class="col-2">
-                    <input type="number" class="form-control" wire:model="soalForm.opsi.{{ $index }}.bobot" placeholder="Bobot" min="0">
-                    @error("soalForm.opsi.{$index}.bobot")
-                        <div class="text-danger">{{ $message }}</div>
-                    @enderror
-                </div>
-                <div class="col-1">
-                    @if(count($soalForm->opsi) > 2)
-                        <button type="button" class="btn btn-sm btn-danger" wire:click="removeOption({{ $index }})">
-                            <i class="bi bi-trash"></i>
-                        </button>
-                    @endif
-                </div>
-            </div>
-        @endforeach
+                        <div class="mb-3">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label class="form-label mb-0">Opsi Jawaban</label>
+                                @if(count($soalForm->opsi) < 5)
+                                    <button type="button" class="btn btn-sm btn-outline-primary" wire:click="addOption">
+                                    Tambah Opsi +
+                                    </button>
+                                    @endif
+                            </div>
 
-        @error('soalForm.opsi')
-            <div class="text-danger">{{ $message }}</div>
-        @enderror
-    </div>
-@endif
+                            @foreach($soalForm->opsi as $index => $option)
+                            <div class="row mb-2">
+                                <div class="col-1">
+                                    <span class="fw-bold">{{ chr($index + 65) }}.</span>
+                                </div>
+                                <div class="col-8">
+                                    <input type="text" class="form-control" wire:model="soalForm.opsi.{{ $index }}.teks" placeholder="Teks opsi">
+                                    @error("soalForm.opsi.{$index}.teks")
+                                    <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-2">
+                                    <input type="number" class="form-control" wire:model="soalForm.opsi.{{ $index }}.bobot" placeholder="Bobot" min="0">
+                                    @error("soalForm.opsi.{$index}.bobot")
+                                    <div class="text-danger">{{ $message }}</div>
+                                    @enderror
+                                </div>
+                                <div class="col-1">
+                                    @if(count($soalForm->opsi) > 2)
+                                    <button type="button" class="btn btn-sm btn-danger" wire:click="removeOption({{ $index }})">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                    @endif
+                                </div>
+                            </div>
+                            @endforeach
+
+                            @error('soalForm.opsi')
+                            <div class="text-danger">{{ $message }}</div>
+                            @enderror
+                        </div>
+                        @endif
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
@@ -192,7 +192,9 @@
 
     @script
     <script>
-        $wire.on('close-modal', ({id}) => {
+        $wire.on('close-modal', ({
+            id
+        }) => {
             bootstrap.Modal.getInstance(document.getElementById(id)).hide();
         });
     </script>

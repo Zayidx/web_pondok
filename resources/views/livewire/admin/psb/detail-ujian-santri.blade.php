@@ -15,7 +15,7 @@
                 <div class="card mb-4">
                     <div class="card-body text-center">
                         <div class="avatar avatar-xl mb-3">
-                             <span class="avatar-content bg-primary rounded-circle fs-3">{{ substr($santri->nama_lengkap, 0, 1) }}</span>
+                             <img src="{{ $santri->foto }}" alt="">
                         </div>
                         <h4 class="card-title">{{ $santri->nama_lengkap }}</h4>
                         <p class="text-muted">NISN: {{ $santri->nisn }}</p>
@@ -72,10 +72,7 @@
                 <div class="card">
                     <div class="card-header d-flex justify-content-between align-items-center">
                         <h4 class="card-title">Riwayat Ujian</h4>
-                        <div class="input-group w-50" style="max-width: 250px;">
-                            <span class="input-group-text"><i class="bi bi-search"></i></span>
-                            <input type="text" wire:model.live.debounce.300ms="search" class="form-control" placeholder="Cari ujian...">
-                        </div>
+                        
                     </div>
                     <div class="card-body">
                         <div class="table-responsive">

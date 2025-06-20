@@ -10,7 +10,6 @@ use Illuminate\Support\Collection;
 use Livewire\Attributes\Layout;
 use Livewire\Component;
 
-// [PERUBAHAN] Komponen ini menjadi lebih sederhana dan hanya mengontrol data utama.
 class AbsenMurid extends Component
 {
 
@@ -21,8 +20,6 @@ class AbsenMurid extends Component
     public Collection $daftarKehadiran;
     public int $jumlahHadir = 0;
     public int $totalSantri = 0;
-
-    // Komentar: Properti yang berhubungan dengan QR dan Scan Log telah dipindahkan ke komponen anak.
 
     public function mount($jadwalId)
     {
@@ -62,15 +59,12 @@ class AbsenMurid extends Component
                 'jam_hadir' => ($status === 'Hadir') ? now() : null,
             ]
         );
-        // Komentar: Setelah update, kita perlu memuat ulang data di komponen ini.
         $this->loadKehadiran();
-        // Komentar: Dan juga memberi tahu komponen daftar scan untuk refresh.
         $this->dispatch('scanUpdated');
     }
 
     public function render()
     {
-        // Komentar: Method render sekarang hanya bertugas menampilkan view utama.
         return view('livewire.admin.admin-piket.absen-murid');
     }
 }

@@ -35,39 +35,37 @@
             </div>
         </div>
 
-        <div class="row mb-5" wire:ignore>
-            <div class="col-6">
-                <h4 class="mb-3">Perbandingan Kehadiran Santri per Kelas</h4>
-                <div id="kehadiranPerKelasChart" class="card rounded-4 p-4 w-100"></div>
-            </div>
-            <div class="table-jadwal col-6">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h4 class="mb-3">Jadwal Piket: {{ $hariDipilih }}, {{ $tanggalDipilihFormatted }}</h4>
-                </div>
-                <div class="card rounded-4">
+        <div class="row mb-5">
+            <div class="col-12 col-lg-7 mb-4 mb-lg-0">
+                <div class="card rounded-4 h-100">
                     <div class="card-body">
+                        <h4 class="mb-3">Perbandingan Kehadiran Santri per Kelas</h4>
+                        <div id="kehadiranPerKelasChart" wire:ignore></div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12 col-lg-5">
+                <div class="card rounded-4 h-100">
+                    <div class="card-body">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="mb-3">Jadwal Piket: {{ $hariDipilih }}, {{ $tanggalDipilihFormatted }}</h4>
+                        </div>
                         <div class="table-responsive">
                             <table class="table table-hover">
                                 <thead>
                                     <tr>
-                                        <th>No.</th>
                                         <th>Kelas</th>
                                         <th>Total Mapel</th>
-                                        <th>Jadwal Masuk</th>
-                                        <th>Jadwal Pulang</th>
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @forelse ($groupedJadwal as $kelasId => $dataKelas)
                                     <tr>
-                                        <td class="text-center">{{ $loop->iteration }}</td>
-                                        <td class="text-center">{{ $dataKelas['kelas_nama'] }}</td>
-                                        <td class="text-center"><span class="badge bg-primary">{{ $dataKelas['total_mapel'] }} Mapel</span></td>
-                                        <td class="text-center">{{ $dataKelas['jadwal_masuk'] }}</td>
-                                        <td class="text-center">{{ $dataKelas['jadwal_pulang'] }}</td>
-                                        <td class="text-center">
-                                            <a wire:navigate href="{{ route('admin.piket.detail_kelas', ['kelasId' => $dataKelas['kelas_id'], 'tanggal' => $selectedDate]) }}"
+                                        <td>{{ $dataKelas['kelas_nama'] }}</td>
+                                        <td><span class="badge bg-primary">{{ $dataKelas['total_mapel'] }} Mapel</span></td>
+                                        <td>
+                                            <a href="{{ route('admin.piket.detail_kelas', ['kelasId' => $dataKelas['kelas_id'], 'tanggal' => $selectedDate]) }}"
                                                 wire:navigate class="btn btn-sm btn-primary text-white">
                                                 <i class="bi bi-eye-fill"></i> Detail
                                             </a>
@@ -75,7 +73,7 @@
                                     </tr>
                                     @empty
                                     <tr>
-                                        <td colspan="6" class="text-center py-4">
+                                        <td colspan="3" class="text-center py-4">
                                             Tidak ada jadwal pelajaran untuk hari ini.
                                         </td>
                                     </tr>
@@ -87,81 +85,92 @@
                 </div>
             </div>
         </div>
-
-
     </section>
 
     @push('scripts')
     <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
     <script>
-        document.addEventListener('livewire:navigated', () => {
-            const chartLabels = @json($chartLabels);
-            const chartData = @json($chartData);
+    function renderKehadiranChart() {
+        const chartLabels = @json($chartLabels);
+        const chartSeries = @json($chartSeries);
 
-            var kehadiranOptions = {
-                series: [{
-                    name: 'Jumlah Hadir',
-                    data: chartData
-                }],
-                chart: {
-                    type: 'bar',
-                    height: 350,
-                    toolbar: {
-                        show: true
-                    }
-                },
-                plotOptions: {
-                    bar: {
-                        horizontal: false,
-                        columnWidth: '55%',
-                        endingShape: 'rounded'
-                    }
-                },
-                dataLabels: {
-                    enabled: true
-                },
-                stroke: {
-                    show: true,
-                    width: 2,
-                    colors: ['transparent']
-                },
-                xaxis: {
-                    categories: chartLabels,
-                    title: {
-                        text: 'Kelas'
-                    }
-                },
-                yaxis: {
-                    title: {
-                        text: 'Jumlah Santri Hadir'
-                    }
-                },
-                fill: {
-                    opacity: 1
-                },
-                tooltip: {
-                    y: {
-                        formatter: function(val) {
-                            return val + " santri"
-                        }
-                    }
-                },
+        if (!chartLabels || chartLabels.length === 0) {
+            document.getElementById('kehadiranPerKelasChart').innerHTML = '<div class="text-center p-5">Tidak ada data untuk ditampilkan.</div>';
+            return;
+        }
+
+        var kehadiranOptions = {
+            series: chartSeries,
+            chart: {
+                type: 'bar',
+                height: 350,
+                stacked: true,
+                toolbar: {
+                    show: true
+                }
+            },
+            plotOptions: {
+                bar: {
+                    horizontal: false,
+                    columnWidth: '60%',
+                }
+            },
+            colors: ['#198754', '#fd7e14', '#0d6efd', '#dc3545'],
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                show: true,
+                width: 2,
+                colors: ['transparent']
+            },
+            xaxis: {
+                categories: chartLabels,
                 title: {
-                    text: 'Grafik Kehadiran Santri per Kelas',
-                    align: 'center'
+                    text: 'Kelas'
                 }
-            };
-
-            const chartEl = document.getElementById('kehadiranPerKelasChart');
-            if (chartEl) {
-                // Hapus instance chart sebelumnya jika ada untuk mencegah duplikasi
-                if (window.kehadiranChart instanceof ApexCharts) {
-                    window.kehadiranChart.destroy();
+            },
+            yaxis: {
+                title: {
+                    text: 'Jumlah Santri'
                 }
-                window.kehadiranChart = new ApexCharts(chartEl, kehadiranOptions);
-                window.kehadiranChart.render();
+            },
+            fill: {
+                opacity: 1
+            },
+            legend: {
+                position: 'top',
+                horizontalAlign: 'center',
+            },
+            tooltip: {
+                y: {
+                    formatter: function(val) {
+                        return val + " santri"
+                    }
+                }
+            },
+            title: {
+                text: 'Grafik Kehadiran Santri per Kelas',
+                align: 'center'
             }
-        });
-    </script>
+        };
+
+        const chartEl = document.getElementById('kehadiranPerKelasChart');
+        if (chartEl) {
+            if (window.kehadiranChart instanceof ApexCharts) {
+                window.kehadiranChart.destroy();
+            }
+            window.kehadiranChart = new ApexCharts(chartEl, kehadiranOptions);
+            window.kehadiranChart.render();
+        }
+    }
+
+    document.addEventListener('livewire:navigated', () => {
+        renderKehadiranChart();
+    });
+
+    renderKehadiranChart();
+
+</script>
     @endpush
 </div>

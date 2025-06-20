@@ -164,63 +164,10 @@
                 </div>
                 
                 <div class="card mb-4">
-                    <div class="card-header">
-                        <h5 class="mb-0">Ringkasan Nilai</h5>
-                    </div>
+                
                     <div class="card-body">
-                        @php
-                            $totalPG = 0;
-                            $totalEssay = 0;
-                            $jumlahSoalPG = 0;
-                            $jumlahSoalEssay = 0;
-
-                            foreach($soalUjian as $soal) {
-                                if($soal->tipe_soal === 'pg') {
-                                    $jumlahSoalPG++;
-                                    $jawaban = $jawabanUjian->get($soal->id);
-                                    if ($jawaban && $jawaban->jawaban) {
-                                        $answerIndex = ord(strtoupper($jawaban->jawaban)) - 65;
-                                        if (isset($soal->opsi[$answerIndex]['bobot'])) {
-                                            $totalPG += (float)$soal->opsi[$answerIndex]['bobot'];
-                                        }
-                                    }
-                                } else {
-                                    $jumlahSoalEssay++;
-                                    if (isset($poinEssay[$soal->id]) && is_numeric($poinEssay[$soal->id])) {
-                                        $totalEssay += (float)$poinEssay[$soal->id];
-                                    }
-                                }
-                            }
-                            $this->totalPoin = $totalPG + $totalEssay;
-                        @endphp
+                       
                         
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="avatar bg-info me-3">
-                                <i class="bi bi-list-check"></i>
-                            </div>
-                            <div class="w-100">
-                                <div class="d-flex justify-content-between">
-                                    <h6 class="mb-0">Pilihan Ganda</h6>
-                                    <h6 class="mb-0">{{ number_format($totalPG, 2) }}</h6>
-                                </div>
-                                <small class="text-muted">{{ $jumlahSoalPG }} Soal</small>
-                            </div>
-                        </div>
-
-                        <div class="d-flex align-items-center mb-3">
-                            <div class="avatar bg-warning me-3">
-                                <i class="bi bi-pencil-square"></i>
-                            </div>
-                            <div class="w-100">
-                                <div class="d-flex justify-content-between">
-                                    <h6 class="mb-0">Esai</h6>
-                                    <h6 class="mb-0">{{ number_format($totalEssay, 2) }}</h6>
-                                </div>
-                                <small class="text-muted">{{ $jumlahSoalEssay }} Soal</small>
-                            </div>
-                        </div>
-
-                        <hr>
 
                         <div class="d-flex justify-content-between align-items-center">
                             <h5 class="mb-0">Total Poin Ujian Ini</h5>

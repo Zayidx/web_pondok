@@ -12,18 +12,12 @@ class JadwalPiketExport implements FromCollection, WithHeadings, ShouldAutoSize
 {
     protected $selectedDate;
 
-    // Komentar: Constructor untuk menerima tanggal yang dipilih dari komponen Dashboard.
     public function __construct($selectedDate)
     {
         $this->selectedDate = $selectedDate;
     }
-
-    /**
-     * @return \Illuminate\Support\Collection
-     */
     public function collection()
     {
-        // Komentar: Logika untuk mengambil dan memformat data, sama seperti di Dashboard Anda.
         Carbon::setLocale('id');
         $selectedCarbonDate = Carbon::parse($this->selectedDate);
         $hariDipilih = $selectedCarbonDate->translatedFormat('l');
@@ -63,10 +57,6 @@ class JadwalPiketExport implements FromCollection, WithHeadings, ShouldAutoSize
         return $exportData;
     }
 
-    /**
-     * @return array
-     */
-    // Komentar: Method untuk mendefinisikan header atau judul kolom di file Excel.
     public function headings(): array
     {
         return [
