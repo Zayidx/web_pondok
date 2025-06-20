@@ -14,9 +14,15 @@
             <div class="col-xl-4 col-lg-5">
                 <div class="card mb-4">
                     <div class="card-body text-center">
-                        <div class="avatar avatar-xl mb-3">
-                             <img src="{{ $santri->foto }}" alt="">
-                        </div>
+                    <div class="avatar avatar-xl mb-3 mx-auto">
+    @php
+        $fotoDokumen = $santri->dokumen->where('jenis_berkas', 'Pas Foto')->first();
+        $fotoPath = $fotoDokumen ? asset('storage/' . $fotoDokumen->file_path) : 'URL_PATH_TO_DEFAULT_AVATAR';
+        // Ganti 'URL_PATH_TO_DEFAULT_AVATAR' dengan path ke gambar default jika santri tidak memiliki foto
+    @endphp
+    <img src="{{ $fotoPath }}" alt="Foto Santri">
+</div>
+
                         <h4 class="card-title">{{ $santri->nama_lengkap }}</h4>
                         <p class="text-muted">NISN: {{ $santri->nisn }}</p>
                         <hr>

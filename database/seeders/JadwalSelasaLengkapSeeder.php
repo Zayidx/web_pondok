@@ -70,16 +70,16 @@ class JadwalSelasaLengkapSeeder extends Seeder
             JadwalPelajaran::updateOrCreate(
                 [
                     'kelas_id' => $jadwal['kelas_id'],
-                    'hari' => 'rabu',
+                    'hari' => 'jumat',
                     'waktu_mulai' => $jadwal['waktu_mulai'],
                 ],
                 array_merge($jadwal, [
-                    'hari' => 'rabu',
+                    'hari' => 'jumat',
                     'role_guru' => 'umum'
                 ])
             );
         }
 
-        $this->command->info('Seeder untuk jadwal hari rabu (jadwal penuh) berhasil dijalankan.');
+        $this->command->info('Seeder untuk jadwal hari jumat (jadwal penuh) berhasil dijalankan.');
     }
 }

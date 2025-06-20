@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\SantriPPDB;
+namespace App\Livewire\PSB;
 
 use App\Models\PSB\Soal;
 use Livewire\Attributes\Validate;

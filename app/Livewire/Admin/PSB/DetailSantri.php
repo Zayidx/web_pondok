@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\Admin\ListSantri;
+namespace App\Livewire\Admin\PSB;
 
 use App\Models\OrangTuaSantri;
 use App\Models\Santri;

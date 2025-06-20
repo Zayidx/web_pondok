@@ -51,10 +51,14 @@ class DetailSoalSantri extends Component
 
     public function loadData()
     {
-        $this->soalUjian = Soal::where('ujian_id', $this->ujianId)->orderBy('id', 'asc')->get();
-        $this->hasilUjian = HasilUjian::where('santri_id', $this->santriId)
-                                      ->where('ujian_id', $this->ujianId)
-                                      ->firstOrFail();
+        $this->soalUjian = Soal::where('ujian_id', $this->ujianId)
+        ->orderByRaw("CASE WHEN tipe_soal = 'pg' THEN 0 ELSE 1 END")
+        ->orderBy('id', 'asc')
+        ->get();
+        
+    $this->hasilUjian = HasilUjian::where('santri_id', $this->santriId)
+    ->where('ujian_id', $this->ujianId)
+    ->firstOrFail();
 
         // Mengambil semua jawaban ujian santri yang terkait
         $this->jawabanUjian = JawabanUjian::where('hasil_ujian_id', $this->hasilUjian->id)->get()->keyBy('soal_id');

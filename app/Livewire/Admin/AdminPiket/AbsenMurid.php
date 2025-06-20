@@ -8,11 +8,12 @@ use App\Models\ESantri\JadwalPelajaran;
 use App\Models\Santri;
 use Illuminate\Support\Collection;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 use Livewire\Component;
 
 class AbsenMurid extends Component
 {
-
+    #[Title('')]
     #[Layout('components/layouts/app')]
     public JadwalPelajaran $jadwal;
     public Collection $semuaSantri;

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\SantriPPDB;
+namespace App\Livewire\PSB;
 
 use Livewire\Component;
 use App\Models\HasilUjian;
@@ -80,7 +80,7 @@ class RiwayatUjian extends Component
 
         $hasilUjian = $query->latest()->paginate(10);
 
-        return view('livewire.santri-p-p-d-b.riwayat-ujian', [
+        return view('livewire.psb.riwayat-ujian', [
             'hasilUjian' => $hasilUjian,
             'stats' => $this->stats,
         ]);

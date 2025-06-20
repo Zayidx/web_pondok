@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\SantriPPDB;
+namespace App\Livewire\PSB;
 
 use Livewire\Component;
 use App\Models\PSB\Ujian;
@@ -63,6 +63,6 @@ class SelesaiUjian extends Component
 
     public function render()
     {
-        return view('livewire.santri-p-p-d-b.selesai-ujian');
+        return view('livewire.psb.selesai-ujian');
     }
 } 

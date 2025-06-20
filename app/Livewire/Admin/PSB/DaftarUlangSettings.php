@@ -6,11 +6,12 @@ use Livewire\Component;
 use App\Models\PSB\BiayaDaftarUlang;
 use App\Models\PSB\PengaturanDaftarUlang;
 use App\Models\PSB\Periode;
-use App\Models\PSB\PsbPeriode;
+use Livewire\Attributes\Title;
 
 class DaftarUlangSettings extends Component
 {
     // Properties for biaya
+    #[Title('Pengaturan Daftar Ulang')]
     public $nama_biaya;
     public $nominal;
     public $keterangan;

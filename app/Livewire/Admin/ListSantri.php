@@ -15,7 +15,6 @@ use App\Models\OrangTuaSantri;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Storage;
-use Livewire\Attributes\Computed;
 use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 use Livewire\Attributes\Url;
@@ -40,21 +39,27 @@ class ListSantri extends Component
     #[Url(except: "")]
     public $perPage = 5;
 
-    // data
     public $kelas, $kamar, $semester, $angkatan, $santri_id, $jenjang, $santriEditId, $formPage = 1;
-    public $kelasFilter, $jenjangFilter, $kamarFilter, $jenisKelaminFilter;
-
+    
+    #[Url(except: '')]
+    public $kelasFilter = '';
+    #[Url(except: '')]
+    public $jenjangFilter = '';
+    #[Url(except: '')]
+    public $kamarFilter = '';
+    #[Url(except: '')]
+    public $jenisKelaminFilter = '';
+    
     public $user;
 
     #[Url(except: '', as: 'q-santri')]
-    public $search;
+    public $search = '';
 
     #[Validate('nullable|image|mimes:jpeg,png,jpg|max:4084')]
     public $foto;
 
-    // Added for sorting functionality
-    public $sortField = 'nama'; // Default sort field
-    public $sortDirection = 'asc'; // Default sort direction
+    public $sortField = 'nama';
+    public $sortDirection = 'asc';
 
     public function updatedPerPage()
     {
@@ -78,8 +83,8 @@ class ListSantri extends Component
             $this->dispatch('showModal');
         }
 
-        $this->kelas = Kelas::with('jenjang')->get();
-        $this->kamar = Kamar::with('waliKamar')->get();
+        $this->kelas = Kelas::all();
+        $this->kamar = Kamar::all();
         $this->semester = Semester::all();
         $this->angkatan = Angkatan::all();
         $this->jenjang = Jenjang::all();
@@ -104,16 +109,16 @@ class ListSantri extends Component
     {
         $this->santriForm->validate();
         $this->waliSantriForm->validate();
-
         $this->validate();
+
+        $imgUrl = null;
         if ($this->foto) {
-            $originalFileName = time() . "-" . $this->foto->hashname();
+            $originalFileName = time() . "-" . $this->foto->hashName();
             $imgUrl = $this->foto->storeAs('images/santri', $originalFileName, 'public');
-            $this->foto = $imgUrl;
         }
 
         $data = $this->santriForm->all();
-        $data['foto'] = $this->foto;
+        $data['foto'] = $imgUrl;
         $santri = Santri::create($data);
 
         $waliSantriData = $this->waliSantriForm->all();
@@ -133,89 +138,30 @@ class ListSantri extends Component
     public function edit($santriId)
     {
         $this->santriEditId = $santriId;
-
         $santriData = Santri::findOrFail($santriId);
-        $waliData = OrangTuaSantri::where('santri_id', $santriId)->first();
+        $waliData = OrangTuaSantri::where('santri_id', $santriId)->firstOrNew();
 
         $this->user = User::where('email', $santriData->nisn)->first();
 
+        $this->santriForm->fill($santriData->toArray());
+        $this->waliSantriForm->fill($waliData->toArray());
         $this->foto = $santriData->foto;
-        $this->santriForm->nama = $santriData->nama;
-        $this->santriForm->nisn = $santriData->nisn;
-        $this->santriForm->nism = $santriData->nism;
-        $this->santriForm->kewarganegaraan = $santriData->kewarganegaraan;
-        $this->santriForm->nik = $santriData->nik;
-        $this->santriForm->tempat_lahir = $santriData->tempat_lahir;
-        $this->santriForm->tanggal_lahir = $santriData->tanggal_lahir;
-        $this->santriForm->jenis_kelamin = $santriData->jenis_kelamin;
-        $this->santriForm->jumlah_saudara_kandung = $santriData->jumlah_saudara_kandung;
-        $this->santriForm->anak_ke = $santriData->anak_ke;
-        $this->santriForm->agama = $santriData->agama;
-        $this->santriForm->hobi = $santriData->hobi;
-        $this->santriForm->aktivitas_pendidikan = $santriData->aktivitas_pendidikan;
-        $this->santriForm->npsn = $santriData->npsn;
-        $this->santriForm->no_kip = $santriData->no_kip;
-        $this->santriForm->no_kk = $santriData->no_kk;
-        $this->santriForm->nama_kepala_keluarga = $santriData->nama_kepala_keluarga;
-        $this->santriForm->riwayat_penyakit = $santriData->riwayat_penyakit;
-        $this->santriForm->status_kesantrian = $santriData->status_kesantrian;
-        $this->santriForm->status_santri = $santriData->status_santri;
-        $this->santriForm->asal_sekolah = $santriData->asal_sekolah;
-        $this->santriForm->yang_membiayai_sekolah = $santriData->yang_membiayai_sekolah;
-
-        $this->santriForm->kelas_id = $santriData->kelas_id;
-        $this->santriForm->kamar_id = $santriData->kamar_id;
-        $this->santriForm->semester_id = $santriData->semester_id;
-        $this->santriForm->angkatan_id = $santriData->angkatan_id;
-
-        $this->waliSantriForm->nama_ayah = $waliData->nama_ayah;
-        $this->waliSantriForm->status_ayah = $waliData->status_ayah;
-        $this->waliSantriForm->kewarganegaraan_ayah = $waliData->kewarganegaraan_ayah;
-        $this->waliSantriForm->nik_ayah = $waliData->nik_ayah;
-        $this->waliSantriForm->tempat_lahir_ayah = $waliData->tempat_lahir_ayah;
-        $this->waliSantriForm->tanggal_lahir_ayah = $waliData->tanggal_lahir_ayah;
-        $this->waliSantriForm->pendidikan_terakhir_ayah = $waliData->pendidikan_terakhir_ayah;
-        $this->waliSantriForm->pekerjaan_ayah = $waliData->pekerjaan_ayah;
-        $this->waliSantriForm->penghasilan_ayah = $waliData->penghasilan_ayah;
-        $this->waliSantriForm->no_telp_ayah = $waliData->no_telp_ayah;
-
-        $this->waliSantriForm->santri_id = $waliData->santri_id;
-        $this->waliSantriForm->nama_ibu = $waliData->nama_ibu;
-        $this->waliSantriForm->status_ibu = $waliData->status_ibu;
-        $this->waliSantriForm->kewarganegaraan_ibu = $waliData->kewarganegaraan_ibu;
-        $this->waliSantriForm->nik_ibu = $waliData->nik_ibu;
-        $this->waliSantriForm->tempat_lahir_ibu = $waliData->tempat_lahir_ibu;
-        $this->waliSantriForm->tanggal_lahir_ibu = $waliData->tanggal_lahir_ibu;
-        $this->waliSantriForm->pendidikan_terakhir_ibu = $waliData->pendidikan_terakhir_ibu;
-        $this->waliSantriForm->pekerjaan_ibu = $waliData->pekerjaan_ibu;
-        $this->waliSantriForm->penghasilan_ibu = $waliData->penghasilan_ibu;
-        $this->waliSantriForm->no_telp_ibu = $waliData->no_telp_ibu;
-
-        $this->waliSantriForm->status_kepemilikan_rumah = $waliData->status_kepemilikan_rumah;
-        $this->waliSantriForm->provinsi = $waliData->provinsi;
-        $this->waliSantriForm->kabupaten = $waliData->kabupaten;
-        $this->waliSantriForm->kecamatan = $waliData->kecamatan;
-        $this->waliSantriForm->kelurahan = $waliData->kelurahan;
-        $this->waliSantriForm->rt = $waliData->rt;
-        $this->waliSantriForm->rw = $waliData->rw;
-        $this->waliSantriForm->alamat = $waliData->alamat;
-        $this->waliSantriForm->kode_pos = $waliData->kode_pos;
-        $this->waliSantriForm->status_orang_tua = $waliData->status_orang_tua;
     }
 
     public function editStore()
     {
         $this->santriForm->validate();
+        $this->waliSantriForm->validate();
+        $this->validate();
 
         $santri = Santri::findOrFail($this->santriEditId);
         $santriData = $this->santriForm->all();
 
         if ($this->foto && is_object($this->foto)) {
             if ($santri->foto && Storage::disk('public')->exists($santri->foto)) {
-                $this->validate();
                 Storage::disk('public')->delete($santri->foto);
             }
-            $fileName = time() . '-' . $this->foto->hashname();
+            $fileName = time() . '-' . $this->foto->hashName();
             $imgUrl = $this->foto->storeAs('images/santri', $fileName, 'public');
             $santriData['foto'] = $imgUrl;
         } else {
@@ -223,24 +169,29 @@ class ListSantri extends Component
         }
 
         $santri->update($santriData);
-        OrangTuaSantri::where('santri_id', $this->santriEditId)
-            ->update($this->waliSantriForm->all());
+        OrangTuaSantri::updateOrCreate(
+            ['santri_id' => $this->santriEditId],
+            $this->waliSantriForm->all()
+        );
+        
+        if($this->user) {
+            $this->user->update([
+                'email' => $this->santriForm->nisn,
+                'name' => $this->santriForm->nama,
+                'password' => Hash::make($this->santriForm->nisn),
+            ]);
+        }
 
-        $this->user->update([
-            'roles_id' => 6,
-            'email' => $this->santriForm->nisn,
-            'name' => $this->santriForm->nama,
-            'password' => Hash::make($this->santriForm->nisn),
-        ]);
-
-        return to_route('admin.master-santri.santri')
-            ->with(['message' => "Success updated " . $santri->nama . " !"]);
+        return to_route('admin.master-santri.santri')->with(['message' => "Success updated " . $santri->nama . " !"]);
     }
 
     #[On('delete')]
     public function delete($santriId)
     {
-        Santri::findOrFail($santriId)?->delete();
+        $santri = Santri::find($santriId);
+        if ($santri) {
+            $santri->delete();
+        }
     }
 
     public function export()
@@ -248,67 +199,31 @@ class ListSantri extends Component
         return Excel::download(new SantriExport, 'santri.xlsx');
     }
 
-    #[Computed]
-    public function getData()
-    {
-        $query = Santri::with(['kelas', 'kamar']);
-
-        if ($this->search) {
-            $query->where(function ($q) {
-                $q->whereRaw('nama LIKE ?', ["%{$this->search}%"])
-                  ->orWhereRaw('CASE
-                            WHEN jenis_kelamin = "putera" THEN "laki-laki"
-                            WHEN jenis_kelamin = "perempuan" THEN "perempuan"
-                            END LIKE ?', ["%{$this->search}%"])
-                  ->orWhere('jenis_kelamin', 'LIKE', "%{$this->search}%")
-                  ->orWhereHas('kelas', function ($query) {
-                      $query->where('nama', 'LIKE', "%{$this->search}%");
-                  })
-                  ->orWhereHas('kelas.jenjang', function ($query) {
-                      $query->where('nama', 'LIKE', "%{$this->search}%");
-                  })
-                  ->orWhereHas('kamar', function ($query) {
-                      $query->where('nama', 'LIKE', "%{$this->search}%");
-                  });
-            });
-        }
-
-        $query->when($this->kelasFilter, function ($q) {
-            $q->whereHas('kelas', function ($query) {
-                $query->where('nama', 'LIKE', "%{$this->kelasFilter}%");
-            });
-        })
-        ->when($this->jenjangFilter, function ($q) {
-            $q->whereHas('kelas.jenjang', function ($query) {
-                $query->where('nama', 'LIKE', "%{$this->jenjangFilter}%");
-            });
-        })
-        ->when($this->kamarFilter, function ($q) {
-            $q->whereHas('kamar', function ($query) {
-                $query->where('nama', 'LIKE', "%{$this->kamarFilter}%");
-            });
-        })
-        ->when($this->jenisKelaminFilter, function ($q) {
-            $q->where('jenis_kelamin', 'LIKE', "%{$this->jenisKelaminFilter}%");
-        });
-
-        return $query->paginate($this->perPage);
-    }
-
     public function render()
     {
-        // Changed 'orangTua' to 'orangTuaSantri' to match the relationship name in the Santri model.
-        $santris = Santri::with(['kamar', 'kelas', 'kelas.jenjang', 'orangTuaSantri']) 
+        $query = Santri::with(['kamar', 'kelas.jenjang', 'orangTuaSantri']) 
             ->when($this->search, function ($query) {
                 $query->where('nama', 'like', '%' . $this->search . '%')
                       ->orWhere('nisn', 'like', '%' . $this->search . '%');
             })
-            ->orderBy($this->sortField, $this->sortDirection)
-            ->paginate($this->perPage);
+            ->when($this->kelasFilter, function ($query) {
+                $query->whereHas('kelas', fn($q) => $q->where('nama', $this->kelasFilter));
+            })
+            ->when($this->jenjangFilter, function ($query) {
+                $query->whereHas('kelas.jenjang', fn($q) => $q->where('nama', $this->jenjangFilter));
+            })
+            ->when($this->kamarFilter, function ($query) {
+                $query->whereHas('kamar', fn($q) => $q->where('nama', $this->kamarFilter));
+            })
+            ->when($this->jenisKelaminFilter, function ($query) {
+                $query->where('jenis_kelamin', $this->jenisKelaminFilter);
+            })
+            ->orderBy($this->sortField, $this->sortDirection);
+
+        $santris = $query->paginate($this->perPage);
 
         return view('livewire.admin.list-santri', [
             'santris' => $santris,
-            'jenjangs' => Jenjang::all(),
         ]);
     }
 }

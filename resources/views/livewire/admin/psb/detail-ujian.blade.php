@@ -43,13 +43,11 @@
                     </div>
                     <div class="mb-3">
                         <label class="form-label fw-bold">Waktu</label>
-                        <p>{{ $ujian->waktu_mulai }} - {{ $ujian->waktu_selesai }}</p>
+                        <div class="flex justify-between items-center">
+    <span class="text-gray-900">{{ \Carbon\Carbon::parse($ujian->waktu_mulai)->format('H:i') }} - {{ \Carbon\Carbon::parse($ujian->waktu_selesai)->format('H:i') }}</span>
+</div>
                     </div>
-                    <div class="d-grid">
-                        <a href="{{ route('admin.psb.ujian.preview', $ujian->id) }}" class="btn btn-info">
-                            <i class="bi bi-eye"></i> Preview Ujian
-                        </a>
-                    </div>
+                    
                 </div>
             </div>
         </div>

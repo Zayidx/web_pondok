@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\SantriPPDB;
+namespace App\Livewire\PSB;
 
 use Livewire\Component;
 use App\Models\PSB\Ujian;
@@ -96,6 +96,6 @@ class KonfirmasiSelesai extends Component
 
     public function render()
     {
-        return view('livewire.santri-p-p-d-b.konfirmasi-selesai');
+        return view('livewire.psb.konfirmasi-selesai');
     }
 } 

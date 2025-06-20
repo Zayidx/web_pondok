@@ -27,7 +27,8 @@ class DetailUjianSantri extends Component
     public function mount($id)
     {
         $this->santriId = $id;
-        $this->santri = PendaftaranSantri::findOrFail($id);
+        // Muat relasi 'dokumen' untuk mendapatkan akses ke foto
+        $this->santri = PendaftaranSantri::with('dokumen')->findOrFail($id); 
         $this->loadUjianList();
     }
 

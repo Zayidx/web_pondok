@@ -2,9 +2,10 @@
 
 namespace App\Livewire\Admin\PSB;
 
-use App\Livewire\SantriPPDB\SoalForm;
+use App\Livewire\PSB\SoalForm;
 use App\Models\PSB\Soal;
 use App\Models\PSB\Ujian;
+use Carbon\Carbon;
 use Livewire\Attributes\Computed;
 use Livewire\Attributes\Title;
 use Livewire\Component;
@@ -40,6 +41,9 @@ class DetailUjian extends Component
         $this->ujian = Ujian::findOrFail($ujianId);
         $this->soalForm = new SoalForm($this, 'soalForm');
         $this->soalForm->ujian_id = $this->ujianId;
+        $waktuMulai = Carbon::parse($this->ujian->waktu_mulai); 
+        // Nilai waktu_selesai diambil langsung dari kolom 'waktu_selesai' pada tabel 'ujians'.
+        $waktuSelesai = Carbon::parse($this->ujian->waktu_selesai); 
     }
 
     /**

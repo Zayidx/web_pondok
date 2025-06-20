@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\SantriPPDB;
+namespace App\Livewire\PSB;
 
 use Livewire\Component;
 use App\Models\PSB\PendaftaranSantri;
@@ -145,6 +145,6 @@ class DashboardUjianSantri extends Component
 
     public function render()
     {
-        return view('livewire.santri-p-p-d-b.dashboard-ujian-santri');
+        return view('livewire.psb.dashboard-ujian-santri');
     }
 } 

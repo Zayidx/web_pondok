@@ -7,10 +7,11 @@
                     <div class="d-flex align-items-center gap-2">
                         <label for="date-filter" class="form-label mb-0 fw-semibold">Pilih Tanggal:</label>
                         <input type="date" id="date-filter" wire:model.live="selectedDate" class="form-control" style="width: auto;">
-                        <button wire:click="exportExcel" class="btn btn-success d-inline-flex align-items-center">
-                            <i class="bi bi-file-earmark-excel-fill me-2"></i>
-                            Export Detail
-                        </button>
+                      {{-- Menggunakan nama rute yang lengkap sesuai dengan definisi di file routes --}}
+<a href="{{ route('admin.piket.laporan.absensi') }}" class="btn btn-success d-inline-flex align-items-center">
+    <i class="bi bi-file-earmark-excel-fill me-2"></i>
+    Export Detail
+</a>
                     </div>
                 </div>
             </div>

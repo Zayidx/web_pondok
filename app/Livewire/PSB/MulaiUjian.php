@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\SantriPPDB;
+namespace App\Livewire\PSB;
 
 use Livewire\Component;
 use App\Models\Ujian; // Import the Ujian model (ensure the namespace is correct: App\Models\PSB\Ujian).
@@ -450,19 +450,17 @@ class MulaiUjian extends Component
     public function gotoPage($pageNumber)
     {
         if ($pageNumber >= 1 && $pageNumber <= $this->jumlahSoal) {
-            // Get the current question to save its answer if any.
-            $soals = $this->ujian->soals()->orderBy('id')->get();
+            $soals = $this->ujian->soals()
+                        ->orderByRaw("CASE WHEN tipe_soal = 'pg' THEN 0 ELSE 1 END") // Baris ini ditambahkan
+                        ->orderBy('id', 'asc') // Baris ini ditambahkan
+                        ->get();
             $currentSoal = $soals[$this->currentPage - 1] ?? null;
 
-            // If there's a current question and an answer bound to the input, save the answer.
-            // This is crucial for persistence when navigating between pages.
             if ($currentSoal && isset($this->jawabanSiswa[$currentSoal->id])) {
                 $this->simpanJawaban($currentSoal->id, $this->jawabanSiswa[$currentSoal->id]);
             }
             
-            $this->currentPage = $pageNumber; // Set the current question page.
-            // No need to reset ['jawaban'] here if using $jawabanSiswa[$currentSoal->id] directly in the blade.
-            // The blade will pick up the existing value from $jawabanSiswa array.
+            $this->currentPage = $pageNumber;
         }
     }
     
@@ -497,17 +495,17 @@ class MulaiUjian extends Component
      */
     public function render()
     {
-        // Get all exam questions, ordered by ID.
-        $soals = $this->ujian->soals()->orderBy('id')->get();
-        // Get the currently active question based on currentPage.
+        $soals = $this->ujian->soals()
+                    ->orderByRaw("CASE WHEN tipe_soal = 'pg' THEN 0 ELSE 1 END") // Baris ini ditambahkan
+                    ->orderBy('id', 'asc') // Baris ini ditambahkan
+                    ->get();
         $currentSoal = $soals[$this->currentPage - 1] ?? null;
 
-        // Return the Blade view along with the necessary data.
-        return view('livewire.santri-p-p-d-b.mulai-ujian', [
-            'soals' => $soals, // All exam questions.
-            'currentSoal' => $currentSoal, // The currently displayed question.
-            'jawabanSiswa' => $this->jawabanSiswa, // Student's saved answers.
-            'durasi' => $this->durasi // Exam duration.
+        return view('livewire.psb.mulai-ujian', [
+            'soals' => $soals,
+            'currentSoal' => $currentSoal,
+            'jawabanSiswa' => $this->jawabanSiswa,
+            'durasi' => $this->durasi
         ]);
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\SantriPPDB;
+namespace App\Livewire\PSB;
 
 use App\Models\PSB\HasilUjian; // Menggunakan model HasilUjian dari namespace PSB
 use Livewire\Attributes\Computed;
@@ -29,6 +29,6 @@ class SantriDashboard extends Component
 
     public function render()
     {
-        return view('livewire.santri-ppdb.santri-dashboard');
+        return view('livewire.psb.santri-dashboard');
     }
 }

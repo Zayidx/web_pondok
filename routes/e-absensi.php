@@ -1,6 +1,7 @@
 <?php
 
 use App\Livewire\Absensi\Scan;
+use App\Livewire\Admin\AdminPiket\LaporanAbsensi;
 use App\Livewire\Admin\ESantri\GuruUmum\Absensi;
 
 use Illuminate\Support\Facades\Auth;
@@ -18,6 +19,7 @@ Route::prefix('e-santri')->middleware('auth')->group(function () {
         Route::get('/jadwal-piket', GuruUmum\JadwalPiket::class)->name('e-santri-guru-umum.jadwal-piket');
         Route::get('/pengumuman', GuruUmum\Pengumuman::class)->name('e-santri-guru-umum.pengumuman');
         Route::get('/absensi',  GuruUmum\Absensi::class)->name('e-santri-guru-umum.absensi');
+    
     });
 });
 

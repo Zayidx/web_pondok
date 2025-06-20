@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\SantriPPDB;
+namespace App\Livewire\PSB;
 
 use Livewire\Component;
 
@@ -8,6 +8,6 @@ class UjianEssay extends Component
 {
     public function render()
     {
-        return view('livewire..santri-p-p-d-b.ujian-essay');
+        return view('livewire.psb.ujian-essay');
     }
 }

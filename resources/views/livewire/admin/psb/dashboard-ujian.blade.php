@@ -95,7 +95,7 @@
                                 <td>{{ $ujian->nama_ujian }}</td>
                                 <td>{{ $ujian->mata_pelajaran }}</td>
                                     <td>{{ \Carbon\Carbon::parse($ujian->tanggal_ujian)->format('d F Y') }}</td>
-                                <td>{{ $ujian->waktu_mulai }} - {{ $ujian->waktu_selesai }}</td>
+                                <td>{{ \Carbon\Carbon::parse($ujian->waktu_mulai)->format('H:i') }} - {{ \Carbon\Carbon::parse($ujian->waktu_selesai)->format('H:i') }}                                </td>
                                     <td>
                                         <span class="badge bg-{{ $ujian->status_ujian === 'aktif' ? 'success' : ($ujian->status_ujian === 'draft' ? 'warning' : 'secondary') }}">
                                             {{ ucfirst($ujian->status_ujian) }}

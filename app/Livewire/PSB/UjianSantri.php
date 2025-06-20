@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Livewire\SantriPPDB;
+namespace App\Livewire\PSB;
 
 use App\Models\JawabanSantri;
+use App\Models\PSB\Soal as PSBSoal;
 use App\Models\Soal;
 use App\Models\Ujian;
 use Livewire\Attributes\Title;
@@ -21,7 +22,7 @@ class UjianSantri extends Component
     public function mount($ujianId)
     {
         $this->ujianId = $ujianId;
-        $this->soals = Soal::where('ujian_id', $this->ujianId)->get();
+        $this->soals = PSBSoal::where('ujian_id', $this->ujianId)->get();
         $this->soalId = $this->soals->isNotEmpty() ? $this->soals[0]->id : null;
     }
 
@@ -71,6 +72,6 @@ class UjianSantri extends Component
     public function render()
     {
         $soal = $this->soals->get($this->currentSoalIndex);
-        return view('livewire.santri-ppdb.ujian-santri', compact('soal'));
+        return view('livewire.psb.ujian-santri', compact('soal'));
     }
 }

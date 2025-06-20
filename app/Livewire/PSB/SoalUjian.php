@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\SantriPPDB;
+namespace App\Livewire\PSB;
 
 use Livewire\Component;
 use App\Models\PSB\Ujian; // Perbarui import menjadi model di namespace PSB
@@ -14,6 +14,7 @@ use Livewire\Attributes\Title;
 use Livewire\Attributes\On;
 use Illuminate\Support\Facades\DB; // Tambahkan import DB
 use Illuminate\Support\Collection; // Pastikan ini sudah ada
+use Illuminate\Support\Facades\Log;
 
 class SoalUjian extends Component
 {
@@ -212,7 +213,7 @@ class SoalUjian extends Component
         } catch (\Exception $e) {
             session()->flash('error', 'Terjadi kesalahan saat menyelesaikan ujian: ' . $e->getMessage());
             // Log the error for debugging
-            \Log::error('Error submitting exam: ' . $e->getMessage(), ['exception' => $e]);
+            Log::error('Error submitting exam: ' . $e->getMessage(), ['exception' => $e]);
         }
     }
 
@@ -225,7 +226,7 @@ class SoalUjian extends Component
     public function render()
     {
         $currentSoal = $this->soals->get($this->currentSoalIndex);
-        return view('livewire.santri-p-p-d-b.soal-ujian', [
+        return view('livewire.psb.soal-ujian', [
             'currentSoal' => $currentSoal,
         ]);
     }

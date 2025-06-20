@@ -5,10 +5,12 @@ namespace App\Livewire\Admin\AdminPiket;
 use App\Models\Kelas;
 use App\Models\ESantri\JadwalPelajaran;
 use Carbon\Carbon;
+use Livewire\Attributes\Title;
 use Livewire\Component;
 
 class DetailAbsensi extends Component
 {
+    #[Title('')]
     public $kelasId;
     public $tanggal;
     public $isToday;

@@ -10,11 +10,14 @@ use App\Models\Kelas;
 use App\Models\Santri;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
+use Livewire\Attributes\Title;
 use Livewire\Component;
 use Maatwebsite\Excel\Facades\Excel;
 
 class Dashboard extends Component
 {
+
+    #[Title('')]
     public $selectedDate;
 
     public function mount()

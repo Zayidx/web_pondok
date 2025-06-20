@@ -20,6 +20,7 @@ use App\Livewire\Admin\AdminPiket\Dashboard as PiketDashboard;
 use App\Livewire\Admin\AdminPiket\DetailAbsensi as PiketDetailAbsensi;
 use App\Livewire\Admin\AdminPiket\AbsenMurid as PiketAbsenMurid;
 use App\Livewire\Admin\AdminPiket\HasilAbsensi as PiketHasilAbsensi;
+use App\Livewire\Admin\AdminPiket\LaporanAbsensi;
 use App\Livewire\Admin\AdminPiket\ManajemenAbsensi;
 use App\Livewire\Admin\AdminPiket\MulaiSesiAbsensi;
 
@@ -42,7 +43,7 @@ Route::prefix('admin')->middleware(['auth', 'role:Super Admin'])->group(function
     // Grup rute untuk data master santri
     Route::prefix('master-santri')->group(function () {
         Route::get('/list-santri', Admin\ListSantri::class)->name('admin.master-santri.santri');
-        Route::get('/list-santri/detail-santri/{id}', DetailSantri::class)->name('admin.master-santri.detail-santri');
+        Route::get('/list-santri/detail-santri/{id}', \App\Livewire\Admin\PSB\DetailSantri::class)->name('admin.master-santri.detail-santri');
         Route::get('/list-wali-santri', Admin\ListWaliSantri::class)->name('admin.master-santri.wali-santri');
         Route::get('/list-santri/export', [Admin\ListSantri::class, 'export'])->name('admin.master-santri.export');
     });
@@ -70,7 +71,6 @@ Route::prefix('admin')->middleware(['auth', 'role:Super Admin'])->group(function
 
     // Grup rute untuk data master PSB
     Route::prefix('master-psb')->group(function () {
-        Route::get('/dashboard', \App\Livewire\SantriPPDB\SantriDashboard::class)->name('santrippdb.dashboard');
         Route::get('/registrations', ShowRegistrations::class)->name('admin.master-psb.show-registrations');
         Route::get('/registrations/{santriId}', DetailRegistration::class)->name('admin.master-psb.detail-registration');
         Route::get('/registrations/{santriId}/edit', \App\Livewire\Admin\PSB\EditRegistration::class)->name('admin.master-psb.edit-registration');
@@ -102,6 +102,7 @@ Route::prefix('admin')->middleware(['auth', 'role:Super Admin'])->group(function
         Route::get('/detail-kelas/{kelasId}/{tanggal}', PiketDetailAbsensi::class)->name('detail_kelas');
         Route::get('/absensi/murid/{jadwalId}', PiketAbsenMurid::class)->name('absensi.murid');
         Route::get('/hasil-absensi/{jadwalId}/{tanggal}', PiketHasilAbsensi::class)->name('hasil.absensi');
+        Route::get('/laporan-absensi-piket', LaporanAbsensi::class)->name('laporan.absensi');
     });
 
     // Grup rute untuk hasil ujian santri

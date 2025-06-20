@@ -63,7 +63,7 @@ class SuratPenerimaanController extends Controller
             return redirect()->route('psb.check-status')->with('error', 'Gagal memuat data atau pengaturan surat penerimaan.');
         }
 
-        return view('psb.surat-penerimaan', compact('data', 'settings'));
+        return view('livewire.admin.psb.surat-penerimaan', compact('data', 'settings'));
     }
 
 
@@ -75,7 +75,7 @@ class SuratPenerimaanController extends Controller
             return redirect()->route('psb.check-status')->with('error', 'Gagal memuat data atau pengaturan surat penerimaan.');
         }
 
-        $pdf = PDF::loadView('psb.surat-penerimaan', compact('data', 'settings'));
+        $pdf = PDF::loadView('livewire.admin.psb.surat-penerimaan', compact('data', 'settings'));
         $pdf->setPaper('a4', 'portrait');
         return $pdf->stream('surat-penerimaan.pdf');
     }
@@ -89,7 +89,7 @@ public function download($id)
         return redirect()->route('psb.check-status')->with('error', 'Gagal memuat data atau pengaturan surat penerimaan.');
     }
 
-    $pdf = PDF::loadView('psb.surat-penerimaan', compact('data', 'settings'));
+    $pdf = PDF::loadView('livewire.admin.psb.surat-penerimaan', compact('data', 'settings'));
     $pdf->setPaper('a4', 'portrait');
     return $pdf->download('surat-penerimaan-' . $data->nama_lengkap . '.pdf');
 }

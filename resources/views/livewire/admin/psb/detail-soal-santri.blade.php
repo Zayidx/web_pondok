@@ -152,9 +152,11 @@
                     <div class="card-body">
                         <h5 class="card-title mb-3">{{ $ujian->nama_ujian }}</h5>
                         <div class="d-flex align-items-center gap-3">
-                            <div class="avatar bg-primary">
-                                <span class="avatar-content">{{ substr($santri->nama_lengkap, 0, 1) }}</span>
-                            </div>
+                        @php
+        $fotoDokumen = $santri->dokumen->where('jenis_berkas', 'Pas Foto')->first();
+        $fotoPath = $fotoDokumen ? asset('storage/' . $fotoDokumen->file_path) : 'URL_PATH_TO_DEFAULT_AVATAR';
+        // Ganti 'URL_PATH_TO_DEFAULT_AVATAR' dengan path ke gambar default jika santri tidak memiliki foto
+    @endphp
                             <div>
                                 <h6 class="mb-0">{{ $santri->nama_lengkap }}</h6>
                                 <small class="text-muted">Peserta Ujian</small>

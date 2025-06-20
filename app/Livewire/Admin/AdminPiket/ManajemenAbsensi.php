@@ -2,28 +2,37 @@
 
 namespace App\Livewire\Admin\AdminPiket;
 
+use App\Models\Absensi\Absensi;
+use App\Models\Absensi\AbsensiDetail;
 use Livewire\Component;
 use App\Models\ESantri\JadwalPelajaran;
 use Carbon\Carbon;
 
 class ManajemenAbsensi extends Component
 {
-    public $hariIni;
-
-    public function mount()
+    public function perbaruiStatusAbsensi($absensiId, $santriId, $status, $jadwal = null, $tanggal = null)
     {
-        $this->hariIni = Carbon::now()->locale('id')->dayName;
-    }
+        if (!$absensiId && $jadwal && $tanggal) {
+            $absensi = Absensi::firstOrCreate(
+                [
+                    'jadwal_pelajaran_id' => $jadwal->id,
+                    'kelas_id' => $jadwal->kelas_id,
+                    'tanggal' => $tanggal,
+                ]
+            );
+            $absensiId = $absensi->id;
+        }
 
-    public function render()
-    {
-        $jadwalPelajaranHariIni = JadwalPelajaran::where('hari', $this->hariIni)
-            ->with(['kelas', 'kategoriPelajaran'])
-            ->orderBy('waktu_mulai')
-            ->get();
+        if (!$absensiId) {
+            return null;
+        }
 
-        return view('livewire.admin.admin-piket.manajemen-absensi', [
-            'jadwalPelajaran' => $jadwalPelajaranHariIni,
-        ]);
+        return AbsensiDetail::updateOrCreate(
+            ['absensi_id' => $absensiId, 'santri_id' => $santriId],
+            [
+                'status' => $status,
+                'jam_hadir' => ($status === 'Hadir') ? now() : null,
+            ]
+        );
     }
 }

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\SantriPPDB;
+namespace App\Livewire\PSB;
 
 use Livewire\Component;
 use App\Models\Ujian; // Pastikan ini menggunakan namespace yang benar: App\Models\PSB\Ujian
@@ -115,6 +115,6 @@ class KonfirmasiUjian extends Component
      */
     public function render()
     {
-        return view('livewire.santri-p-p-d-b.konfirmasi-ujian'); // Mengembalikan view Blade untuk komponen ini.
+        return view('livewire.psb.konfirmasi-ujian'); // Mengembalikan view Blade untuk komponen ini.
     }
 }

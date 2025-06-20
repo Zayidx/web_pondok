@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Livewire\SantriPPDB;
+namespace App\Livewire\PSB;
 
 use Livewire\Component;
 use App\Models\PSB\PendaftaranSantri; // Menggunakan model PendaftaranSantri yang Anda kirim sebelumnya
@@ -172,6 +172,6 @@ class PendaftaranUlang extends Component
     public function render()
     {
         // Merender view blade
-        return view('livewire.santri-p-p-d-b.pendaftaran-ulang');
+        return view('livewire.psb.pendaftaran-ulang');
     }
 }

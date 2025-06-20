@@ -1,7 +1,6 @@
 <?php
 
 use App\Livewire\Auth;
-use App\Livewire\StudentExam;
 use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 
@@ -17,7 +16,6 @@ Route::prefix('auth')->group(function () {
     Route::get('/logout', Auth\Logout::class)->name('auth.logout');
 });
 
-Route::get('/questions', StudentExam::class)->name('questions');
 
 Route::fallback(function () {
     return view('404');

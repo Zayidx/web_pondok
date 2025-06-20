@@ -9,8 +9,10 @@ use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
+use Maatwebsite\Excel\Concerns\WithStyles;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class AbsensiHarianExport implements FromCollection, WithHeadings, ShouldAutoSize
+class AbsensiHarianExport implements FromCollection, WithHeadings, ShouldAutoSize, WithStyles
 {
     protected $selectedDate;
 
@@ -19,9 +21,6 @@ class AbsensiHarianExport implements FromCollection, WithHeadings, ShouldAutoSiz
         $this->selectedDate = $selectedDate;
     }
 
-    /**
-     * @return \Illuminate\Support\Collection
-     */
     public function collection()
     {
         $date = Carbon::parse($this->selectedDate);
@@ -55,10 +54,11 @@ class AbsensiHarianExport implements FromCollection, WithHeadings, ShouldAutoSiz
                             : '-';
                 
                 $exportData->push([
+                    'nisn'      => $student->nisn ?? '-',
+                    'santri'    => $student->nama,
                     'kelas'     => $schedule->kelas->nama,
                     'mapel'     => $schedule->mata_pelajaran,
                     'waktu'     => Carbon::parse($schedule->waktu_mulai)->format('H:i') . ' - ' . Carbon::parse($schedule->waktu_selesai)->format('H:i'),
-                    'santri'    => $student->nama,
                     'status'    => $status,
                     'jam_hadir' => $jamHadir
                 ]);
@@ -71,12 +71,20 @@ class AbsensiHarianExport implements FromCollection, WithHeadings, ShouldAutoSiz
     public function headings(): array
     {
         return [
+            'NISN',
+            'Nama Santri',
             'Kelas',
             'Mata Pelajaran',
             'Waktu',
-            'Nama Santri',
             'Status Kehadiran',
             'Jam Hadir',
+        ];
+    }
+
+    public function styles(Worksheet $sheet)
+    {
+        return [
+            1 => ['font' => ['bold' => true]],
         ];
     }
 }
