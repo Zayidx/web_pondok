@@ -22,7 +22,6 @@
     </div>
 
     <div class="row">
-        {{-- Exam Info Card --}}
         <div class="col-md-4 mb-3">
             <div class="card">
                 <div class="card-header">
@@ -44,22 +43,25 @@
                     <div class="mb-3">
                         <label class="form-label fw-bold">Waktu</label>
                         <div class="flex justify-between items-center">
-    <span class="text-gray-900">{{ \Carbon\Carbon::parse($ujian->waktu_mulai)->format('H:i') }} - {{ \Carbon\Carbon::parse($ujian->waktu_selesai)->format('H:i') }}</span>
-</div>
+                            <span class="text-gray-900">{{ \Carbon\Carbon::parse($ujian->waktu_mulai)->format('H:i') }} - {{ \Carbon\Carbon::parse($ujian->waktu_selesai)->format('H:i') }}</span>
+                        </div>
                     </div>
-                    
                 </div>
             </div>
         </div>
 
-        {{-- Questions List Card --}}
         <div class="col-md-8 mb-3">
             <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
+                <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
                     <h5 class="card-title mb-0">Daftar Soal</h5>
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createOrUpdateSoal" wire:click="create">
-                        Tambah Soal +
-                    </button>
+                    <div>
+                        <a href="{{ route('admin.psb.ujian.preview', ['ujianId' => $ujian->id]) }}" class="btn btn-info" target="_blank">
+                            <i class="bi bi-eye"></i> Preview Ujian
+                        </a>
+                        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createOrUpdateSoal" wire:click="create">
+                            Tambah Soal +
+                        </button>
+                    </div>
                 </div>
                 <div class="card-body">
                     <div class="table-responsive">
@@ -104,7 +106,6 @@
         </div>
     </div>
 
-    {{-- Create/Edit Question Modal --}}
     <div class="modal fade" id="createOrUpdateSoal" tabindex="-1" wire:ignore.self>
         <div class="modal-dialog modal-lg">
             <div class="modal-content">

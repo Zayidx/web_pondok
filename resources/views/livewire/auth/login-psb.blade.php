@@ -4,7 +4,7 @@
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
                     <a href="index.html" class="flex items-center">
-                        <img class="h-10 w-10" src="https://via.placeholder.com/40x40/1e40af/ffffff?text=SMA" alt="Logo SMA"/>
+                        <img class="h-10 w-10" src="logo.webp" alt="Logo SMA"/>
                         <div class="ml-3">
                             <h1 class="text-xl font-bold text-primary">SMA Bina Prestasi</h1>
                         </div>
@@ -97,7 +97,7 @@
                 <div class="text-center mt-4">
                     <p class="text-sm text-gray-600">
                         Belum punya akun?
-                        <a href="register.html" class="text-primary font-semibold hover:underline">Daftar sekarang</a>
+                        <a href="{{ route('register-santri') }}" wire:click class="text-primary font-semibold hover:underline">Daftar sekarang</a>
                     </p>
                 </div>
             </div>

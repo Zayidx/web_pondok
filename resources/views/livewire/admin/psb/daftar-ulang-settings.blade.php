@@ -19,26 +19,26 @@
                     <form wire:submit.prevent="savePengaturan">
                         <div class="mb-3">
                             <label class="form-label">Nama Bank</label>
-                            <input type="text" class="form-control" wire:model="nama_bank">
-                            @error('nama_bank') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control @error('nama_bank') is-invalid @enderror" wire:model="nama_bank">
+                            @error('nama_bank') <span class="invalid-feedback">{{ $message }}</span> @enderror
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Nomor Rekening</label>
-                            <input type="text" class="form-control" wire:model="nomor_rekening">
-                            @error('nomor_rekening') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control @error('nomor_rekening') is-invalid @enderror" wire:model="nomor_rekening">
+                            @error('nomor_rekening') <span class="invalid-feedback">{{ $message }}</span> @enderror
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Atas Nama</label>
-                            <input type="text" class="form-control" wire:model="atas_nama">
-                            @error('atas_nama') <span class="text-danger">{{ $message }}</span> @enderror
+                            <input type="text" class="form-control @error('atas_nama') is-invalid @enderror" wire:model="atas_nama">
+                            @error('atas_nama') <span class="invalid-feedback">{{ $message }}</span> @enderror
                         </div>
 
                         <div class="mb-3">
                             <label class="form-label">Catatan Transfer</label>
-                            <textarea class="form-control" wire:model="catatan_transfer" rows="3"></textarea>
-                            @error('catatan_transfer') <span class="text-danger">{{ $message }}</span> @enderror
+                            <textarea class="form-control @error('catatan_transfer') is-invalid @enderror" wire:model="catatan_transfer" rows="3"></textarea>
+                            @error('catatan_transfer') <span class="invalid-feedback">{{ $message }}</span> @enderror
                         </div>
 
                         <button type="submit" class="btn btn-primary">Simpan Pengaturan</button>
@@ -57,20 +57,20 @@
                         <form wire:submit.prevent="saveBiaya">
                             <div class="mb-3">
                                 <label class="form-label">Nama Biaya</label>
-                                <input type="text" class="form-control" wire:model="nama_biaya">
-                                @error('nama_biaya') <span class="text-danger">{{ $message }}</span> @enderror
+                                <input type="text" class="form-control @error('nama_biaya') is-invalid @enderror" wire:model="nama_biaya">
+                                @error('nama_biaya') <span class="invalid-feedback">{{ $message }}</span> @enderror
                             </div>
 
                             <div class="mb-3">
                                 <label class="form-label">Nominal</label>
-                                <input type="number" class="form-control" wire:model="nominal">
-                                @error('nominal') <span class="text-danger">{{ $message }}</span> @enderror
+                                <input type="number" class="form-control @error('nominal') is-invalid @enderror" wire:model="nominal">
+                                @error('nominal') <span class="invalid-feedback">{{ $message }}</span> @enderror
                             </div>
 
                             <div class="mb-3">
                             <label class="form-label">Keterangan</label>
-                            <textarea class="form-control" wire:model="keterangan" rows="2"></textarea>
-                            @error('keterangan') <span class="text-danger">{{ $message }}</span> @enderror
+                            <textarea class="form-control @error('keterangan') is-invalid @enderror" wire:model="keterangan" rows="2"></textarea>
+                            @error('keterangan') <span class="invalid-feedback">{{ $message }}</span> @enderror
                         </div>
 
                         <div class="mb-3">
@@ -106,14 +106,14 @@
                             <tbody>
                                 @forelse($biayas as $biaya)
                                      <tr>
-        <td>{{ $biaya->nama_biaya }}</td>
-        <td>Rp {{ number_format($biaya->jumlah, 0, ',', '.') }}</td>
-        <td>
-            <span class="badge bg-{{ $biaya->is_active ? 'success' : 'danger' }}">
-                {{ $biaya->is_active ? 'Aktif' : 'Nonaktif' }}
-            </span>
-        </td>
-        <td>
+                                        <td>{{ $biaya->nama_biaya }}</td>
+                                        <td>Rp {{ number_format($biaya->jumlah, 0, ',', '.') }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ $biaya->is_active ? 'success' : 'danger' }}">
+                                                {{ $biaya->is_active ? 'Aktif' : 'Nonaktif' }}
+                                            </span>
+                                        </td>
+                                        <td>
                                             <div class="btn-group">
                                                 <button class="btn btn-sm btn-warning" wire:click="editBiaya({{ $biaya->id }})">
                                                     <i class="bi bi-pencil"></i>
@@ -124,8 +124,8 @@
                                                 </button>
                                             </div>
                                         </td>
-        </tr>
-@empty
+                                    </tr>
+                                @empty
                                     <tr>
                                         <td colspan="4" class="text-center">Tidak ada data biaya</td>
                                     </tr>
@@ -180,4 +180,4 @@
             </div>
         </div>
     @endif
-</div> 
+</div>

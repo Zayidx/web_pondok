@@ -75,7 +75,7 @@
 
                 {{-- KONDISI 2: Jika periode tidak ditemukan (null), tampilkan pesan bahwa pendaftaran belum dibuka. --}}
                 @elseif (!$periode_daftar_ulang || !$pengaturan)
-                    <div class="bg-white rounded-lg shadow-lg p-8 text-center">
+                    <div class="bg-white rounded-lg shadow-lg p-8 text-center my-20">
                         <div class="bg-yellow-100 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
                             <i class="fas fa-clock text-yellow-600 text-3xl"></i>
                         </div>

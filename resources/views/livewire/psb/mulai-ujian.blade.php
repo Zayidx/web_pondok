@@ -1,388 +1,251 @@
-<?php
+<div>
+    <div class="gradient-bg min-h-screen">
+        <div class="max-w-6xl mx-auto px-4 py-8">
+            <div class="bg-white rounded-xl card-shadow p-6 mb-8 hover-lift">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div>
+                        <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">{{ $ujian->nama_ujian }}</h1>
+                        <p class="text-lg text-gray-600">{{ $santri->nama_lengkap }}</p>
+                    </div>
 
-namespace App\Livewire\PSB;
+                    {{-- Penjelasan Timer: 
+                        - `wire:poll.1s="tick"`: This is a Livewire command to call the `tick()` method in the backend every 1 second.
+                        - `$this->waktuMundurFormatted`: Displays the formatted remaining time from the backend (HH:MM:SS).
+                    --}}
+                    <div class="bg-red-100 px-4 py-2 rounded-lg" wire:poll.1s="tick">
+                        <div class="text-center">
+                            <div class="text-xl font-bold text-red-700 tabular-nums">
+                                {{ $this->waktuMundurFormatted }}
+                            </div>
+                            <p class="text-red-600 text-sm">Sisa Waktu</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-use Livewire\Component;
-use App\Models\Ujian;
-use App\Models\PSB\HasilUjian;
-use App\Models\PSB\JawabanUjian;
-use App\Models\PSB\PendaftaranSantri;
-use Illuminate\Support\Facades\Auth;
-use Carbon\Carbon;
-use Livewire\Attributes\Layout;
-use Livewire\Attributes\Title;
-use Livewire\Attributes\Computed;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+            <div class="bg-white rounded-xl card-shadow p-6 mb-8">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm font-medium text-gray-700">Progress Ujian</span>
+                    <span class="text-sm text-gray-500">{{ $soalDijawab }} dari {{ $jumlahSoal }} soal</span>
+                </div>
+                <div class="w-full bg-gray-200 rounded-full h-2">
+                    {{-- Penjelasan Progress: The width of this div is dynamically calculated based on the percentage of answered questions. --}}
+                    <div class="bg-primary h-2 rounded-full transition-all duration-300"
+                        style="width: {{ $jumlahSoal > 0 ? ($soalDijawab / $jumlahSoal) * 100 : 0 }}%">
+                    </div>
+                </div>
+            </div>
 
-/**
- * MulaiUjian Livewire Class.
- *
- * This component manages the display and logic for the student's exam page.
- * It handles exam initialization, saving answers, managing the countdown timer,
- * and processing exam submissions.
- */
-class MulaiUjian extends Component
-{
-    #[Layout('components.layouts.ujian')]
-    #[Title('Mulai Ujian')]
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="md:col-span-1 space-y-6">
+                    <div class="bg-white rounded-lg card-shadow overflow-hidden">
+                        <div class="bg-primary p-4">
+                            <h2 class="text-lg font-semibold text-white flex items-center gap-2">Informasi Ujian</h2>
+                        </div>
+                        <div class="p-5">
+                            <table class="w-full">
+                                <tbody>
+                                    <tr>
+                                        <td class="py-3 font-medium text-gray-700">Mata Pelajaran</td>
+                                        <td class="py-3 text-gray-600">: {{ $ujian->mata_pelajaran }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3 font-medium text-gray-700">Tanggal</td>
+                                        <td class="py-3 text-gray-600">: {{ \Carbon\Carbon::parse($ujian->tanggal_ujian)->format('d M Y') }}</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3 font-medium text-gray-700">Durasi</td>
+                                        <td class="py-3 text-gray-600">: {{ $durasi }} menit</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="py-3 font-medium text-gray-700">Jumlah Soal</td>
+                                        <td class="py-3 text-gray-600">: {{ $jumlahSoal }} soal</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
 
-    public $ujian;
-    public $santri;
-    public $hasilUjian;
-    public $jumlahSoal;
-    public $jawabanSiswa = [];
-    public $soalDijawab = 0;
-    public $isFinished = false;
-    public $currentPage = 1;
-    public $jawaban;
-    public $modalMessage = '';
-    public $showModal = false;
-    public $sisaWaktuDetik;
+                    <div class="bg-white rounded-lg card-shadow p-6">
+                        <h3 class="text-lg font-semibold text-gray-900 mb-4">Navigasi Soal</h3>
+                        <div class="grid grid-cols-5 gap-2" wire:key="navigasi-soal">
+                            {{-- Penjelasan Navigasi:
+                                - Loops through the number of questions.
+                                - Button colors change dynamically: blue for active question, green for answered questions, gray for unanswered questions.
+                            --}}
+                            @if($soals)
+                            @foreach($soals as $index => $soal)
+                            <button wire:click="gotoPage({{ $index + 1 }})"
+                                class="w-10 h-10 rounded-lg flex items-center justify-center text-sm font-medium
+                                        {{ ($index + 1) == $currentPage ? 'bg-blue-600 text-white' :
+                                           (isset($jawabanSiswa[$soal->id]) && !empty($jawabanSiswa[$soal->id]) ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-600') }}"
+                                wire:key="nav-soal-{{ $index + 1 }}">
+                                {{ $index + 1 }}
+                            </button>
+                            @endforeach
+                            @endif
+                        </div>
+                    </div>
+                </div>
 
-    /**
-     * The mount function, executed when the component is initialized.
-     * Retrieves student and exam data, and initializes exam results.
-     *
-     * @param int $ujianId The ID of the exam to start.
-     * @return \Illuminate\Http\RedirectResponse|void
-     */
-    public function mount($ujianId)
-    {
-        $this->santri = Auth::guard('santri')->user() ?? PendaftaranSantri::find(session('santri_id'));
+                <div class="md:col-span-2">
+                    @if($currentSoal)
+                    <div class="bg-white rounded-xl card-shadow overflow-hidden mb-6">
+                        <div class="p-6">
+                            <div class="flex items-start gap-4">
+                                <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center font-bold text-lg shadow-lg flex-shrink-0">{{ $currentPage }}</div>
+                                <div class="flex-1">
+                                    <p class="text-lg text-gray-800 mb-6 leading-relaxed">{!! $currentSoal->pertanyaan !!}</p>
 
-        if (!$this->santri) {
-            Auth::guard('santri')->logout();
-            return redirect()->route('login-ppdb-santri')->with('error', 'Anda tidak memiliki akses ke halaman ujian.');
-        }
+                                    {{-- Penjelasan Blok Soal:
+                                        - Uses @if to display different formats for Multiple Choice (pg) and Essay questions.
+                                    --}}
+                                    @if ($currentSoal->tipe_soal === 'pg')
+                                    <div class="space-y-3" wire:key="soal-{{ $currentSoal->id }}-pg">
+                                        {{-- Penjelasan Perulangan Opsi:
+                                                - This loop will display all answer options for the current question.
+                                            --}}
+                                        @foreach ($currentSoal->opsi as $key => $opsi)
+                                        <label class="flex items-center p-4 border-2 border-gray-200 rounded-lg hover:border-blue-600 hover:bg-blue-50 cursor-pointer transition duration-200 group"
+                                            wire:key="opsi-{{ $currentSoal->id }}-{{ $key }}">
 
-        $this->ujian = Ujian::withCount('soals')->findOrFail($ujianId);
-        $this->jumlahSoal = $this->ujian->soals_count;
+                                            {{-- Penjelasan Input Radio (PENTING):
+                                                - `wire:model` is removed to prevent conflicts.
+                                                - `x-on:click`: Solely responsible for calling the backend.
+                                                - The `if-else` logic within: if the same radio is clicked again, call `hapusJawaban`. If a new radio is clicked, call `simpanJawaban`.
+                                                - `{{ ... ? 'checked' : '' }}`: To ensure previously saved selections remain checked when navigating between questions.
+                                            --}}
+                                            <input type="radio"
+                                                name="question_{{ $currentSoal->id }}"
+                                                value="{{ $key }}"
+                                                class="w-5 h-5 text-blue-600 border-gray-300 focus:ring-blue-200 focus:ring-2"
+                                                x-data="{ soalId: {{ $currentSoal->id }}, key: '{{ $key }}' }"
+                                                x-on:click="if ($el.checked && $el.value === @js($jawabanSiswa[$currentSoal->id] ?? '')) { 
+                                                               $el.checked = false; 
+                                                               @this.call('hapusJawaban', soalId); 
+                                                           } else { 
+                                                               @this.call('simpanJawaban', soalId, key); 
+                                                           }"
+                                                {{ !empty($jawabanSiswa[$currentSoal->id]) && (string)$jawabanSiswa[$currentSoal->id] === (string)$key ? 'checked' : '' }}>
 
-        $now = Carbon::now();
-        $waktuMulaiUjian = Carbon::parse($this->ujian->tanggal_ujian->format('Y-m-d') . ' ' . $this->ujian->waktu_mulai);
-        $waktuSelesaiUjian = Carbon::parse($this->ujian->tanggal_ujian->format('Y-m-d') . ' ' . $this->ujian->waktu_selesai);
+                                            <div class="ml-4 flex-1">
+                                                <span class="text-gray-800 group-hover:text-blue-600">
+                                                    <span class="font-semibold mr-2">{{ chr(65 + $key) }}.</span>
+                                                    {{ $opsi['teks'] }}
+                                                </span>
+                                            </div>
+                                        </label>
+                                        @endforeach
+                                    </div>
+                                    @else
+                                    <h6 class="mb-2">Jawaban Anda:</h6>
+    <div class="mb-3">
+        <textarea 
+                                            wire:model.debounce.500ms="jawabanSiswa.{{ $currentSoal->id }}"
+                                            x-data
+                                            x-init="$el.addEventListener('input', () => {
+                                                if ($el.value.trim() !== '') {
+                                                    @this.simpanJawaban({{ $currentSoal->id }}, $el.value)
+                                                } else {
+                                                    @this.hapusJawaban({{ $currentSoal->id }})
+                                                }
+                                            })"
+            class="form-control w-full p-3 border-2 border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" 
+            rows="6" 
+            placeholder="Tulis jawaban Anda di sini...">{{ $jawabanSiswa[$currentSoal->id] ?? '' }}</textarea>
+    </div>
+@endif
 
-        if ($now->lessThan($waktuMulaiUjian)) {
-            session()->flash('error', 'Ujian "' . $this->ujian->nama_ujian . '" belum dimulai. Ujian akan dimulai pada ' . $waktuMulaiUjian->format('d F Y H:i') . ' WIB.');
-            return redirect()->route('santri.dashboard-ujian');
-        }
+                                    <div class="flex justify-between items-center mt-6 w-full">
+                                        <button wire:click="previousPage" @if($currentPage==1) disabled @endif class="px-4 py-2 flex items-center gap-2 bg-gray-100 text-gray-600 rounded-lg">Sebelumnya</button>
+                                        <button wire:click="nextPage" @if($currentPage==$jumlahSoal) disabled @endif class="px-4 py-2 flex items-center gap-2 bg-blue-600 text-white rounded-lg">Selanjutnya</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" wire:click="confirmSubmit" class="inline-flex items-center px-6 py-3 text-lg font-medium text-white bg-green-600 rounded-lg">
+                        <span>Selesai & Kumpulkan</span>
+                    </button>
+                    @else
+                    <div class="bg-white rounded-xl card-shadow p-6">
+                        <p class="text-gray-600">Tidak ada soal yang tersedia.</p>
+                    </div>
+                    @endif
+                </div>
+            </div>
+        </div>
+    </div>
 
-        if ($now->greaterThanOrEqualTo($waktuSelesaiUjian)) {
-            $hasilUjian = HasilUjian::firstOrNew(['santri_id' => $this->santri->id, 'ujian_id' => $this->ujian->id]);
-            
-            if ($hasilUjian->exists && $hasilUjian->status !== 'selesai') {
-                $hasilUjian->update([
-                    'status' => 'selesai',
-                    'waktu_selesai' => $waktuSelesaiUjian,
-                    'nilai_akhir' => 0
-                ]);
-                $this->santri->update([
-                    'status_santri' => 'sedang_ujian',
-                ]);
-            }
-            elseif (!$hasilUjian->exists) {
-                $hasilUjian->fill([
-                    'status' => 'selesai',
-                    'waktu_mulai' => $now,
-                    'waktu_selesai' => $waktuSelesaiUjian,
-                    'nilai_akhir' => 0
-                ])->save();
-                 $this->santri->update([
-                    'status_santri' => 'sedang_ujian',
-                ]);
-            }
-            session()->flash('error', 'Waktu untuk mengerjakan ujian "' . $this->ujian->nama_ujian . '" sudah berakhir pada ' . $waktuSelesaiUjian->format('d F Y H:i') . ' WIB.');
-            return redirect()->route('santri.dashboard-ujian');
-        }
+    <!-- Confirmation Modal -->
+    <div id="confirmation-modal" class="modal-container" wire:ignore>
+        <div class="modal-backdrop" onclick="hideModal()"></div>
+        <div class="modal-content">
+            <div class="text-center">
+                <!-- Warning Icon -->
+                <div class="modal-icon">
+                    <svg class="w-10 h-10 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                    </svg>
+                </div>
 
-        $this->hasilUjian = HasilUjian::firstOrCreate(
-            ['santri_id' => $this->santri->id, 'ujian_id' => $this->ujian->id],
-            [
-                'status' => 'sedang_mengerjakan',
-                'waktu_mulai' => $now,
-                'waktu_selesai' => $waktuSelesaiUjian
-            ]
-        );
+                <h3 class="modal-title">Konfirmasi Pengumpulan</h3>
+                <p class="modal-message">{{ $modalMessage }}</p>
 
-        if ($this->hasilUjian->status === 'selesai') {
-            session()->flash('message', 'Anda sudah menyelesaikan ujian ini.');
-            return redirect()->route('santri.selesai-ujian', ['ujianId' => $this->ujian->id]);
-        }
-        
-        $waktuSelesaiDariHasilUjian = Carbon::parse($this->hasilUjian->waktu_selesai);
-        $this->sisaWaktuDetik = $now->diffInSeconds($waktuSelesaiDariHasilUjian, false);
+                <div class="modal-buttons">
+                    <button type="button" onclick="hideModal()" class="modal-button modal-button-cancel">
+                        Kembali
+                    </button>
+                    <button type="button" wire:click="submitUjian" onclick="hideModal()" class="modal-button modal-button-confirm">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        Ya, Kumpulkan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-        if ($this->sisaWaktuDetik <= 0) {
-            $this->submitUjian();
-            session()->flash('error', 'Waktu untuk mengerjakan ujian "' . $this->ujian->nama_ujian . '" sudah berakhir.');
-            return redirect()->route('santri.dashboard-ujian');
-        }
-
-        $jawabanUjians = JawabanUjian::where('hasil_ujian_id', $this->hasilUjian->id)->get();
-        foreach ($jawabanUjians as $jawaban) {
-            $this->jawabanSiswa[$jawaban->soal_id] = $jawaban->jawaban;
-        }
-
-        $this->hitungSoalDijawab();
-    }
-
-    private function hitungSoalDijawab()
-    {
-        $this->soalDijawab = count(array_filter($this->jawabanSiswa, function ($value) {
-            return $value !== null && trim((string) $value) !== '';
-        }));
-    }
-
-    public function tick()
-    {
-        $now = Carbon::now();
-        $waktuSelesaiUjianTerjadwal = Carbon::parse($this->ujian->tanggal_ujian->format('Y-m-d') . ' ' . $this->ujian->waktu_selesai);
-
-        if ($now->greaterThanOrEqualTo($waktuSelesaiUjianTerjadwal) || $this->sisaWaktuDetik <= 0) {
-            $this->sisaWaktuDetik = 0;
-            $this->submitUjian();
-        } else {
-            $this->sisaWaktuDetik--;
-        }
-    }
-
-    #[Computed]
-    public function waktuMundurFormatted()
-    {
-        $hours = floor($this->sisaWaktuDetik / 3600);
-        $minutes = floor(($this->sisaWaktuDetik % 3600) / 60);
-        $seconds = $this->sisaWaktuDetik % 60;
-        return sprintf('%02d:%02d:%02d', $hours, $minutes, $seconds);
-    }
-
-    #[Computed]
-    public function durasi()
-    {
-        if (!$this->ujian) return 0;
-        $waktuMulai = Carbon::parse($this->ujian->waktu_mulai);
-        $waktuSelesai = Carbon::parse($this->ujian->waktu_selesai);
-        return $waktuMulai->diffInMinutes($waktuSelesai);
-    }
-
-    public function hapusJawaban($soalId)
-    {
-        if ($this->isFinished) return;
-        
-        unset($this->jawabanSiswa[$soalId]);
-
-        JawabanUjian::where(['hasil_ujian_id' => $this->hasilUjian->id, 'soal_id' => $soalId])->delete();
-
-        $this->hitungSoalDijawab();
-
-        $this->dispatch('jawaban-updated', soalId: $soalId);
-    }
-
-    public function simpanJawaban($soalId, $jawaban)
-    {
-        if ($jawaban === null || $jawaban === '') {
-            return $this->hapusJawaban($soalId);
-        }
-        
-        $this->jawabanSiswa[$soalId] = $jawaban;
-        
-        JawabanUjian::updateOrCreate(
-            ['hasil_ujian_id' => $this->hasilUjian->id, 'soal_id' => $soalId],
-            ['jawaban' => $jawaban]
-        );
-    
-        $this->hitungSoalDijawab();
-        $this->dispatch('jawaban-updated', soalId: $soalId);
-    }
-    
-    public function checkUnansweredQuestions()
-    {
-        $soals = $this->ujian->soals;
-        $unansweredQuestions = [];
-        foreach ($soals as $index => $soal) {
-            if (!isset($this->jawabanSiswa[$soal->id]) || empty($this->jawabanSiswa[$soal->id])) {
-                $unansweredQuestions[] = $index + 1;
-            }
-        }
-        if (count($unansweredQuestions) > 0) {
-            $this->modalMessage = 'Soal nomor ' . implode(', ', $unansweredQuestions) . ' belum dijawab. Apakah Anda yakin ingin mengumpulkan ujian?';
-        } else {
-            $this->modalMessage = 'Semua soal sudah dijawab. Apakah Anda yakin ingin mengumpulkan ujian?';
-        }
-    }
-
-    public function confirmSubmit()
-    {
-        $this->checkUnansweredQuestions();
-        $this->showModal = true;
-        $this->dispatch('show-modal');
-        $this->gotoPage($this->currentPage + 1);
-    }
- 
-    public function submitUjian()
-    {
-        foreach ($this->jawabanSiswa as $soalId => $jawaban) {
-            $this->simpanJawaban($soalId, $jawaban);
-        }
-
-        $totalScore = 0;
-        $soals = $this->ujian->soals;
-        
-        Log::info('Starting score calculation', [
-            'ujian_id' => $this->ujian->id,
-            'santri_id' => $this->santri->id,
-            'total_soal' => count($soals)
-        ]);
-        
-        foreach ($soals as $soal) {
-            $jawaban = $this->jawabanSiswa[$soal->id] ?? null;
-            
-            if ($soal->tipe_soal === 'pg' && $jawaban !== null) {
-                $answerIndex = (int)$jawaban;
-                
-                Log::info('Processing PG answer', [
-                    'soal_id' => $soal->id,
-                    'jawaban' => $jawaban,
-                    'answerIndex' => $answerIndex,
-                    'opsi' => $soal->opsi
-                ]);
-                
-                if (isset($soal->opsi[$answerIndex]['bobot'])) {
-                    $poinPG = (float)$soal->opsi[$answerIndex]['bobot'];
-                    $totalScore += $poinPG;
-                    
-                    Log::info('PG score calculated', [
-                        'soal_id' => $soal->id,
-                        'poinPG' => $poinPG,
-                        'totalScore' => $totalScore
-                    ]);
-                    
-                    $jawabanUjian = JawabanUjian::where([
-                        'hasil_ujian_id' => $this->hasilUjian->id,
-                        'soal_id' => $soal->id
-                    ])->first();
-
-                    if ($jawabanUjian) {
-                        $jawabanUjian->update([
-                            'nilai' => $poinPG,
-                            'jawaban' => $jawaban
-                        ]);
-                        
-                        Log::info('Jawaban updated', [
-                            'soal_id' => $soal->id,
-                            'nilai' => $poinPG,
-                            'jawaban' => $jawaban
-                        ]);
-                    }
-                }
-            } elseif ($soal->tipe_soal === 'essay' && $jawaban !== null) {
-                if (isset($soal->bobot)) {
-                    $poinEssay = (float)$soal->bobot;
-                    $totalScore += $poinEssay;
-                    
-                    Log::info('Essay score calculated', [
-                        'soal_id' => $soal->id,
-                        'poinEssay' => $poinEssay,
-                        'totalScore' => $totalScore
-                    ]);
-                    
-                    $jawabanUjian = JawabanUjian::where([
-                        'hasil_ujian_id' => $this->hasilUjian->id,
-                        'soal_id' => $soal->id
-                    ])->first();
-
-                    if ($jawabanUjian) {
-                        $jawabanUjian->update([
-                            'nilai' => $poinEssay,
-                            'jawaban' => $jawaban
-                        ]);
-                        
-                        Log::info('Essay answer updated', [
-                            'soal_id' => $soal->id,
-                            'nilai' => $poinEssay,
-                            'jawaban' => $jawaban
-                        ]);
-                    }
-                }
+    {{-- Penjelasan Javascript:
+        - `show/hideModal`: Functions to show and hide the confirmation modal.
+        - `window.addEventListener`: Listens for events from the Livewire backend to trigger `show/hideModal` functions.
+        - `Livewire.on('jawaban-updated', ...)`: Event listener to uncheck radio buttons if the answer is cleared.
+    --}}
+    @push('scripts')
+    <script>
+        function showModal() {
+            const modal = document.getElementById('confirmation-modal');
+            if (modal) {
+                modal.style.display = 'flex';
+                modal.classList.add('modal-visible');
             }
         }
 
-        Log::info('Final score calculation', [
-            'totalScore' => $totalScore,
-            'hasilUjianId' => $this->hasilUjian->id
-        ]);
-
-        $this->hasilUjian->update([
-            'nilai_akhir' => $totalScore,
-            'status' => 'selesai',
-            'waktu_selesai' => now()
-        ]);
-
-        $this->santri->update([
-            'status_santri' => 'selesai_ujian' // Ubah status santri menjadi 'selesai_ujian'
-        ]);
-
-        $semuaHasilUjian = HasilUjian::where('santri_id', $this->santri->id)
-            ->where('status', 'selesai')
-            ->get();
-
-        $totalNilaiSemuaUjian = $semuaHasilUjian->sum('nilai_akhir');
-        $rataRataUjian = $semuaHasilUjian->avg('nilai_akhir');
-
-        $this->santri->update([
-            'total_nilai_semua_ujian' => $totalNilaiSemuaUjian,
-            'rata_rata_ujian' => $rataRataUjian
-        ]);
-
-        return redirect()->route('santri.selesai-ujian', ['ujianId' => $this->ujian->id]);
-    }
-
-    public function gotoPage($pageNumber)
-    {
-        if ($pageNumber >= 1 && $pageNumber <= $this->jumlahSoal) {
-            // Ubah baris ini untuk menerapkan pengurutan
-            $soals = $this->ujian->soals()
-                        ->orderByRaw("CASE WHEN tipe_soal = 'pg' THEN 0 ELSE 1 END")
-                        ->orderBy('id', 'asc') // Tambahkan pengurutan sekunder berdasarkan ID
-                        ->get();
-            $currentSoal = $soals[$this->currentPage - 1] ?? null;
-
-            if ($currentSoal && isset($this->jawabanSiswa[$currentSoal->id])) {
-                $this->simpanJawaban($currentSoal->id, $this->jawabanSiswa[$currentSoal->id]);
+        function hideModal() {
+            const modal = document.getElementById('confirmation-modal');
+            if (modal) {
+                modal.style.display = 'none';
+                modal.classList.remove('modal-visible');
             }
-            
-            $this->currentPage = $pageNumber;
         }
-    }
-    
-    public function nextPage()
-    {
-        if ($this->currentPage < $this->jumlahSoal) {
-            $this->gotoPage($this->currentPage + 1);
-        }
-    }
-    
-    public function previousPage()
-    {
-        if ($this->currentPage > 1) {
-            $this->gotoPage($this->currentPage - 1);
-        }
-    }
-
-    public function render()
-    {
-        // Ubah baris ini untuk menerapkan pengurutan
-        $soals = $this->ujian->soals()
-                    ->orderByRaw("CASE WHEN tipe_soal = 'pg' THEN 0 ELSE 1 END")
-                    ->orderBy('id', 'asc') // Tambahkan pengurutan sekunder berdasarkan ID
-                    ->get();
-        $currentSoal = $soals[$this->currentPage - 1] ?? null;
-
-        return view('livewire.psb.mulai-ujian', [
-            'soals' => $soals,
-            'currentSoal' => $currentSoal,
-            'jawabanSiswa' => $this->jawabanSiswa,
-            'durasi' => $this->durasi
-        ]);
-    }
-}
+        document.addEventListener('DOMContentLoaded', () => {
+            hideModal();
+        });
+        window.addEventListener('show-modal', () => {
+            showModal();
+        });
+        window.addEventListener('hide-modal', () => {
+            hideModal();
+        });
+        // Remove the old 'jawaban-updated' listener as it's no longer needed for radio buttons
+        // since x-on:click handles persistence directly.
+        // Livewire.on('jawaban-updated', ({ soalId }) => {
+        //     document.querySelectorAll(`input[name='question_${soalId}']`).forEach(input => {
+        //         input.checked = false;
+        //     });
+        // });
+    </script>
+    @endpush
+</div>

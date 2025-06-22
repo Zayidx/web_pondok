@@ -25,14 +25,31 @@ class DaftarUlangSettings extends Component
     public $atas_nama;
     public $catatan_transfer;
 
-    protected $rules = [
-        'nama_biaya' => 'required|min:3',
-        'nominal' => 'required|numeric|min:0',
-        'keterangan' => 'nullable',
-        'nama_bank' => 'required',
-        'nomor_rekening' => 'required',
-        'atas_nama' => 'required',
-        'catatan_transfer' => 'nullable'
+    // Aturan validasi yang digabungkan untuk kemudahan pengelolaan
+    protected function rules()
+    {
+        return [
+            'nama_biaya' => 'required|min:3',
+            'nominal' => 'required|numeric|min:0',
+            'keterangan' => 'nullable',
+            'nama_bank' => 'required|string|max:255',
+            'nomor_rekening' => 'required|numeric',
+            'atas_nama' => 'required|string|max:255',
+            'catatan_transfer' => 'nullable|string'
+        ];
+    }
+
+    // Pesan validasi kustom untuk memberikan umpan balik yang lebih jelas
+    protected $messages = [
+        'nama_biaya.required' => 'Nama biaya wajib diisi.',
+        'nama_biaya.min' => 'Nama biaya harus memiliki minimal 3 karakter.',
+        'nominal.required' => 'Nominal wajib diisi.',
+        'nominal.numeric' => 'Nominal harus berupa angka.',
+        'nominal.min' => 'Nominal tidak boleh kurang dari 0.',
+        'nama_bank.required' => 'Nama bank wajib diisi.',
+        'nomor_rekening.required' => 'Nomor rekening wajib diisi.',
+        'nomor_rekening.numeric' => 'Nomor rekening harus berupa angka.',
+        'atas_nama.required' => 'Kolom "atas nama" wajib diisi.',
     ];
 
     public function mount()
@@ -53,11 +70,12 @@ class DaftarUlangSettings extends Component
 
     public function savePengaturan()
     {
+        // Validasi hanya untuk field pengaturan rekening
         $this->validate([
-            'nama_bank' => 'required',
-            'nomor_rekening' => 'required',
-            'atas_nama' => 'required',
-            'catatan_transfer' => 'nullable'
+            'nama_bank' => 'required|string|max:255',
+            'nomor_rekening' => 'required|numeric',
+            'atas_nama' => 'required|string|max:255',
+            'catatan_transfer' => 'nullable|string'
         ]);
 
         PengaturanDaftarUlang::updateOrCreate(
@@ -76,6 +94,7 @@ class DaftarUlangSettings extends Component
 
     public function saveBiaya()
     {
+        // Validasi hanya untuk field biaya
         $this->validate([
             'nama_biaya' => 'required|min:3',
             'nominal' => 'required|numeric|min:0',
@@ -126,6 +145,7 @@ class DaftarUlangSettings extends Component
     public function cancelEdit()
     {
         $this->reset(['nama_biaya', 'nominal', 'keterangan', 'is_active', 'biaya_id', 'is_editing']);
+        $this->resetErrorBag(); // Menghapus pesan error saat membatalkan
     }
 
     public function render()

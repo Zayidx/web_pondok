@@ -17,13 +17,11 @@
                 </div>
                 <div class="hidden md:block">
                     <div class="ml-10 flex items-baseline space-x-4">
-                        <a href="{{ route('santri.dashboard-ujian') }}" class="text-primary px-3 py-2 rounded-md text-sm font-medium bg-blue-50">Dashboard Ujian</a>
-                        <a href="#" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition duration-300">Profil</a>
-                        <a href="#" class="text-gray-700 hover:text-primary px-3 py-2 rounded-md text-sm font-medium transition duration-300">Bantuan</a>
+                        
                         <div class="flex items-center gap-4">
-                            <a href="{{ route('santri.dashboard-ujian') }}" class="btn btn-primary">
+                            <a href="{{ route('psb-page') }}" class="btn btn-primary">
                                 <i class="bi bi-grid-fill me-2"></i>
-                                Dashboard
+                                Home
                             </a>
                             <form action="{{ route('logout-ppdb-santri') }}" method="POST" class="inline">
                                 @csrf

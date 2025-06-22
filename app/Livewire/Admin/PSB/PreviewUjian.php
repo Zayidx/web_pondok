@@ -2,99 +2,58 @@
 
 namespace App\Livewire\Admin\PSB;
 
-use App\Models\PSB\Soal;
 use App\Models\PSB\Ujian;
 use Livewire\Component;
-use Livewire\Attributes\Title;
-use Livewire\Attributes\Computed;
 use Livewire\Attributes\Layout;
+use Livewire\Attributes\Title;
 
-/**
- * PreviewUjian Component
- * 
- * Komponen ini menampilkan preview ujian dari perspektif santri,
- * menampilkan soal-soal dan opsi jawaban seperti yang akan dilihat santri
- */
+#[Layout('components.layouts.ujian')] // Sets the Blade layout to be used.
+#[Title('Preview Ujian')]
 class PreviewUjian extends Component
 {
-    #[Title('Preview Ujian')]
-    #[Layout('components.layouts.preview-ujian')]
-    
-    public $ujianId;
     public $ujian;
-    public $currentQuestionIndex = 0;
-    public $questions;
+    public $soals;
+    public $jumlahSoal;
+    public $currentPage = 1;
 
     public function mount($ujianId)
     {
-        $this->ujianId = $ujianId;
-        $this->ujian = Ujian::with('soals')->findOrFail($ujianId);
-        $this->loadQuestions();
+        $this->ujian = Ujian::with(['soals' => function ($query) {
+            $query->orderByRaw("CASE WHEN tipe_soal = 'pg' THEN 0 ELSE 1 END")
+                  ->orderBy('created_at', 'asc');
+        }])->findOrFail($ujianId);
+
+        $this->soals = $this->ujian->soals;
+        $this->jumlahSoal = $this->soals->count();
     }
 
-    protected function loadQuestions()
+    public function gotoPage($pageNumber)
     {
-        // Cache the questions for 5 minutes to improve performance
-        $this->questions = cache()->remember("ujian_{$this->ujianId}_questions", 300, function () {
-            return $this->ujian->soals()
-                ->orderByRaw("CASE WHEN tipe_soal = 'pg' THEN 0 ELSE 1 END")
-                ->orderBy('created_at', 'asc')
-                ->get();
-        });
-    }
-
-    #[Computed]
-    public function currentQuestion()
-    {
-        return $this->questions[$this->currentQuestionIndex] ?? null;
-    }
-
-    #[Computed]
-    public function totalQuestions()
-    {
-        return $this->questions->count();
-    }
-
-    #[Computed]
-    public function progress()
-    {
-        if ($this->totalQuestions() === 0) return 0;
-        return ($this->currentQuestionIndex + 1) / $this->totalQuestions() * 100;
-    }
-
-    public function nextQuestion()
-    {
-        if ($this->currentQuestionIndex < $this->totalQuestions() - 1) {
-            $this->currentQuestionIndex++;
-            $this->dispatchBrowserEvent('question-changed');
+        if ($pageNumber >= 1 && $pageNumber <= $this->jumlahSoal) {
+            $this->currentPage = $pageNumber;
         }
     }
 
-    public function previousQuestion()
+    public function nextPage()
     {
-        if ($this->currentQuestionIndex > 0) {
-            $this->currentQuestionIndex--;
-            $this->dispatchBrowserEvent('question-changed');
+        if ($this->currentPage < $this->jumlahSoal) {
+            $this->currentPage++;
         }
     }
 
-    public function goToQuestion($index)
+    public function previousPage()
     {
-        if ($index >= 0 && $index < $this->totalQuestions()) {
-            $this->currentQuestionIndex = $index;
-            $this->dispatchBrowserEvent('question-changed');
+        if ($this->currentPage > 1) {
+            $this->currentPage--;
         }
     }
 
-    /**
-     * Render view untuk komponen ini
-     * 
-     * @return \Illuminate\View\View
-     */
     public function render()
     {
+        $currentSoal = $this->soals[$this->currentPage - 1] ?? null;
+
         return view('livewire.admin.psb.preview-ujian', [
-            'currentQuestion' => $this->currentQuestion()
+            'currentSoal' => $currentSoal,
         ]);
     }
-} 
+}

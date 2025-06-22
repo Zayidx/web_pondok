@@ -89,6 +89,7 @@ Route::prefix('ppdb')->middleware(['auth', 'role:Pendaftaran Santri'])->group(fu
     Route::prefix('psb/ujian')->name('admin.psb.ujian.')->group(function () {
         Route::get('/hasil', HasilUjianSantri::class)->name('hasil');
         Route::get('/detail/{id}', DetailUjianSantri::class)->name('detail');
+        Route::get('/preview/{ujianId}', PreviewUjian::class)->name('preview'); 
         Route::get('/detail-soal/{ujianId}/{santriId}', DetailSoalSantri::class)->name('detail-soal');
     });
 

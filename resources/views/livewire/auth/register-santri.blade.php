@@ -5,7 +5,7 @@
             <div class="flex justify-between items-center h-16">
                 <div class="flex items-center">
                     <a href="/" class="flex items-center">
-                        <img class="h-10 w-10" src="https://via.placeholder.com/40x40/1e40af/ffffff?text=SMA" alt="Logo SMA" />
+                        <img class="h-10 w-10" src="logo.webp" alt="Logo SMA" />
                         <div class="ml-3">
                             <h1 class="text-xl font-bold text-primary">SMA Bina Prestasi</h1>
                         </div>
@@ -380,17 +380,16 @@
         </section>
     @endif
 
-    <!-- Footer -->
     <footer class="bg-gray-900 text-white py-8">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <div class="flex items-center mb-4">
-                <img class="h-8 w-8 mr-3" src="https://via.placeholder.com/32x32/1e40af/ffffff?text=SMA" alt="Logo SMA" />
-                <h3 class="text-lg font-semibold">SMA Bina Prestasi</h3>
-            </div>
-            <p class="text-gray-400 mb-4">Jl. Pendidikan No. 123, Jakarta Selatan 12345</p>
-            <p class="text-gray-400 text-sm">© 2025 SMA Bina Prestasi. All Rights Reserved.</p>
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+        <div class="flex justify-center items-center mb-4">
+            <img class="h-8 w-8 mr-3" src="logo.webp" alt="Logo SMA" />
+            <h3 class="text-lg font-semibold">SMA Bina Prestasi</h3>
         </div>
-    </footer>
+        <p class="text-gray-400 mb-4">Jl. Pendidikan No. 123, Jakarta Selatan 12345</p>
+        <p class="text-gray-400 text-sm">© 2025 SMA Bina Prestasi. All Rights Reserved.</p>
+    </div>
+</footer>
 
     <!-- Success Modal -->
     <div id="modal" class="fixed inset-0 bg-black bg-opacity-100 {{ $showSuccessModal ? 'flex' : 'hidden' }} items-center justify-center z-50">

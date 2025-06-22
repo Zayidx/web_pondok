@@ -7,11 +7,12 @@ use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Log;
+use Livewire\Attributes\Layout;
 
 class RegisterSantri extends Component
 {
     use WithFileUploads;
-
+    #[Layout('components.layouts.auth-ppdb')]
     public $formPage = 1;
     public $successMessage = '';
     public $showSuccessModal = false;
@@ -252,11 +253,11 @@ class RegisterSantri extends Component
             ]);
     
             $documents = [
-                ['file' => $this->pas_foto, 'jenis' => 'Pas Foto', 'path' => 'images/santri'],
-                ['file' => $this->ijazah, 'jenis' => 'Ijazah', 'path' => 'documents'],
-                ['file' => $this->skhun, 'jenis' => 'SKHUN', 'path' => 'documents'],
-                ['file' => $this->akta_kelahiran, 'jenis' => 'Akta Kelahiran', 'path' => 'documents'],
-                ['file' => $this->kartu_keluarga, 'jenis' => 'Kartu Keluarga', 'path' => 'documents'],
+                ['file' => $this->pas_foto, 'jenis' => 'Pas Foto', 'path' => 'ppdb/images'],
+                ['file' => $this->ijazah, 'jenis' => 'Ijazah', 'path' => 'ppdb/documents'],
+                ['file' => $this->skhun, 'jenis' => 'SKHUN', 'path' => 'ppdb/documents'],
+                ['file' => $this->akta_kelahiran, 'jenis' => 'Akta Kelahiran', 'path' => 'ppdb/documents'],
+                ['file' => $this->kartu_keluarga, 'jenis' => 'Kartu Keluarga', 'path' => 'ppdb/documents'],
             ];
     
             foreach ($documents as $doc) {
@@ -283,7 +284,7 @@ class RegisterSantri extends Component
             $this->formPage = 1;
         } catch (\Exception $e) {
             DB::rollBack();
-            \Log::error('Submit failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            Log::error('Submit failed', ['error' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
             $this->addError('submit', 'Terjadi kesalahan: ' . $e->getMessage());
         }
     }
@@ -308,6 +309,6 @@ class RegisterSantri extends Component
 
     public function render()
     {
-        return view('livewire.auth.register-santri')->layout('components.layouts.auth-ppdb');
+        return view('livewire.auth.register-santri');
     }
 }

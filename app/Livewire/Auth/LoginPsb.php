@@ -10,6 +10,7 @@ use Livewire\Attributes\Layout;
 
 class LoginPsb extends Component
 {
+    
     public $email;
     public $nisn;
     public $errorMessage;
